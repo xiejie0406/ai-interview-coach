@@ -1,0 +1,40 @@
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# Java and Maven
+target/
+*.class
+.mvn/timing.properties
+
+# Node
+node_modules/
+dist/
+.vite/
+coverage/
+.cache/
+*.tsbuildinfo
+
+# IDE and OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Runtime artifacts
+.runtime/
+/.playwright-cli/
+/output/
+.git.disabled/
+logs/
+tmp/
+artifacts/private/
+*.log
+*.pid
+
+# Python caches
+__pycache__/
+.pytest_cache/
+*.py[cod]

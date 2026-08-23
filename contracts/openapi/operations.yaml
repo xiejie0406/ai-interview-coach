@@ -1,0 +1,125 @@
+openapi: 3.1.0
+info: { title: AI Interview Coach Operations API, version: 0.2.0 }
+servers: [{ url: /api/v1 }]
+security: [{ sessionCookie: [] }]
+paths:
+  /status:
+    get:
+      operationId: getPublicStatus
+      security: []
+      responses: { '200': { description: Public service and maintenance projection, content: { application/json: { schema: { $ref: '#/components/schemas/PublicStatus' } } } } }
+  /admin/operations/{view}:
+    get:
+      operationId: getOperationsProjection
+      parameters: [{ name: view, in: path, required: true, schema: { type: string, enum: [providers, jobs, cost, quality] } }]
+      responses:
+        '200': { description: Typed redacted projection; never contains answer, transcript, prompt, token, secret or storage key, content: { application/json: { schema: { $ref: '#/components/schemas/OperationsProjection' } } } }
+        '403': { $ref: '#/components/responses/Error' }
+  /admin/feature-flags/{flagId}:
+    get:
+      operationId: getFeatureFlag
+      parameters: [{ name: flagId, in: path, required: true, schema: { type: string, maxLength: 128 } }]
+      responses:
+        '200': { description: Current feature flag version, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/FeatureFlagView' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /admin/feature-flags/{flagId}/commands/{command}:
+    post:
+      operationId: applyFeatureFlagCommand
+      parameters:
+        - { name: flagId, in: path, required: true, schema: { type: string, maxLength: 128 } }
+        - { name: command, in: path, required: true, schema: { type: string, enum: [activate, disable, rollback] } }
+        - { $ref: '#/components/parameters/IdempotencyKey' }
+        - { $ref: '#/components/parameters/IfMatch' }
+        - { $ref: '#/components/parameters/CsrfToken' }
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false, required: [reasonCode], properties: { reasonCode: { type: string, minLength: 1, maxLength: 96 }, expiresAt: { type: [string, 'null'], format: date-time } } } } } }
+      responses:
+        '200': { description: Audited feature flag version, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/FeatureFlagView' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes: { sessionCookie: { type: apiKey, in: cookie, name: AIC_SESSION } }
+  parameters:
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128 } }
+    IfMatch: { name: If-Match, in: header, required: true, schema: { type: string, pattern: '^"v[0-9]+"$' } }
+    CsrfToken: { name: X-AIC-XSRF-TOKEN, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 512 } }
+  headers:
+    ETag: { description: Current aggregate version, schema: { type: string, pattern: '^"v[0-9]+"$' } }
+  responses:
+    Error: { description: Error envelope, content: { application/json: { schema: { $ref: './common.yaml#/components/schemas/ErrorEnvelope' } } } }
+  schemas:
+    PublicStatus:
+      type: object
+      additionalProperties: false
+      required: [status, updatedAt]
+      properties:
+        status: { type: string, enum: [OPERATIONAL, DEGRADED, MAINTENANCE] }
+        updatedAt: { type: string, format: date-time }
+        message: { type: [string, 'null'], maxLength: 500 }
+    ProjectionHeader:
+      type: object
+      required: [view, projectionVersion, generatedAt, stale]
+      properties:
+        view: { type: string, enum: [providers, jobs, cost, quality] }
+        projectionVersion: { type: integer, minimum: 0 }
+        generatedAt: { type: string, format: date-time }
+        stale: { type: boolean }
+    ProviderProjection:
+      type: object
+      additionalProperties: false
+      required: [view, projectionVersion, generatedAt, stale, items]
+      properties:
+        view: { type: string, const: providers }
+        projectionVersion: { type: integer, minimum: 0 }
+        generatedAt: { type: string, format: date-time }
+        stale: { type: boolean }
+        items: { type: array, items: { type: object, additionalProperties: false, required: [capability, providerAlias, modelAlias, configVersion, state, lastSuccessAt, failureClass, latencyP95Ms], properties: { capability: { type: string, maxLength: 96 }, providerAlias: { type: string, maxLength: 96 }, modelAlias: { type: string, maxLength: 128 }, configVersion: { type: string, maxLength: 128 }, state: { type: string, enum: [HEALTHY, DEGRADED, UNAVAILABLE, DISABLED] }, lastSuccessAt: { type: [string, 'null'], format: date-time }, failureClass: { type: [string, 'null'], maxLength: 96 }, latencyP95Ms: { type: [integer, 'null'], minimum: 0 } } } }
+    JobProjection:
+      type: object
+      additionalProperties: false
+      required: [view, projectionVersion, generatedAt, stale, items]
+      properties:
+        view: { type: string, const: jobs }
+        projectionVersion: { type: integer, minimum: 0 }
+        generatedAt: { type: string, format: date-time }
+        stale: { type: boolean }
+        items: { type: array, items: { type: object, additionalProperties: false, required: [jobType, state, count, oldestAgeSeconds], properties: { jobType: { type: string, maxLength: 128 }, state: { type: string, enum: [PENDING, RUNNING, RETRY_WAIT, CANCEL_REQUESTED, SUCCEEDED, FAILED_FINAL, CANCELLED] }, count: { type: integer, minimum: 0 }, oldestAgeSeconds: { type: integer, minimum: 0 } } } }
+    CostProjection:
+      type: object
+      additionalProperties: false
+      required: [view, projectionVersion, generatedAt, stale, periodStart, periodEnd, items]
+      properties:
+        view: { type: string, const: cost }
+        projectionVersion: { type: integer, minimum: 0 }
+        generatedAt: { type: string, format: date-time }
+        stale: { type: boolean }
+        periodStart: { type: string, format: date-time }
+        periodEnd: { type: string, format: date-time }
+        items: { type: array, items: { type: object, additionalProperties: false, required: [capability, currency, currencyExponent, amountMinor, invocationCount], properties: { capability: { type: string, maxLength: 96 }, currency: { type: string, pattern: '^[A-Z]{3}$' }, currencyExponent: { type: integer, minimum: 0, maximum: 6 }, amountMinor: { type: integer, minimum: 0, maximum: 9007199254740991 }, invocationCount: { type: integer, minimum: 0 } } } }
+    QualityProjection:
+      type: object
+      additionalProperties: false
+      required: [view, projectionVersion, generatedAt, stale, items]
+      properties:
+        view: { type: string, const: quality }
+        projectionVersion: { type: integer, minimum: 0 }
+        generatedAt: { type: string, format: date-time }
+        stale: { type: boolean }
+        items: { type: array, items: { type: object, additionalProperties: false, required: [agentRole, schemaVersion, goldenSetVersion, status, sampleSize, passRateBasisPoints], properties: { agentRole: { type: string, maxLength: 96 }, schemaVersion: { type: string, maxLength: 128 }, goldenSetVersion: { type: string, maxLength: 128 }, status: { type: string, enum: [PASS, FAIL, NOT_RUN, BLOCKED] }, sampleSize: { type: integer, minimum: 0 }, passRateBasisPoints: { type: [integer, 'null'], minimum: 0, maximum: 10000 } } } }
+    OperationsProjection:
+      oneOf:
+        - { $ref: '#/components/schemas/ProviderProjection' }
+        - { $ref: '#/components/schemas/JobProjection' }
+        - { $ref: '#/components/schemas/CostProjection' }
+        - { $ref: '#/components/schemas/QualityProjection' }
+      discriminator: { propertyName: view }
+    FeatureFlagView:
+      type: object
+      additionalProperties: false
+      required: [id, state, safetyClass, configurationVersion, activatedAt, expiresAt, version]
+      properties:
+        id: { type: string, maxLength: 128 }
+        state: { type: string, enum: [DISABLED, ACTIVE, ROLLED_BACK] }
+        safetyClass: { type: string, enum: [NORMAL, SAFETY_CRITICAL] }
+        configurationVersion: { type: string, maxLength: 128 }
+        activatedAt: { type: [string, 'null'], format: date-time }
+        expiresAt: { type: [string, 'null'], format: date-time }
+        version: { type: integer, minimum: 0 }

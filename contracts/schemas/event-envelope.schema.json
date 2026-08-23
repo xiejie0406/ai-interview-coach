@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-interview-coach.local/contracts/event-envelope-v1.json",
+  "title": "EventEnvelopeV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["eventId", "type", "streamId", "aggregateId", "aggregateVersion", "sequence", "occurredAt", "schemaVersion", "correlationId", "durability", "data"],
+  "properties": {
+    "eventId": {"type": "string", "minLength": 1},
+    "type": {"type": "string", "minLength": 1},
+    "streamId": {"type": "string", "minLength": 1},
+    "aggregateId": {"type": "string", "minLength": 1},
+    "aggregateVersion": {"type": "integer", "minimum": 0},
+    "sequence": {"type": "integer", "minimum": 0},
+    "occurredAt": {"type": "string", "format": "date-time"},
+    "schemaVersion": {"type": "integer", "minimum": 1},
+    "correlationId": {"type": "string", "minLength": 1},
+    "durability": {"type": "string", "enum": ["DURABLE", "EPHEMERAL"]},
+    "data": {"type": "object", "additionalProperties": true}
+  }
+}

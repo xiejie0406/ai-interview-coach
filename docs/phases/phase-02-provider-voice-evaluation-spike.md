@@ -1,0 +1,129 @@
+# 第 02 期：Provider、语音、结构化输出与 Golden Set 风险验证
+
+> 文档类型：Phase  
+> 文档状态：Draft  
+> Phase ID：PHASE-02  
+> 风险等级：L3  
+> 产出/适用阶段：2、4、5、8 专项前瞻  
+> 阶段状态：WaitingForApproval  
+> owner：agent / evaluation / voice / integration  
+> 证据结果：NotRun  
+> 前置：PHASE-01；真实调用、音频与费用分别授权
+
+## 1. 本期为什么存在
+
+结构化 Agent、中文 Java/AI 术语 ASR/TTS 和评测一致性是最大技术风险；若延后验证，后续产品闭环可能建立在错误供应商或不可达到的质量假设上。
+
+## 2. 用户可见目标
+
+仅提供内部 T0 演示：一段自制语音转写、一个结构化面试动作、一份证据化反馈和一段中性 TTS；界面明确“风险原型，不处理真实用户，不是产品能力”。
+
+## 3. 技术学习目标
+
+学习能力端口、结构化 JSON Schema、模型回放、盲评 Golden Set、ASR 术语评测、延迟/成本测量与外部数据处理风险。
+
+## 4. 范围
+
+脱敏 fixtures、Provider 比较矩阵、Interview Agent/Evidence/Judge schema、中文术语语音集、Golden Set v0、超时/限流/坏 JSON/低置信实验、质量/延迟/成本/地域/DPA 结论。
+
+## 5. 非目标
+
+不建设生产 Agent/语音；不使用真实录音/简历；不保存未经脱敏的响应；不做 Realtime/WebRTC；不把 benchmark Provider 直接定为生产供应商。
+
+## 6. 前置决策
+
+DEC-031、034–040、048、058；调用前明确候选、预算、数据地域、非训练/保留条款、样本许可和人工标注 owner。
+
+## 7. 前置期次和依赖
+
+依赖 01 的契约/test-support 壳；可使用独立 runner，不依赖 identity、catalog 或业务数据库。
+
+## 8. 涉及的 REQ/BR/AC/DES
+
+REQ-04/05/07/08/15；BR-02–05/07；AC-02/05/06/08；DES-PROVIDER、DES-AGENT、DES-VOICE、DES-EVAL。
+
+## 9. 本期完整功能点
+
+- `Chat/STT/TTS` benchmark port 与统一错误/用量记录。
+- Interviewer Action、EvidenceSpan、RubricJudgement schema。
+- Java/JVM/Spring/RAG/Agent/MCP 中英混说术语集。
+- 正确/部分/错误/不足/冲突/注入样本和人工 Rubric。
+- 主/备候选的成功率、P50/P95、成本、条款、失败分类。
+
+## 10. 正常流程
+
+选择批准 fixture→调用候选→校验 schema/回读 evidence→人工盲评→记录版本、用量与延迟→生成对比报告与继续/缩小/停止建议。
+
+## 11. 空态、错误、拒绝、取消和恢复
+
+无候选/无授权时只跑 fake 并标 NotRun；坏 schema 拒绝；DPA/地域不明拒绝真实调用；用户可取消 benchmark batch；中断后按 sample ID 续跑，不能重复计入统计。
+
+## 12. 后端模块
+
+test-support 的 `BenchmarkCase/ProviderFake`；application 概念 port；独立 runner 的 `StructuredOutputEvaluator/SpeechTermEvaluator/GoldenSetComparator`。不把 benchmark 代码放 domain。
+
+## 13. 前端页面和组件
+
+可选内部 `/lab/t0` 页面或静态报告 viewer：`PrototypeWarning`、`SampleResultTable`、`AudioConsentNotice`；若无 UI 授权则以脱敏 Markdown/JSON 报告作为可观察成果。
+
+## 14. 数据实体、约束和迁移
+
+不建生产表。fixture 带 stable case ID、locale、license、expected rubric、sensitive=false；报告不含原始 Provider 敏感响应。若需持久化只用本地 benchmark artifact，生命周期明确。
+
+## 15. REST/SSE/WebSocket/API 或事件
+
+不开放公网 API。runner 使用窄 port；可计划本地 `BenchmarkResult v1` schema。语音样本请求式调用即可，不据此决定产品 WS 协议。
+
+## 16. Agent/Prompt/Provider
+
+五类组件中本期验证 Interview Agent、Evidence Extractor、Rubric Judge；Report/Learning 仅 schema 草案。Prompt/Schema 每次带版本；主备只形成候选和退出条件。
+
+## 17. 安全与隐私
+
+仅自制/许可、脱敏样本；Secret 不入仓库/日志；供应商响应脱敏汇总；若条款允许训练或不可删除则对应真实数据路线停止。
+
+## 18. 计划新增文件树
+
+```text
+benchmarks/{README.md,fixtures/{golden-set,speech-terms,interview-actions},runners/,reports/}
+contracts/schemas/{interviewer-action-v1,evidence-extraction-v1,rubric-judgement-v1}.schema.json
+backend/interview-test-support/src/main/java/.../benchmark/{BenchmarkCase,GoldenSetComparator}.java
+docs/research/{provider-benchmark,speech-benchmark,evaluation-calibration}.md
+frontend/src/features/lab/t0/                         # 仅在批准 UI 原型时
+```
+
+## 19. 计划修改文件树
+
+```text
+contracts/schemas/README.md
+backend/interview-test-support/pom.xml               # 仅批准的 runner 依赖
+docs/decisions/decision-register.md                  # 由 owner 回写决定，不由 Phase 代写批准
+```
+
+## 20. 后续 TASK 拆分建议
+
+样本与许可、schema/harness、LLM 结构化、ASR、TTS、Judge 盲评、故障/成本、决策报告分别拆 TASK；真实调用与费用单列执行包。
+
+## 21. 验证建议
+
+单元：schema/evidence span；契约：错误分类；集成：批准沙箱；UI：警示和结果；Golden Set：核心；UAT：仅由评审者判断原型是否值得继续。fake 不能形成供应商结论。
+
+## 22. 明确完成标准
+
+每个高风险问题都有实际 Pass/Fail/Blocked/NotRun 与可定位版本；形成主/备候选或明确无法继续；没有真实敏感数据和未授权费用。
+
+## 23. 本期不能证明什么
+
+不能证明生产稳定性、真实用户体验、商业付费价值、最终供应商合规或端到端产品闭环。
+
+## 24. 风险与停止条件
+
+预算超限、真实隐私数据要求、条款/地域不明、结构化成功率/ASR 术语/评测一致性低于批准门时停止；优先缩小承诺，不无限调 Prompt。
+
+## 25. 下一期进入条件
+
+路线可继续不要求所有指标 Pass，但必须有明确风险结论和 owner；Provider 产品接入仍需 Phase 06/12/13 的新批准。
+
+## 26. 建议学习和复盘内容
+
+复盘 offline evaluation、human-in-the-loop、structured outputs、speech WER/术语召回、延迟分位数、单位成本和 benchmark 不能替代 UAT。

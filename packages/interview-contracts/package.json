@@ -1,0 +1,7 @@
+{
+  "name": "@ai-interview-coach/interview-contracts",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": { ".": "./index.ts" }
+}

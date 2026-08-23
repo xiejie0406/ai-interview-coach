@@ -1,0 +1,79 @@
+# 窗口 21 提示词：Evaluation / Report / Learning
+
+```text
+你负责 AI Interview Coach 的 Evaluation、Report、Learning 代码落地候选实现。
+
+项目目录：
+D:\2025Ai\26-05-23\ai-interview-coach
+
+必须先完整读取：
+- C:\Users\admin\.codex\AGENTS.md
+- C:\Users\admin\.codex\specs\agent-governance.md
+- C:\Users\admin\.codex\specs\architecture-spec.md
+- C:\Users\admin\.codex\specs\development-spec.md
+- C:\Users\admin\.codex\specs\quality-delivery-spec.md
+- C:\Users\admin\.codex\specs\documentation-spec.md
+- 项目根 AGENTS.md
+- docs/specs/README.md
+- docs/features/FEAT-INTERVIEW-001-ai-interview-coach/README.md
+- docs/features/FEAT-INTERVIEW-001-ai-interview-coach/tasks.md
+- docs/architecture/implementation-contract-pack.md
+- docs/architecture/code-landing-readiness-review.md
+
+当前事实：
+- L3；主阶段仍是阶段 3 WaitingForApproval。
+- 文档、任务和代码均是候选落地，不是 Approved。
+- 所有运行证据 NotRun。
+- PRD 和技术架构存在已知截断，禁止猜写原文。
+
+只允许编辑：
+- backend/interview-domain/src/main/java/com/aiinterviewcoach/domain/evaluation/**
+- backend/interview-domain/src/main/java/com/aiinterviewcoach/domain/learning/**
+- backend/interview-application/src/main/java/com/aiinterviewcoach/application/evaluation/**
+- backend/interview-application/src/main/java/com/aiinterviewcoach/application/learning/**
+- backend/interview-application/src/main/java/com/aiinterviewcoach/application/agent/evidence/**
+- backend/interview-application/src/main/java/com/aiinterviewcoach/application/agent/judge/**
+- backend/interview-application/src/main/java/com/aiinterviewcoach/application/agent/report/**
+- backend/interview-application/src/main/java/com/aiinterviewcoach/application/agent/learning/**
+
+禁止修改：
+- POM、contracts、adapters、boot、frontend、test-support、测试代码、docs/product、docs/architecture/technical-architecture.md、docs/phases/phase-*.md。
+
+目标：
+- 实现 framework-free、provider-neutral 的 Evidence Extractor、Rubric Judge、Report Composer、Learning Coach 边界。
+- 建立 Evaluation、Report、Learning Plan 的领域状态机、值对象、领域事件、Repository/Port 接口和 application internal services。
+- 强制 tenantId、ownerUserId、version、source session/turn/evidence lineage。
+- Prompt/Schema/Provider config 必须 pin：promptKey、promptVersion、schemaKey、schemaVersion、providerRoutePlanId/model policy snapshot。
+- 人工反馈只能追加，不得覆盖历史评估；历史评估 immutable。
+- 敏感文本、模型消息、证据正文、报告正文、学习建议正文的 toString/log 字段必须脱敏。
+- Provider 输出必须按 schema version 接收；无法校验时产生失败结果或 PendingManualReview，不可静默通过。
+- 支持 idempotency/job receipt 形态，但不实现 adapter。
+
+最小建议类：
+- domain/evaluation/EvaluationRun、EvaluationStatus、EvidenceItem、EvidenceBundle、RubricScore、RubricDimensionScore、RubricSnapshot、EvaluationReport、ReportStatus、FeedbackNote、EvaluationPolicySnapshot。
+- domain/learning/LearningPlan、LearningPlanStatus、LearningGoal、LearningTask、LearningCheckpoint、LearningRecommendation、LearningProgressSnapshot。
+- application/evaluation/EvaluationRepository、ReportRepository、StartEvaluationUseCase、GetEvaluationReportUseCase、SubmitReportFeedbackUseCase、internal/DefaultStartEvaluation、internal/DefaultSubmitReportFeedback。
+- application/learning/LearningPlanRepository、CreateLearningPlanUseCase、GetLearningPlanUseCase、UpdateLearningProgressUseCase、internal/*。
+- application/agent/evidence/EvidenceExtractorPort、EvidenceExtractionRequest、EvidenceExtractionResult。
+- application/agent/judge/RubricJudgePort、RubricJudgeRequest、RubricJudgeResult。
+- application/agent/report/ReportComposerPort、ReportComposerRequest、ReportComposerResult。
+- application/agent/learning/LearningCoachPort、LearningCoachRequest、LearningCoachResult。
+
+完成前只做只读静态检查：
+- Java package 与路径一致。
+- import 均在允许范围或既有 domain/application 公共包内。
+- domain 不依赖 Spring/JPA/HTTP/adapters/boot。
+- application 不依赖 adapters/boot。
+- 不包含 PaiCLI 字样或包名。
+- toString 不泄漏 answer/transcript/prompt/model raw content。
+
+不得运行构建、测试、服务、迁移、Git 或外部调用。
+
+交接：
+- 已改文件。
+- 新增核心类和职责。
+- 未闭合契约。
+- 静态检查结果。
+- 证据状态保持 NotRun。
+```
+

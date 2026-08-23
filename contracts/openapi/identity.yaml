@@ -1,0 +1,93 @@
+openapi: 3.1.0
+info: { title: AI Interview Coach Identity API, version: 0.1.0 }
+servers: [{ url: /api/v1 }]
+paths:
+  /auth/register:
+    post:
+      operationId: registerAccount
+      security: []
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/RegisterRequest' } } } }
+      responses:
+        '201': { description: Account created with a personal tenant, content: { application/json: { schema: { $ref: '#/components/schemas/AccountView' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+  /auth/login:
+    post:
+      operationId: login
+      security: []
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/LoginRequest' } } } }
+      responses:
+        '204': { description: Session cookie rotated; no token is returned in the response body }
+        '401': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+  /auth/logout:
+    post:
+      operationId: logout
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/CsrfToken' }]
+      responses:
+        '204': { description: Current session revoked }
+        '401': { $ref: '#/components/responses/Error' }
+  /me:
+    get:
+      operationId: getCurrentAccount
+      responses:
+        '200': { description: Current account and personal tenant, headers: { ETag: { schema: { type: string, pattern: '^"v[0-9]+"$' } } }, content: { application/json: { schema: { $ref: '#/components/schemas/AccountView' } } } }
+        '401': { $ref: '#/components/responses/Error' }
+    patch:
+      operationId: updateProfile
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/IfMatch' }, { $ref: '#/components/parameters/CsrfToken' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/ProfilePatch' } } } }
+      responses:
+        '200': { description: New immutable profile version, headers: { ETag: { schema: { type: string, pattern: '^"v[0-9]+"$' } } }, content: { application/json: { schema: { $ref: '#/components/schemas/AccountView' } } } }
+        '412': { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes:
+    sessionCookie: { type: apiKey, in: cookie, name: AIC_SESSION }
+  parameters:
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128 } }
+    CsrfToken: { name: X-AIC-XSRF-TOKEN, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 512 } }
+    IfMatch: { name: If-Match, in: header, required: true, schema: { type: string, pattern: '^"v[0-9]+"$' } }
+  responses:
+    Error: { description: Error envelope, content: { application/json: { schema: { $ref: './common.yaml#/components/schemas/ErrorEnvelope' } } } }
+  schemas:
+    RegisterRequest:
+      type: object
+      additionalProperties: false
+      required: [email, password, displayName, locale, timeZone, acceptedPolicyVersions]
+      properties:
+        email: { type: string, format: email, maxLength: 320 }
+        password: { type: string, minLength: 8, maxLength: 256, writeOnly: true }
+        displayName: { type: string, minLength: 1, maxLength: 80 }
+        locale: { type: string, const: zh-CN }
+        timeZone: { type: string, maxLength: 64 }
+        acceptedPolicyVersions: { type: object, additionalProperties: { type: string, maxLength: 64 } }
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email: { type: string, format: email, maxLength: 320 }
+        password: { type: string, minLength: 1, maxLength: 256, writeOnly: true }
+    ProfilePatch:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        displayName: { type: string, minLength: 1, maxLength: 80 }
+        javaExperienceYears: { type: integer, minimum: 0, maximum: 50 }
+        targetRole: { type: string, enum: [JAVA_BACKEND, AI_APPLICATION, AGENT_ENGINEER] }
+        targetLevel: { type: string, enum: [JUNIOR, MID, SENIOR] }
+    AccountView:
+      type: object
+      additionalProperties: false
+      required: [userId, tenantId, displayName, locale, timeZone, accountStatus, version]
+      properties:
+        userId: { type: string, format: uuid }
+        tenantId: { type: string, format: uuid }
+        displayName: { type: string }
+        locale: { type: string }
+        timeZone: { type: string }
+        accountStatus: { type: string, enum: [PENDING, ACTIVE, LOCKED, DISABLED, CLOSING, CLOSED] }
+        version: { type: integer, minimum: 0 }
+security: [{ sessionCookie: [] }]

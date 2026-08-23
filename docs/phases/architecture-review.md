@@ -1,0 +1,187 @@
+# 技术架构审查与边界深化
+
+> 文档类型：设计审查  
+> 文档状态：Draft  
+> owner / 责任边界：架构 owner 提供建议；产品行为仍由 PRD owner 决定  
+> 创建时间：2026-08-02  
+> 更新时间：2026-08-02  
+> Feature ID：FEAT-INTERVIEW-001  
+> 风险等级：L3  
+> 产出/适用阶段：5 技术设计的前瞻输入  
+> 阶段状态：WaitingForApproval  
+> 关联：[十八期路线](README.md)、[现有技术架构](../architecture/technical-architecture.md)、[决策登记](../decisions/decision-register.md)
+
+## 1. 总体判断
+
+现有“Spring Boot 模块化单体 + PostgreSQL + 可插拔 Provider + 级联语音 + 异步评测”的战略正确，18 期足以承载一名 Java 开发者逐步转型为 AI Agent 应用开发者。需要深化的不是更换大方向，而是四个约束：物理 module 不能按业务域爆炸；逻辑域必须有唯一写 owner；可靠性/隐私/成本不能等到产品闭环后补；每期必须交付一条可运行或可审核纵切。
+
+原路线的主要问题：
+
+| 发现 | 影响 | v2 处理 |
+|---|---|---|
+| Practice、Session、Agent、Text UI、Evaluation、Report 连续水平拆分 | 第 05–11 期用户价值晚，接口易反复 | 第 05/06/09/10 各自形成可见纵切 |
+| Outbox/Job 到原第 14 期 | 前面评测与语音会先形成不可靠异步事实 | 新第 08 期在首场面试前建立 |
+| 权益/用量到原第 15 期 | Provider 调用先发生、成本与重复扣减后补 | 新第 07 期提供预检/预留端口，第 16 期再接真实支付 |
+| 隐私删除到原第 16 期 | 身份、音频早已存在，治理为后补 | 第 03 期同意基线，第 12 期音频生命周期，第 15 期完整删除 |
+| Operations 聚合在原第 17 期 | 早期链路不可观察 | 从第 01/02 期即有关联 ID、调用元数据和风险报告；第 14/17 深化 |
+
+## 2. Maven 多 module 最终建议
+
+推荐一个仓库、一个根聚合 POM、五个后端 Maven module，加一个独立 Node 前端和版本化契约目录：
+
+```text
+root
+├── backend/interview-domain
+├── backend/interview-application
+├── backend/interview-adapters
+├── backend/interview-boot
+├── backend/interview-test-support
+├── frontend
+└── contracts
+```
+
+依赖方向：
+
+```text
+interview-domain <- interview-application <- interview-adapters <- interview-boot
+                         ^                      ^
+                         └──── boot 装配 ──────┘
+interview-test-support 仅以 test scope 被各 module 测试引用，任何生产 module 不依赖它
+```
+
+- `interview-domain`：纯 Java 领域对象、值对象、状态机、策略、领域事件；不依赖 Spring、JPA、HTTP、SDK。
+- `interview-application`：用例、事务边界声明、输入/输出 port、权限协调、Job 编排；依赖 domain，不持有 Adapter 类型。
+- `interview-adapters`：JPA/Flyway 运行适配、REST/SSE/WebSocket 入站适配、Provider/对象存储/支付出站适配；依赖 application/domain。
+- `interview-boot`：Spring Boot main、配置属性、安全装配、Bean 选择、迁移资源和 Worker profile；不放业务规则。
+- `interview-test-support`：builder、fixture、fake port、Testcontainers 辅助、Golden Set harness；禁止生产代码引用，fake 证据不冒充真实链路。
+
+不建议为 11 个逻辑业务域各建 Maven module：会制造 POM、DTO 和测试装配负担。逻辑边界使用包、Spring Modulith（兼容时）和 ArchUnit；只有出现独立部署/扩缩容/团队 owner 证据时才拆物理 module。
+
+## 3. 逻辑域 owner 与禁止越界
+
+| 逻辑域 | 唯一写 owner | 公开能力 | 禁止越界 |
+|---|---|---|---|
+| identity | 用户、personal tenant、membership、session、role | principal/tenant/role 查询与账号命令 | 不保存业务资源或 Provider Key |
+| catalog | Question/QuestionVersion/RubricVersion/Taxonomy/Source | 已发布内容查询、版本引用、发布事件 | LLM 不得发布；其他域不得改 Rubric |
+| practice | PracticeAttempt/AnswerVersion/收藏/待加强 | 提交与历史查询、不可变回答引用 | 不判断正式评分，不复制题目正文 |
+| interview | InterviewPlan/Session/Turn/预算/状态机 | 计划、命令、快照、会话事件 | Agent/voice/billing 不得直接改状态 |
+| voice | AudioArtifact/TranscriptVersion/语音轮次 | ASR/TTS port 编排、转写确认、删除请求 | 不拥有面试事实；不推断人格/情绪 |
+| agent | Prompt/Schema registry、Agent 编排、Provider capability | 结构化候选动作与调用元数据 | 不拥有 tenant、计费、发布或状态终裁 |
+| evaluation | EvaluationVersion/EvidenceSpan/DimensionResult/ReportVersion | 评测、质量门、只读报告 | Composer 不改 Judge 结论；无证据不强判 |
+| learning | Weakness/LearningPlan/LearningItem/趋势策略 | 建议、复练、复测 | 不直接重算评测；只引用存在内容 |
+| billing | Plan/Entitlement/Reservation/Settlement/Order/CostLedger | 预检、预留、结算、释放、订单 | 金额/额度不用 LLM；支付回调不直接改其他域表 |
+| governance | Consent/Retention/Deletion/Audit/AdminAccess | 同意判定、删除编排、审计查询 | 业务审批不能覆盖安全拒绝 |
+| operations | Flag/ProviderHealth/告警/只读投影/工单 | 健康、成本、质量和故障视图 | 默认不读敏感正文，不成为业务事实源 |
+
+域间只通过 application port、公开 DTO 或版本化事件协作。任何跨域 Repository、JPA entity 或可变集合访问均为架构违规。
+
+## 4. PostgreSQL schema owner 与 tenant 约束
+
+推荐单 PostgreSQL database、按逻辑域分 schema：`identity`、`catalog`、`practice`、`interview`、`voice`、`agent`、`evaluation`、`learning`、`billing`、`governance`、`operations`、`platform`。`platform` 只拥有 `job`、`outbox_event`、`idempotency_record` 等技术事实。
+
+数据库角色建议：`aic_migrator` 独占 DDL；`aic_app` 只获运行所需 DML；`aic_readonly_ops` 只读经批准的脱敏视图。单体早期不为每个域创建连接池/数据库账号，但通过 migration 路径、Repository 包和架构测试落实写 owner。管理员查询走应用权限，不直连生产表。
+
+tenant 规则：
+
+- 用户私有表必须 `tenant_id NOT NULL`，并包含 `created_at`、`updated_at`、必要 `version`；业务唯一约束以 `tenant_id` 为前缀。
+- 主键可用全局 UUID/ULID，但查询、更新、删除不得只按 `id`；Repository 方法必须携带 `TenantId`。
+- 跨域引用保存稳定 ID/版本，不用跨 schema 可变实体。必要外键必须包含 tenant 一致性；公共 catalog 内容通过明确 `visibility=PUBLIC` 与不可变版本引用访问。
+- personal tenant 从第 03 期建立；B2B 未批准前不实现组织 UI。PostgreSQL RLS 作为 T2 防御增强候选，不能替代应用授权；若启用必须验证连接池 tenant context 清理。
+- 删除使用逻辑隐藏→内部物理清理→对象/Provider/备份到期→完成/部分失败，不以一次 `DELETE` 宣称端到端完成。
+
+## 5. Flyway、Redis 与对象存储进入时间
+
+- Flyway：第 01 期进入并成为所有 schema 变化唯一迁移入口；采用 expand→migrate→contract，禁止应用启动自动推断 schema。
+- 对象存储抽象：第 02 期 benchmark 使用受控临时 fixture；第 12 期真实音频前引入私有 S3-compatible adapter、TTL、加密、hash、purpose 和删除状态。供应商不在规划中猜定。
+- Redis：T0/T1 单实例不是业务事实依赖；第 14 期在多实例、限流、短锁、SSE 游标/会话协调证据下引入。Redis 丢失不得导致会话、额度、订单或删除事实丢失。
+
+## 6. REST、SSE、WebSocket 与 Webhook 精确职责
+
+| 协议 | 职责 | 关键契约 |
+|---|---|---|
+| REST `/api/v1` | CRUD、命令、快照、查询、确认 | Cookie/CSRF、`Idempotency-Key`、ETag/version、标准错误、分页 |
+| SSE `/api/v1/streams/*` | 服务端→浏览器文本 delta、会话状态、Job/报告进度、用量变化 | `eventId`、aggregate sequence、heartbeat、`Last-Event-ID`、终态、重放窗口 |
+| WebSocket `/ws/v1/interviews/{id}/voice` | 双向音频 chunk、ASR partial/final、TTS chunk、语音控制 | 首帧认证、turn token、codec/size、sequence、背压、ack、取消、终态 |
+| Webhook `/api/v1/webhooks/*` | 支付/供应商服务端回调 | 签名、时间窗、防重放、幂等、乱序、回读/对账 |
+
+SSE 不上传音频；WebSocket 不承载普通 CRUD 或支付；REST 202 只表示 Job 已受理，不表示完成；前端任何重试以服务端 `retryable` 和幂等语义为准。
+
+## 7. Provider SPI、主备、Prompt 与 Schema
+
+定义窄端口：`ChatModelPort`、`SpeechToTextPort`、`TextToSpeechPort`、`EmbeddingPort`（P1 候选）、`ObjectStoragePort`、`PaymentPort`。端口使用项目 DTO，不暴露 Spring AI、LangChain4j 或厂商 SDK 类型。
+
+路由输入仅允许 capability、locale、data-region、quality-tier、latency/cost budget 和 health；主备切换受 Feature Flag、地域/DPA 和总成本预算约束，不循环故障切换。每次调用记录 provider/model/config/prompt/schema/price 版本、request ID、耗时、用量、结果和错误分类，日志不记录完整敏感正文。
+
+Prompt/Schema 是版本化业务配置：`DRAFT→EVALUATING→APPROVED→ACTIVE→RETIRED`。只有 Golden Set 达门且人工批准的组合可 ACTIVE；历史 Evaluation/Report 永远引用生成版本。坏 JSON 最多进行批准次数的修复，schema 永久错误不自动重试。
+
+## 8. Agent 职责拆分
+
+| Agent/组件 | 输入 | 输出 | 确定性门禁 |
+|---|---|---|---|
+| Interview Agent | 计划、当前题、回答、剩余预算 | `ASK/FOLLOW_UP/CLARIFY/NEXT/COMPLETE` 候选 | Interview application 裁决状态、范围、次数、时间 |
+| Evidence Extractor | 不可变 Answer/TranscriptVersion | 带字符区间的 EvidenceSpan | 必须能回读原文；虚构/越界 span 拒绝 |
+| Rubric Judge | 题目/Rubric 版本、EvidenceSpan | 维度结论、reason code、置信/不足 | schema、允许枚举、证据门、确定性后处理 |
+| Report Composer | 已裁决 EvaluationVersion | 报告章节草稿 | 不改分、不新增事实、不隐藏限制 |
+| Learning Coach | Weakness、历史与可用题目 | LearningPlan 候选 | 只能引用存在题目，用户可删改，趋势需可比 |
+
+不建议把五者做成网络服务或自由协作多 Agent。它们是同一应用内职责明确、可回放的组件，应用层控制顺序、预算、超时、取消和版本。
+
+## 9. 状态机、Outbox、Job、幂等与恢复
+
+- 面试状态：`DRAFT→READY→IN_PROGRESS↔PAUSED→COMPLETING→COMPLETED`，另有 `CANCELLED/FAILED_RECOVERABLE/FAILED_FINAL`；报告状态独立。
+- Job：`PENDING→RUNNING→SUCCEEDED|FAILED_RETRYABLE|FAILED_FINAL|CANCELLED`，claim 带 lease/heartbeat；过期可接管。
+- Outbox 与业务事实同事务写入，consumer 至少一次、必须幂等；不承诺 exactly-once。
+- 幂等键作用域包含 tenant、operation、resource/input version；同键不同 payload 返回冲突，不能静默复用。
+- 恢复快照包含 last stable turn、session version、pending jobs、SSE cursor 和可用命令；partial audio/transcript 可明确丢弃并重录，已确认回答不可丢。
+
+第 08 期必须先提供这些底座，再让第 09–13 期接真实 Agent/语音；第 14 期只做多实例、故障注入和容量深化。
+
+## 10. 音频 Artifact 生命周期
+
+`CREATED→UPLOADING→UPLOADED→TRANSCRIBING→TRANSCRIBED→DELETE_QUEUED→DELETED`；异常包括 `UPLOAD_FAILED/TRANSCRIBE_FAILED/DELETE_PARTIAL`。Artifact 元数据记录 tenant、session/turn、purpose、codec、bytes/duration、hash、storage key、consent version、expiresAt 和 provider request ID；不在数据库存音频正文。
+
+未同意不得创建 upload session；ASR final 由用户确认后形成新 `TranscriptVersion`；评分只引用确认版本。TTS Artifact 与用户音频分开标记，可按内容 hash 受控缓存，但不得跨 tenant 泄露私有文本。具体 24 小时等 SLA 保持 Gate B 决策，不在本文猜定。
+
+## 11. 权益、额度、预留、结算与成本账本
+
+用户权益与 Provider 成本是两套账：`Entitlement` 决定能否使用，`UsageReservation` 防止并发透支，`Settlement` 按批准规则结算/释放，`CostLedgerEntry` 记录平台实际成本。状态 `RESERVED→SETTLED|RELEASED|EXPIRED`，所有金额/数量使用确定性、版本化单位。
+
+第 07 期在真实面试前建立测试权益、预估和预留 port；第 09–13 期每次调用都记录可结算用量；第 16 期才接 Order/Payment 与真实价格/退款。Provider 重试必须归属同一业务 operation，防止重复扣用户权益，同时保留平台重试成本。
+
+## 12. 管理员、安全、审计与隐私删除
+
+角色至少分 `CONTENT_ADMIN/OPS_ADMIN/SUPPORT/PRIVACY_AUDITOR/SUPER_ADMIN`，默认拒绝。内容管理员不可读用户回答/音频；敏感访问需 MFA、短会话、reason code、ticket/reference、目标范围和 append-only 审计。审计记录 actor/action/target class/result/correlationId，不保存被访问正文。
+
+隐私删除先同步隐藏，再由 Job 删除各 schema、对象存储和可要求删除的 Provider 副本，备份按已披露窗口自然过期；用户可见 `IN_PROGRESS/PARTIAL_FAILED/COMPLETED/BLOCKED_LEGAL`，管理员不能把部分失败改成完成。
+
+## 13. 前端模块、路由、状态与恢复
+
+路由按公开区 `/`、认证 `/auth/*`、工作台 `/app/*`、后台 `/admin/*`。React feature 对应逻辑域；`shared/api` 只放 transport/error，不能放业务规则。
+
+- TanStack Query：服务端查询、快照、失效；不缓存完整音频或长期敏感正文。
+- Zustand：当前面试 UI、连接、设备、草稿、播放状态；服务端仍是会话/额度/删除真相。
+- Router loader/guard：只做体验预检，服务端再次授权。
+- Error Boundary + route error page + global reconnect banner；每页覆盖空、加载、业务拒绝、系统失败、无权限、过期、取消和恢复。
+- 草稿仅在批准范围使用 IndexedDB，带 tenant/user namespace、TTL 和 logout 清理；默认不持久化原始音频。
+
+## 14. 测试、Golden Set、浏览器 UAT 与故障注入
+
+测试分层：domain unit（状态/预算/计费）、module boundary（ArchUnit/Modulith）、repository（PostgreSQL/tenant/lock/migration）、provider contract（fake/stub/批准沙箱）、API/AsyncAPI（错误/幂等/续传）、React component、Playwright 关键旅程、Golden Set 内容质量、security/privacy、resilience/chaos、performance。
+
+Golden Set 必含正确/部分/错误/证据不足/冲突/Prompt Injection/ASR 技术错词；记录内容版本、人工 rubric、模型/prompt/schema 和比较方法。浏览器 UAT 由用户最终决定，至少覆盖首次登录、题库空态、文本闭环、麦克风拒绝、ASR 修正、TTS 失败降级、报告复练、额度不足和删除部分失败。
+
+故障注入包括 Provider timeout/rate limit/bad schema、Worker crash/lease expiry、重复 Outbox、SSE 断线、WS 乱序、Redis 丢失、对象删除失败、支付回调乱序；实际运行需独立授权，本文结果均为 NotRun。
+
+## 15. 部署、监控、Flag、备份与回滚
+
+部署保持单区域模块化单体：Web/API 与 Worker 可用同一 artifact 不同 profile，托管 PostgreSQL/Redis/对象存储。dev/test/prod 的账号、Secret、数据和 bucket 隔离；生产不使用本地 `.env`。
+
+监控覆盖业务漏斗、Provider 延迟/错误、ASR 修正率、Judge 拒判率、Job backlog、SSE/WS 重连、用量/成本、越权拒绝、删除失败；统一 correlation/trace/tenantHash/session/job/providerInvocation ID，禁止正文进入 span/log。
+
+Feature Flag 可关闭 voice/provider/payment/new prompt/schema，不得放宽权限或隐私。数据库每日备份/PITR、对象版本/生命周期和恢复演练的具体 RPO/RTO 待批准。迁移使用 expand/contract；应用回滚前验证 schema 向后兼容；删除和支付等不可逆事实使用补偿，不把重新部署称为数据回滚。
+
+## 16. 推荐批准的架构决定与停止条件
+
+建议批准方向：五 module 分层、11 个逻辑域、单库多 schema、Flyway 首期、Redis T2、对象存储语音前、REST/SSE/WS 分工、窄 Provider SPI、五 Agent 职责、PostgreSQL Outbox/Job、personal tenant、安全 Cookie、测试权益先于真实支付、治理前置、模块化单体部署。
+
+停止条件：上游截断未修复；Gate A 未关闭；供应商地域/DPA/删除不满足；中文术语/结构化输出/Golden Set 未达批准门；tenant scope 无法强制；幂等/恢复/成本上限不成立；日志或监控泄露敏感正文。触发时退回阶段 3/4/5，不以增加 Prompt、重试或运维人工绕过。

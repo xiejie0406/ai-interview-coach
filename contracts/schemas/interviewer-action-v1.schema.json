@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-interview-coach.local/contracts/interviewer-action-v1.json",
+  "title": "InterviewerActionV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["action", "reasonCode", "questionText"],
+  "properties": {
+    "action": {"type": "string", "enum": ["ASK", "FOLLOW_UP", "CLARIFY", "NEXT", "COMPLETE"]},
+    "reasonCode": {"type": "string", "minLength": 1, "maxLength": 96},
+    "questionText": {"type": ["string", "null"], "maxLength": 4000},
+    "questionVersionId": {"type": ["string", "null"], "maxLength": 128},
+    "rubricVersionId": {"type": ["string", "null"], "maxLength": 128},
+    "targetDimension": {"type": ["string", "null"], "maxLength": 96},
+    "expectedAnswerSeconds": {"type": ["integer", "null"], "minimum": 10, "maximum": 900}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"action": {"const": "COMPLETE"}}},
+      "then": {"properties": {"questionText": {"type": "null"}}},
+      "else": {"properties": {"questionText": {"type": "string", "minLength": 1}}}
+    }
+  ]
+}

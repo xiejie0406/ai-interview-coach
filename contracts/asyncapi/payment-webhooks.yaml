@@ -1,0 +1,30 @@
+asyncapi: 3.0.0
+info: { title: AI Interview Coach Payment Webhooks, version: 0.1.0 }
+channels:
+  paymentWebhook:
+    address: /api/v1/webhooks/payments/{provider}
+    parameters: { provider: { description: Approved payment-provider alias, not a secret or SDK type } }
+    messages: { paymentEvent: { $ref: '#/components/messages/PaymentEvent' } }
+operations:
+  receivePaymentWebhook: { action: receive, channel: { $ref: '#/channels/paymentWebhook' } }
+components:
+  messages:
+    PaymentEvent:
+      name: payment.provider.event
+      headers:
+        type: object
+        required: [signature, timestamp, eventId]
+        properties: { signature: { type: string }, timestamp: { type: string }, eventId: { type: string } }
+      payload:
+        type: object
+        additionalProperties: false
+        required: [eventId, providerPaymentRef, eventType, occurredAt]
+        properties:
+          eventId: { type: string }
+          providerPaymentRef: { type: string }
+          eventType: { type: string, enum: [PAYMENT_PENDING, PAYMENT_SUCCEEDED, PAYMENT_FAILED, REFUND_PENDING, REFUND_SUCCEEDED, REFUND_FAILED] }
+          occurredAt: { type: string, format: date-time }
+x-webhook-contract:
+  authentication: Provider-specific signature over exact bytes plus timestamp window; browser Cookie and CSRF are not accepted.
+  replay: Provider event ID is unique; duplicate and out-of-order events are idempotently reconciled against provider read-back.
+  ownership: Webhook updates billing state only and never writes interview, identity or learning tables directly.

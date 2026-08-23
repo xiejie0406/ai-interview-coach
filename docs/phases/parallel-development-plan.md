@@ -1,0 +1,119 @@
+# 多窗口并行落地计划
+
+> 文档类型：Phase / 并行编排  
+> 文档状态：Draft  
+> owner / 责任边界：协调窗口维护波次、独占范围和交接；Feature `tasks.md` 才是正式任务事实源  
+> 创建时间：2026-08-02  
+> 更新时间：2026-08-02  
+> Roadmap ID：ROADMAP-INTERVIEW-001  
+> 风险等级：L3  
+> 产出/适用阶段：3–7 前瞻编排  
+> 阶段状态：WaitingForApproval  
+> 证据结果：NotRun  
+> 关联：[完整性审查](implementation-readiness.md)、[依赖矩阵](dependency-matrix.md)、[提示词索引](window-prompts/README.md)
+
+## 1. 并行原则
+
+多窗口不是把 18 期同时开工。应按“共享契约先冻结、独占目录再并行、集成审查最后收口”组织。所有窗口共享同一工作区时，任何未协调的公共文件修改会立即影响其他窗口，因此每个波次必须有唯一协调者。
+
+## 2. 波次总览
+
+| 波次 | 窗口 | 当前能否启动 | 目标 | 退出门 |
+|---|---|---|---|---|
+| A 文档补全 | 01–04 | 可以 | 决策提案、原型、技术契约、DoR/验证设计 | 用户获得可审查的阶段 3–5 输入 |
+| B Canonical 收口 | 00 + 产品/架构 owner | 等用户决定 | 回写 PRD/决策/架构并审批 | PRD/原型/设计 Approved |
+| C 任务包 | 05 | 等波次 B | 建立 Feature 控制页、`tasks.md` 和执行包 | 用户批准执行包 |
+| D 共享脚手架 | 10 | 等波次 C 和代码授权 | 创建根构建、module POM 与共享空壳 | 发布明确基线，其他代码窗口可启动 |
+| E 并行编码 | 11–14 | 等窗口 10 | 四个独占范围并行实现 Phase 01 | 各窗口只读自审并交接 |
+| F 集成审查 | 15 | 等 11–14 | 检查边界、契约、冲突和 DoD | 给出通过/退回结论；不自动运行测试 |
+
+## 3. 波次 A：现在可以同时打开
+
+| 窗口 | 产物 | 独占写范围 | 禁止修改 |
+|---|---|---|---|
+| 01 决策提案 | `docs/review/gate-a-resolution-proposal.md` | 仅该文件 | PRD、decision-register、技术架构、Phase |
+| 02 探索原型 | `docs/prototypes/FEAT-INTERVIEW-001/prototype.md` | 仅该目录 | Canonical PRD、代码、既有 Phase |
+| 03 技术契约包 | `docs/architecture/implementation-contract-pack.md` | 仅该文件 | 截断技术架构、PRD、源码 |
+| 04 DoR/验证设计 | `docs/phases/dor-and-verification-plan.md` | 仅该文件 | 生产/测试代码、验证执行、结论状态 |
+
+四个窗口完成后，由协调窗口只读比较冲突；用户先拍板决策，再由单一 owner 回写 Canonical 文件。不得让四个窗口分别修改同一 PRD。
+
+## 4. 波次 C：唯一任务包窗口
+
+窗口 05 只能在波次 B 完成后启动。它创建 Phase 01 对应的 L3 Feature 资料包，正式 `tasks.md` 需要包含：
+
+- Approved Spec/原型/设计版本。
+- `TASK-*`、依赖、文件范围、不得修改、预期 EV、停止条件。
+- 共享文件 owner 和四个代码窗口的互斥目录。
+- 代码、测试代码、构建/测试/启动、真实外部调用、Git 的独立授权矩阵。
+- 精确命令、工作目录、影响、失败证据和有效期；未获授权项保持 `NotRequested/Pending`。
+
+## 5. 波次 D：共享脚手架必须串行
+
+窗口 10 独占以下文件，其他窗口在其交接前不得创建或修改：
+
+```text
+pom.xml
+backend/pom.xml
+backend/*/pom.xml
+.editorconfig
+.gitignore
+.env.example
+backend/interview-boot/src/main/resources/application*.yaml
+frontend/package.json                # 若执行包指定由窗口 13 所有，则窗口 10不得修改
+```
+
+窗口 10 只创建批准的空骨架和依赖版本，不实现业务。它完成后必须给出共享基线、实际文件和未运行项；无 Git 授权时不能用 commit 作为基线，可用文件清单和时间戳/内容版本交接。
+
+## 6. 波次 E：四个代码窗口的独占边界
+
+| 窗口 | 独占范围 | 可只读引用 | 禁止写入 |
+|---|---|---|---|
+| 11 Domain/Application | `backend/interview-domain/src/**`、`backend/interview-application/src/**` | contracts、设计、POM | adapters、boot、frontend、contracts、所有 POM |
+| 12 Adapters/Boot | `backend/interview-adapters/src/**`、`backend/interview-boot/src/**`（迁移/配置是否包含以 tasks 为准） | domain/application、contracts | domain/application、frontend、contracts、所有 POM |
+| 13 Frontend | `frontend/src/**`、执行包明确授予的前端配置 | OpenAPI/AsyncAPI | backend、contracts、根/后端 POM |
+| 14 Contracts/Test-support | `contracts/**`、`backend/interview-test-support/src/**`、批准的 benchmark fixture |设计、公开 DTO |生产模块、frontend、所有 POM |
+
+如果某窗口发现必须修改公共错误码、事件信封、POM、migration 编号或其他窗口文件，立即停止并向窗口 00 提交“契约变更请求”，不能直接改。
+
+## 7. 共享文件所有权
+
+| 共享事实 | 唯一 owner | 变更流程 |
+|---|---|---|
+| PRD/REQ/BR/AC | 产品 owner | 回到阶段 3，用户批准 |
+| 技术设计/DES | 架构 owner | 设计变更评审 |
+| `tasks.md`/执行包 | 窗口 05/协调 owner | 用户批准范围变化 |
+| 根/后端 POM与版本 | 窗口 10 | 依赖变更请求，不允许窗口自行添加 |
+| OpenAPI/AsyncAPI/JSON Schema | 窗口 14 | consumer 提案→契约 owner 更新→通知全部窗口 |
+| migration 序号/跨 schema 规则 | 窗口 12 中指定的数据 owner | 先登记预约，避免重复版本号 |
+| 前端 router/API client | 窗口 13 | 其他窗口只给需求，不直接修改 |
+
+## 8. 每个窗口统一交接
+
+```markdown
+## 窗口交接
+- 窗口/任务 ID：
+- 输入基线和上游版本：
+- 实际修改文件：
+- 实现或文档行为：
+- 与计划差异：
+- 未修改的共享文件：
+- 发现的契约/产品问题：
+- 测试代码授权：NotRequested/Pending/Approved/Denied/Expired
+- 构建/测试/启动结果：NotRun/Pass/Fail/Blocked/NotApplicable
+- Git/外部操作：未执行/实际授权记录
+- 下一窗口与进入条件：
+- 停止/退回建议：
+```
+
+## 9. 冲突处理
+
+- 产品语义冲突：所有代码窗口停止相关行为，退回产品 owner。
+- API/schema 冲突：消费者停止，窗口 14 给兼容提案；批准后统一更新。
+- POM/依赖冲突：窗口 10 评估，不允许每个窗口加自己的框架。
+- 同一文件冲突：后启动窗口让出；不复制第二份文件绕过。
+- 用户在工作区已有修改：视为用户内容；无法绕开时停止并报告。
+
+## 10. 建议窗口数量
+
+同一时刻最多建议 4 个活跃写窗口。文档波次可以 4 个；代码波次推荐窗口 11–14 四个，窗口 00 只做协调/只读，不与它们抢文件。18 期不能同时开 18 个代码窗口。

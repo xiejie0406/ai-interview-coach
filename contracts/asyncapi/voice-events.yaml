@@ -1,0 +1,315 @@
+asyncapi: 3.0.0
+info:
+  title: AI Interview Coach Voice WebSocket
+  version: 0.2.0
+  description: RuoYi-bound candidate protocol. The HTTP upgrade must already carry a valid RuoYi Bearer principal; any socketTicket is short-lived, single-use, bound to that principal and never an independent session or authentication source. Numeric flow limits are supplied by the server handle/hello and are not guessed by clients.
+channels:
+  voiceSession:
+    address: /ws/v1/interviews/{interviewId}/voice
+    parameters:
+      interviewId: { description: Owner-scoped interview ID }
+    messages:
+      clientHello: { $ref: '#/components/messages/ClientHello' }
+      clientAudioStart: { $ref: '#/components/messages/ClientAudioStart' }
+      clientAudioChunk: { $ref: '#/components/messages/ClientAudioChunk' }
+      clientAudioStop: { $ref: '#/components/messages/ClientAudioStop' }
+      clientAudioCancel: { $ref: '#/components/messages/ClientAudioCancel' }
+      clientTtsCancel: { $ref: '#/components/messages/ClientTtsCancel' }
+      serverHello: { $ref: '#/components/messages/ServerHello' }
+      serverFlowControl: { $ref: '#/components/messages/ServerFlowControl' }
+      serverAck: { $ref: '#/components/messages/ServerAck' }
+      serverNack: { $ref: '#/components/messages/ServerNack' }
+      transcriptPartial: { $ref: '#/components/messages/TranscriptPartial' }
+      transcriptFinal: { $ref: '#/components/messages/TranscriptFinal' }
+      speechFailure: { $ref: '#/components/messages/SpeechFailure' }
+      ttsState: { $ref: '#/components/messages/TtsState' }
+      ttsChunk: { $ref: '#/components/messages/TtsChunk' }
+      voiceTurnState: { $ref: '#/components/messages/VoiceTurnState' }
+      voiceDegraded: { $ref: '#/components/messages/VoiceDegraded' }
+      resyncRequired: { $ref: '#/components/messages/ResyncRequired' }
+      terminal: { $ref: '#/components/messages/Terminal' }
+operations:
+  receiveClientVoiceFrames:
+    action: receive
+    channel: { $ref: '#/channels/voiceSession' }
+    messages:
+      - { $ref: '#/channels/voiceSession/messages/clientHello' }
+      - { $ref: '#/channels/voiceSession/messages/clientAudioStart' }
+      - { $ref: '#/channels/voiceSession/messages/clientAudioChunk' }
+      - { $ref: '#/channels/voiceSession/messages/clientAudioStop' }
+      - { $ref: '#/channels/voiceSession/messages/clientAudioCancel' }
+      - { $ref: '#/channels/voiceSession/messages/clientTtsCancel' }
+  sendServerVoiceFrames:
+    action: send
+    channel: { $ref: '#/channels/voiceSession' }
+    messages:
+      - { $ref: '#/channels/voiceSession/messages/serverHello' }
+      - { $ref: '#/channels/voiceSession/messages/serverFlowControl' }
+      - { $ref: '#/channels/voiceSession/messages/serverAck' }
+      - { $ref: '#/channels/voiceSession/messages/serverNack' }
+      - { $ref: '#/channels/voiceSession/messages/transcriptPartial' }
+      - { $ref: '#/channels/voiceSession/messages/transcriptFinal' }
+      - { $ref: '#/channels/voiceSession/messages/speechFailure' }
+      - { $ref: '#/channels/voiceSession/messages/ttsState' }
+      - { $ref: '#/channels/voiceSession/messages/ttsChunk' }
+      - { $ref: '#/channels/voiceSession/messages/voiceTurnState' }
+      - { $ref: '#/channels/voiceSession/messages/voiceDegraded' }
+      - { $ref: '#/channels/voiceSession/messages/resyncRequired' }
+      - { $ref: '#/channels/voiceSession/messages/terminal' }
+components:
+  messages:
+    ClientHello: { name: client.hello, payload: { $ref: '#/components/schemas/ClientHelloEnvelope' } }
+    ClientAudioStart: { name: client.audio.start, payload: { $ref: '#/components/schemas/ClientAudioStartEnvelope' } }
+    ClientAudioChunk: { name: client.audio.chunk, payload: { $ref: '#/components/schemas/ClientAudioChunkEnvelope' } }
+    ClientAudioStop: { name: client.audio.stop, payload: { $ref: '#/components/schemas/ClientAudioStopEnvelope' } }
+    ClientAudioCancel: { name: client.audio.cancel, payload: { $ref: '#/components/schemas/ClientAudioCancelEnvelope' } }
+    ClientTtsCancel: { name: client.tts.cancel, payload: { $ref: '#/components/schemas/ClientTtsCancelEnvelope' } }
+    ServerHello: { name: server.hello, payload: { $ref: '#/components/schemas/ServerHelloEnvelope' } }
+    ServerFlowControl: { name: server.flow-control, payload: { $ref: '#/components/schemas/ServerFlowControlEnvelope' } }
+    ServerAck: { name: server.ack, payload: { $ref: '#/components/schemas/ServerAckEnvelope' } }
+    ServerNack: { name: server.nack, payload: { $ref: '#/components/schemas/ServerNackEnvelope' } }
+    TranscriptPartial: { name: asr.partial, description: Ephemeral and discardable after reconnect, payload: { $ref: '#/components/schemas/TranscriptPartialEnvelope' } }
+    TranscriptFinal: { name: asr.final, description: Durable transcript version that still requires explicit user confirmation, payload: { $ref: '#/components/schemas/TranscriptFinalEnvelope' } }
+    SpeechFailure: { name: speech.failed, payload: { $ref: '#/components/schemas/SpeechFailureEnvelope' } }
+    TtsState: { name: tts.state, payload: { $ref: '#/components/schemas/TtsStateEnvelope' } }
+    TtsChunk: { name: tts.chunk, payload: { $ref: '#/components/schemas/TtsChunkEnvelope' } }
+    VoiceTurnState: { name: voice.turn.state, payload: { $ref: '#/components/schemas/VoiceTurnStateEnvelope' } }
+    VoiceDegraded: { name: voice.turn.degraded, payload: { $ref: '#/components/schemas/VoiceDegradedEnvelope' } }
+    ResyncRequired: { name: server.resync-required, payload: { $ref: '#/components/schemas/ResyncRequiredEnvelope' } }
+    Terminal: { name: server.terminal, payload: { $ref: '#/components/schemas/TerminalEnvelope' } }
+  schemas:
+    BaseEnvelope:
+      type: object
+      required: [messageId, type, voiceSessionId, sessionId, turnId, generation, sequence, ackSequence, occurredAt, schemaVersion, data]
+      properties:
+        messageId: { type: string, format: uuid }
+        type: { type: string, maxLength: 96 }
+        voiceSessionId: { type: string, format: uuid }
+        sessionId: { type: string, format: uuid }
+        turnId: { type: string, format: uuid }
+        generation: { type: integer, minimum: 1 }
+        sequence: { type: integer, minimum: 0 }
+        ackSequence: { type: integer, minimum: 0 }
+        occurredAt: { type: string, format: date-time }
+        schemaVersion: { type: integer, const: 1 }
+        data: { type: object }
+    ClientHelloEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: client.hello }, data: { $ref: '#/components/schemas/ClientHelloData' } } }]
+      unevaluatedProperties: false
+    ClientAudioStartEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: client.audio.start }, data: { $ref: '#/components/schemas/AudioStartData' } } }]
+      unevaluatedProperties: false
+    ClientAudioChunkEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: client.audio.chunk }, data: { $ref: '#/components/schemas/AudioChunkData' } } }]
+      unevaluatedProperties: false
+    ClientAudioStopEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: client.audio.stop }, data: { $ref: '#/components/schemas/AudioStopData' } } }]
+      unevaluatedProperties: false
+    ClientAudioCancelEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: client.audio.cancel }, data: { $ref: '#/components/schemas/CancelData' } } }]
+      unevaluatedProperties: false
+    ClientTtsCancelEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: client.tts.cancel }, data: { $ref: '#/components/schemas/CancelData' } } }]
+      unevaluatedProperties: false
+    ServerHelloEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: server.hello }, data: { $ref: '#/components/schemas/ServerHelloData' } } }]
+      unevaluatedProperties: false
+    ServerFlowControlEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: server.flow-control }, data: { $ref: '#/components/schemas/FlowControlData' } } }]
+      unevaluatedProperties: false
+    ServerAckEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: server.ack }, data: { $ref: '#/components/schemas/AckData' } } }]
+      unevaluatedProperties: false
+    ServerNackEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: server.nack }, data: { $ref: '#/components/schemas/NackData' } } }]
+      unevaluatedProperties: false
+    TranscriptPartialEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: asr.partial }, data: { $ref: '#/components/schemas/TranscriptPartialData' } } }]
+      unevaluatedProperties: false
+    TranscriptFinalEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: asr.final }, data: { $ref: '#/components/schemas/TranscriptFinalData' } } }]
+      unevaluatedProperties: false
+    SpeechFailureEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: speech.failed }, data: { $ref: '#/components/schemas/FailureData' } } }]
+      unevaluatedProperties: false
+    TtsStateEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: tts.state }, data: { $ref: '#/components/schemas/TtsStateData' } } }]
+      unevaluatedProperties: false
+    TtsChunkEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: tts.chunk }, data: { $ref: '#/components/schemas/TtsChunkData' } } }]
+      unevaluatedProperties: false
+    VoiceTurnStateEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: voice.turn.state }, data: { $ref: '#/components/schemas/VoiceTurnStateData' } } }]
+      unevaluatedProperties: false
+    VoiceDegradedEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: voice.turn.degraded }, data: { $ref: '#/components/schemas/FailureData' } } }]
+      unevaluatedProperties: false
+    ResyncRequiredEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: server.resync-required }, data: { $ref: '#/components/schemas/ResyncData' } } }]
+      unevaluatedProperties: false
+    TerminalEnvelope:
+      allOf: [{ $ref: '#/components/schemas/BaseEnvelope' }, { type: object, properties: { type: { const: server.terminal }, data: { $ref: '#/components/schemas/TerminalData' } } }]
+      unevaluatedProperties: false
+    ClientHelloData:
+      type: object
+      additionalProperties: false
+      required: [socketTicket, protocolVersion, resumeFromServerSequence, capabilities]
+      properties:
+        socketTicket: { type: string, minLength: 32, maxLength: 4096, writeOnly: true }
+        protocolVersion: { type: integer, const: 1 }
+        resumeFromServerSequence: { type: integer, minimum: 0 }
+        capabilities: { type: array, uniqueItems: true, items: { type: string, enum: [BASE64_AUDIO, TTS_PLAYBACK, TRANSCRIPT_REVIEW] } }
+    AudioStartData:
+      type: object
+      additionalProperties: false
+      required: [codec, sampleRate, channelCount]
+      properties:
+        codec: { type: string, maxLength: 128 }
+        sampleRate: { type: integer, minimum: 1 }
+        channelCount: { type: integer, minimum: 1, maximum: 8 }
+    AudioChunkData:
+      type: object
+      additionalProperties: false
+      required: [bytesBase64, durationMs]
+      properties:
+        bytesBase64: { type: string, contentEncoding: base64 }
+        durationMs: { type: integer, minimum: 1 }
+    AudioStopData:
+      type: object
+      additionalProperties: false
+      required: [totalBytes, totalDurationMs]
+      properties:
+        totalBytes: { type: integer, minimum: 1 }
+        totalDurationMs: { type: integer, minimum: 1 }
+    CancelData:
+      type: object
+      additionalProperties: false
+      required: [reasonCode]
+      properties: { reasonCode: { type: string, minLength: 1, maxLength: 96 } }
+    ServerHelloData:
+      type: object
+      additionalProperties: false
+      required: [protocolVersion, resumeAccepted, serverSequence, nextExpectedClientSequence, flowControl]
+      properties:
+        protocolVersion: { type: integer, const: 1 }
+        resumeAccepted: { type: boolean }
+        serverSequence: { type: integer, minimum: 0 }
+        nextExpectedClientSequence: { type: integer, minimum: 1 }
+        flowControl: { $ref: '#/components/schemas/FlowControlLimits' }
+    FlowControlLimits:
+      type: object
+      additionalProperties: false
+      required: [maxInFlightChunks, maxChunkBytes, maxBufferedDurationMs]
+      properties:
+        maxInFlightChunks: { type: integer, minimum: 1 }
+        maxChunkBytes: { type: integer, minimum: 1 }
+        maxBufferedDurationMs: { type: integer, minimum: 1 }
+    FlowControlData:
+      type: object
+      additionalProperties: false
+      required: [paused, reasonCode, limits]
+      properties:
+        paused: { type: boolean }
+        reasonCode: { type: [string, 'null'], maxLength: 96 }
+        limits: { $ref: '#/components/schemas/FlowControlLimits' }
+    AckData:
+      type: object
+      additionalProperties: false
+      required: [acceptedClientSequence, remainingWindow]
+      properties:
+        acceptedClientSequence: { type: integer, minimum: 0 }
+        remainingWindow: { type: integer, minimum: 0 }
+    NackData:
+      type: object
+      additionalProperties: false
+      required: [expectedClientSequence, receivedClientSequence, recoverable]
+      properties:
+        expectedClientSequence: { type: integer, minimum: 1 }
+        receivedClientSequence: { type: integer, minimum: 0 }
+        recoverable: { type: boolean }
+    TranscriptPartialData:
+      type: object
+      additionalProperties: false
+      required: [text, confidence]
+      properties:
+        text: { type: string, maxLength: 30000 }
+        confidence: { type: [number, 'null'], minimum: 0, maximum: 1 }
+    TranscriptFinalData:
+      type: object
+      additionalProperties: false
+      required: [transcriptId, transcriptVersionId, audioArtifactId, text, language, offsetUnit, lowConfidenceSpans, transcriptVersion]
+      properties:
+        transcriptId: { type: string, format: uuid }
+        transcriptVersionId: { type: string, format: uuid }
+        audioArtifactId: { type: string, format: uuid }
+        text: { type: string, minLength: 1, maxLength: 30000 }
+        language: { type: string, maxLength: 32 }
+        offsetUnit: { type: string, enum: [UTF16, UNICODE_CODE_POINT] }
+        lowConfidenceSpans: { type: array, items: { $ref: '#/components/schemas/ConfidenceSpan' } }
+        transcriptVersion: { type: integer, minimum: 0 }
+    ConfidenceSpan:
+      type: object
+      additionalProperties: false
+      required: [startInclusive, endExclusive, confidence]
+      properties:
+        startInclusive: { type: integer, minimum: 0 }
+        endExclusive: { type: integer, minimum: 1 }
+        confidence: { type: number, minimum: 0, maximum: 1 }
+    FailureData:
+      type: object
+      additionalProperties: false
+      required: [reasonCode, recoverable]
+      properties:
+        reasonCode: { type: string, minLength: 1, maxLength: 96 }
+        recoverable: { type: boolean }
+    TtsStateData:
+      type: object
+      additionalProperties: false
+      required: [state, outputArtifactId]
+      properties:
+        state: { type: string, enum: [STARTED, COMPLETED, CANCELLED, FAILED] }
+        outputArtifactId: { type: [string, 'null'], format: uuid }
+    TtsChunkData:
+      type: object
+      additionalProperties: false
+      required: [chunkSequence, bytesBase64, endOfOutput]
+      properties:
+        chunkSequence: { type: integer, minimum: 1 }
+        bytesBase64: { type: string, contentEncoding: base64 }
+        endOfOutput: { type: boolean }
+    VoiceTurnStateData:
+      type: object
+      additionalProperties: false
+      required: [state, voiceExecutionVersion]
+      properties:
+        state: { type: string, enum: [IDLE, LISTENING, TRANSCRIBING, CONFIRMING, THINKING, SPEAKING, DEGRADED, CANCELLED] }
+        voiceExecutionVersion: { type: integer, minimum: 0 }
+    ResyncData:
+      type: object
+      additionalProperties: false
+      required: [reasonCode, snapshotUrl]
+      properties:
+        reasonCode: { type: string, minLength: 1, maxLength: 96 }
+        snapshotUrl: { type: string, format: uri-reference, pattern: '^/api/v1/' }
+    TerminalData:
+      type: object
+      additionalProperties: false
+      required: [reasonCode, recoverable, snapshotUrl]
+      properties:
+        reasonCode: { type: string, minLength: 1, maxLength: 96 }
+        recoverable: { type: boolean }
+        snapshotUrl: { type: [string, 'null'], format: uri-reference, pattern: '^/api/v1/' }
+x-socket-contract:
+  authentication: The HTTP upgrade must authenticate the existing RuoYi Bearer principal through the aic.voice.v1 and ruoyi-bearer.<JWT> subprotocols. A one-use principal-bound socket ticket is then consumed in the first client.hello frame; neither credential may appear in the URL or browser persistence.
+  ordering: Client and server sequences are independent and monotonic. Duplicate frames are ACKed and discarded; gaps are NACKed or require resync.
+  backpressure: The client must pause when maxInFlightChunks or maxBufferedDurationMs is reached and resume only after ACK/flow-control permits it.
+  cancellation: client.audio.cancel stops capture and queues unconfirmed input for deletion; client.tts.cancel never changes Interview Session state.
+  recovery: Partials may be discarded. Confirmed Transcript/Answer facts are recovered through REST snapshot before any replay.
+  closeCodes:
+    4401: unauthenticated
+    4403: forbidden-or-consent-required
+    4408: protocol-or-backpressure-violation
+    4409: stale-turn-or-generation
+    4413: unsupported-payload-or-codec
+    4429: rate-limited
+    4503: capability-unavailable

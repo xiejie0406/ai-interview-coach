@@ -1,0 +1,222 @@
+# AI Interview Coach 决策登记表
+
+> 文档状态：Draft  
+> 决策集版本：v0.1  
+> 创建时间：2026-08-02  
+> 更新时间：2026-08-02  
+> 风险等级：L3  
+> 当前主阶段：3 功能规格（WaitingForApproval）  
+> 关联 PRD：[`../product/prd.md`](../product/prd.md) v0.2 Draft  
+> 关联技术架构：[`../architecture/technical-architecture.md`](../architecture/technical-architecture.md) Draft  
+> owner / 决策权：产品与商业决策由用户拍板；架构 owner 提供推荐与影响分析，不代替用户批准
+
+## 1. 使用说明
+
+这份登记表用于在编写开发计划和 `TASK-*` 前集中关闭关键歧义。表中的“推荐”只是建议，不代表已经批准；除 `DEC-001` 外，Gate A 当前均为 `Pending`。
+
+决策时可以直接回复：
+
+```text
+接受 Gate A 推荐包；但修改：
+DEC-003=B
+DEC-008=A
+DEC-012=转写成功后 24 小时内删除
+```
+
+也可以逐项回复：
+
+```text
+DEC-002=A
+DEC-003=A
+DEC-004=A
+```
+
+统一状态：
+
+- `Pending`：尚未决定。
+- `Accepted`：用户明确接受推荐项或指定选项。
+- `Rejected`：明确不采用，需要记录替代方案。
+- `Deferred`：明确延后，且不进入当前计划。
+- `Superseded`：被后续决策替代，保留历史。
+
+## 2. Gate A：制定开发计划前必须决定
+
+Gate A 决定产品边界、MVP 切片和计划的模块结构。未关闭时只能继续调研、规格和原型，不能形成可执行开发计划。
+
+### 2.1 产品、用户与商业边界
+
+| ID | 决策问题 | 主要选项 | 推荐及理由 | 影响范围 | 最晚决定时间 | 状态 | 用户决定 |
+|---|---|---|---|---|---|---|---|
+| DEC-001 | 新项目与 PaiCLI 的关系 | A. 完全独立；B. 作为 PaiCLI 子模块；C. 共享运行时 | **A（已确认）**。只借鉴设计经验，避免许可、数据、部署和演进耦合 | 全项目、仓库、依赖、数据、部署 | 已关闭 | Accepted | A：完全独立 |
+| DEC-002 | 产品工作名 | A. AI Interview Coach；B. 中文品牌名；C. 现在同时定中英文品牌 | **A**。先用工作名，不让品牌注册阻塞 MVP；正式上线前再做商标与域名核验 | 文档、包名、仓库名、UI 文案 | 计划前 | Pending | 待填写 |
+| DEC-003 | 首批核心用户 | A. Java 开发者转型 AI 应用/Agent；B. 全部 Java 求职者；C. 所有技术岗位 | **A**。垂直人群痛点最清晰，也最适合创始人内容优势；普通 Java 作为知识基础而非第二产品线 | 定位、题库、Rubric、获客、指标 | 计划前 | Pending | 待填写 |
+| DEC-004 | MVP 核心价值闭环 | A. 题库→模拟面试→证据化报告→弱项复练；B. 只做题库；C. 只做模拟面试 | **A**。能够验证差异化与复购；题库或聊天单点容易同质化 | P0 范围、页面、数据、里程碑 | 计划前 | Pending | 待填写 |
+| DEC-005 | 首发市场与数据地域 | A. 中国大陆；B. 海外；C. 同时全球 | **A**。与当前用户和普通话场景一致；供应商和数据默认选择境内链路，后续再做海外部署 | 合规、供应商、登录、支付、部署、隐私文案 | 计划前 | Pending | 待填写 |
+| DEC-006 | 首发语言 | A. 简体中文；B. 中英双语；C. 英文 | **A**。先保证中文技术术语 ASR 和评分质量；数据模型保留 locale 字段 | 内容、Prompt、ASR/TTS、UI、测试集 | 计划前 | Pending | 待填写 |
+| DEC-007 | P0 题库范围 | A. Java 基础 + AI 应用/RAG/Agent/工作流/评测安全/系统设计/项目表达；B. 只做 Agent；C. 扩到全部 Java 八股 | **A**，但内容生产按“转型必备路径”限量，不追求题量；每题必须有来源、Rubric 和追问 | 内容模型、后台、种子数据、Golden Set | 计划前 | Pending | 待填写 |
+| DEC-008 | 语音是否属于 MVP | A. P0，采用 ASR→文本 Agent→TTS 并可降级文本；B. P1；C. 只做文本 | **A**。语音是面试场景的核心体验，但采用级联方案控制风险；Realtime 不进入 MVP | 前端权限、音频链路、Provider、成本、隐私、验收 | 计划前 | Pending | 待填写 |
+| DEC-009 | 简历与 JD 个性化 | A. P1 延后；B. P0 仅 JD；C. P0 同时简历 + JD | **A**。先验证通用闭环，减少敏感数据、解析和幻觉范围 | 隐私、对象存储、Prompt、个性化、页面 | 计划前 | Pending | 待填写 |
+| DEC-010 | MVP 商业模式 | A. 个人 Free + Pro 权益/额度，支付接入可在 T2；B. 一开始完成真实支付；C. 免费产品；D. B2B 优先 | **A**。从数据模型首日保留权益与用量，先验证价值和单位成本，真实支付在商业化里程碑落地 | Entitlement、Usage、套餐页面、支付、指标 | 计划前 | Pending | 待填写 |
+| DEC-011 | 真实面试辅助边界 | A. 明确禁止隐蔽 Copilot/代答；B. 允许提示；C. 暂不声明 | **A**。产品只服务练习与复盘，降低作弊、声誉和平台风险 | 产品非目标、风控、FAQ、审核、营销 | 计划前 | Pending | 待填写 |
+| DEC-012 | 原始音频默认策略 | A. 转写成功后尽快删除；B. 默认保留供回放；C. 用户选择后保留 | **A**。默认不提供原音回放，只保存转写和必要元数据；具体删除 SLA 在 Gate B 关闭 | 隐私、存储、删除工作流、报告能力、成本 | 计划前确定方向 | Pending | 待填写 |
+| DEC-013 | 评分产品措辞 | A. “练习反馈/证据化评测”，允许证据不足；B. “权威评分”；C. 只给建议不评分 | **A**。保留可比较维度，但不得把 LLM 判断包装成招聘结论 | 报告、Rubric、免责声明、营销、Golden Set | 计划前 | Pending | 待填写 |
+| DEC-014 | P0 账号范围 | A. 账号 + 个人档案 + 历史记录 + 删除入口；B. 匿名体验优先；C. 完整社交账号体系 | **A**。学习闭环需要历史和弱项；可在首页提供有限游客示例，不建设复杂社交体系 | Auth、Profile、数据归属、隐私、页面 | 计划前 | Pending | 待填写 |
+| DEC-015 | P0 内容运营后台 | A. 最小后台纳入 P0；B. 直接改数据库；C. P1 再做 | **A**。题目、来源、Rubric、版本和发布是评分可信度基础，不能靠生产库手工维护 | Admin、权限、审核、版本、审计 | 计划前 | Pending | 待填写 |
+| DEC-016 | MVP 成功门槛 | A. 采用 PRD 指标候选；B. 只看功能完成；C. 另定指标 | **A**。至少跟踪首次价值达成、面试完成率、反馈有用度、Golden Set 一致率、7 日复练和单位成本；数值可在原型后校正 | Analytics、验收、里程碑、商业判断 | 计划前确定指标集合 | Pending | 待填写 |
+| DEC-017 | 交付里程碑 | A. T0 风险原型→T1 可用 MVP→T2 商业化 MVP；B. 一次性完成；C. 先纯题库 | **A**。T0 验证语音/评测/隐私，T1 完成无真实支付的用户闭环，T2 接入套餐支付与生产治理 | 开发计划、依赖、验收、预算 | 计划前 | Pending | 待填写 |
+| DEC-018 | 阶段 4 原型范围 | A. 关键页面 + 文本/语音主流程 + 空/错/拒绝/取消/恢复；B. 只画主流程；C. 跳过原型 | **A**。L3 场景必须先关闭麦克风拒绝、Provider 故障、恢复和删除等交互歧义 | 原型、PRD 回流、API 状态、任务拆分 | 开发计划前 | Pending | 待填写 |
+
+### 2.2 技术战略与计划结构
+
+| ID | 决策问题 | 主要选项 | 推荐及理由 | 影响范围 | 最晚决定时间 | 状态 | 用户决定 |
+|---|---|---|---|---|---|---|---|
+| DEC-019 | 后端语言基线 | A. Java 21；B. Java 17；C. 其他语言 | **A**。使用当前 LTS 能力，并与“Java 开发者转 AI 应用”定位一致 | 构建、依赖、部署、招聘/学习 | 计划前 | Pending | 待填写 |
+| DEC-020 | 后端形态 | A. Spring Boot 模块化单体；B. 微服务；C. Serverless 拼装 | **A**。一个团队的 MVP 应优先降低分布式事务和运维复杂度，同时用模块边界保留拆分能力 | 模块、部署、事务、任务拆分 | 计划前 | Pending | 待填写 |
+| DEC-021 | Maven 工程组织 | A. 单仓多 Maven module；B. 单 Maven module 按 package 分层；C. 多仓库 | **A**。建议 `app/domain/application/infrastructure` 等少量模块，利用编译边界控制依赖；避免过度拆分 | 目录、依赖、CI、任务文件范围 | 计划前 | Pending | 待填写 |
+| DEC-022 | 前端技术 | A. React + TypeScript + Vite（基线，自研）；B. Vue 2 全栈；C. Vue 3 多端（admin-web + portal-web + mobile 三端 Vue 3） | **C（与 DEC-070/071/072/073 联动生效）**。原历史推荐 A 已被 2026-08-16 用户对话明确替换。`DEC-070/071/072/073` 是 C 的实现拆分：RuoYi-Vue3 当 admin-web 骨架、自研 Vue 3 当 portal-web、uni-app Vue 3 当 mobile；同时与 `DEC-022 A` 的旧 React 19 现状形成"归档/迁移"关系（详见 `docs/architecture/ruoyi-migration-plan.md`）。`DEC-022 A` 不再覆盖 `DEC-070/071/072/073`。 | Web、组件、测试、部署、归档动作 | R1 SPEC 批准前 | Pending | C：Vue 3 多端，与 DEC-070/071/072/073 联动 |
+| DEC-023 | 业务事实数据库 | A. PostgreSQL；B. MySQL；C. 文档数据库 | **A**。事务、JSONB、全文/向量扩展和复杂查询适合本产品，且不绑定云厂商 | Schema、事务、检索、部署 | 计划前 | Pending | 待填写 |
+| DEC-024 | 数据访问与迁移 | A. Spring Data JPA + Flyway，复杂查询用 JdbcClient/原生 SQL；B. jOOQ 为主；C. MyBatis | **A**。先提升领域开发效率；只有报表复杂度出现证据后再评估 jOOQ | Repository、Migration、测试、报表 | 计划前 | Pending | 待填写 |
+| DEC-025 | Redis 在 MVP 的角色 | A. T0 可不启用，T1 商业多实例纳入；B. 从第一天强依赖；C. 完全不用 | **A**。本地原型可用进程内实现，但正式多实例会话、限流和短期协调需要 Redis；业务事实仍在 PostgreSQL | 会话、限流、部署、测试替身 | 计划前 | Pending | 待填写 |
+| DEC-026 | 对象存储进入时间 | A. T0 用受控临时存储，T1 引入 S3 兼容私有对象存储；B. 从第一天云对象存储；C. 不使用 | **A**。语音临时对象和后续导出需要对象存储抽象，但不在原型阶段绑定供应商 | 音频、导出、简历、删除、部署 | 计划前 | Pending | 待填写 |
+| DEC-027 | 接口协议分工 | A. REST 管命令/查询，SSE 管文本与进度，WebSocket 管双向语音；B. 全 WebSocket；C. 全 REST 轮询 | **A**。按交互特性拆分，降低重连、鉴权和幂等复杂度 | API、前端状态、网关、恢复测试 | 计划前 | Pending | 待填写 |
+| DEC-028 | Web 认证形态 | A. 同源 Secure HttpOnly Cookie Session；B. 浏览器 localStorage JWT；C. 前端持有 Provider Key | **A**。降低 Token 泄漏面，并由服务端统一处理 CSRF、轮换和吊销；**C 禁止** | Auth、安全、CORS、部署、测试 | 计划前 | Pending | 待填写 |
+| DEC-029 | 租户模型 | A. 从第一天建立 `personal tenant`；B. 只有 `user_id`，B2B 时迁移；C. 立即做完整组织 | **A**。用轻量 tenant 边界承载个人空间，避免未来组织隔离大迁移；不在 MVP 暴露复杂组织 UI | 数据归属、权限、索引、审计、B2B 演进 | 计划前 | Pending | 待填写 |
+| DEC-030 | Agent 框架战略 | A. 业务状态机与端口自有，Spring AI/LangChain4j 仅可作为 Adapter；B. 完全绑定 Spring AI；C. 完全绑定 LangChain4j；D. 全自研底层 SDK | **A**。保护会话、评测、成本和恢复契约，同时允许利用成熟 SDK 的模型调用能力 | Agent、Provider SPI、测试、可替换性 | 计划前 | Pending | 待填写 |
+| DEC-031 | 评测链路与发布门 | A. Rubric + Evidence Extractor + LLM Judge + 置信门 + Golden Set；B. 单次 LLM 打分；C. 纯规则 | **A**。这是“证据化反馈”的可信度底座；Golden Set 未达门槛不得宣传权威评分 | 内容、Agent、报告、测试、运营 | 计划前 | Pending | 待填写 |
+| DEC-032 | 代码仓库与许可证 | A. 独立私有仓库、暂不声明开源许可证；B. 立即开源；C. 与 PaiCLI 同仓 | **A**。商业策略未定前保留全部权利；仓库建议 `ai-interview-coach`，阶段 6 执行前再单独授权 Git 初始化 | IP、Git、CI、协作、发布 | 计划前决定策略；Git 动作另行授权 | Pending | 待填写 |
+
+## 3. Gate B：进入对应实现包前决定
+
+这些决策不会阻塞开发计划的整体编写。计划中应把它们作为前置 `DEC-*` 任务和停止条件；未关闭时不得启动对应实现包或真实外部链路。
+
+### 3.1 依赖、供应商与 AI 质量
+
+| ID | 决策问题 | 主要选项 | 推荐及理由 | 影响范围 | 最晚决定时间 | 状态 | 用户决定 |
+|---|---|---|---|---|---|---|---|
+| DEC-033 | Spring Boot/Spring Modulith/Node 等具体版本 | 固定当前受支持版本；或追最新 | 在阶段 6 做兼容矩阵后锁版本；Spring Modulith 兼容则引入，否则用 Maven + ArchUnit 实现等价边界 | 构建、依赖、安全维护 | 脚手架任务前 | Pending | 待填写 |
+| DEC-034 | LLM 主备供应商 | 国内云模型、自托管、海外 API、双供应商 | 中国大陆首发优先境内、支持结构化输出且 DPA/地域清晰的主供应商；至少保留第二 Adapter，实测质量/延迟/成本后拍板 | Provider、Prompt、成本、合规、故障降级 | Agent 集成前 | Pending | 待填写 |
+| DEC-035 | ASR 供应商 | 云 ASR、自托管 Whisper 类、浏览器能力 | 以普通话 Java/AI 术语、流式时延、热词、数据地域、删除能力和价格进行盲测后选择；浏览器原生识别只作非关键降级 | 语音、术语、隐私、成本 | 语音集成前 | Pending | 待填写 |
+| DEC-036 | TTS 供应商与声音 | 云 TTS、自托管、浏览器 TTS | 优先与 ASR 同地域的可流式云 TTS；提供中性面试官声音，不做声音克隆 | 语音体验、成本、伦理、缓存 | 语音集成前 | Pending | 待填写 |
+| DEC-037 | Embedding 与检索实现 | PostgreSQL 全文；pgvector；外部向量库 | P0 先用结构化筛选 + PostgreSQL 全文；只有召回评测证明需要语义检索时引入 pgvector，不上独立向量数据库 | 题库、RAG、数据迁移、评测 | 检索任务前 | Pending | 待填写 |
+| DEC-038 | 模型/Prompt 版本与路由 | 固定单模型；按任务路由；动态自动路由 | P0 按“面试官/证据提取/评分/学习计划”配置显式版本，禁止无审计自动漂移；变更需回归 Golden Set | 可复现性、成本、报告历史、运维 | Agent 实现前 | Pending | 待填写 |
+| DEC-039 | Golden Set 初始规模与通过门槛 | 小型人工集；大规模采购；仅线上反馈 | 首版每个核心方向覆盖正确/部分/错误/证据不足及 ASR 错词；建议至少 100 个有人工 Rubric 的样本，一致率目标沿用 PRD 候选 80%，最终由评测设计批准 | 发布门、内容成本、模型选型 | 评分上线前 | Pending | 待填写 |
+| DEC-040 | 题目来源与版权政策 | 自研/授权；抓取聚合；用户投稿 | 只用自研、明确授权或允许引用的来源；记录 URL/版本/访问日/许可，不复制商业题库全文；投稿需授权条款和审核 | 内容后台、法务、搜索、品牌 | 导入首批内容前 | Pending | 待填写 |
+
+### 3.2 账号、商业与隐私
+
+| ID | 决策问题 | 主要选项 | 推荐及理由 | 影响范围 | 最晚决定时间 | 状态 | 用户决定 |
+|---|---|---|---|---|---|---|---|
+| DEC-041 | 首个登录方式 | 邮箱密码/验证码；手机号短信；微信；GitHub/Gitee | T1 先选一种低成本主方式并支持账号找回；中国大陆商业上线前根据获客渠道决定手机号或微信，第三方登录不与基础账号强耦合 | Auth、费用、实名/合规、转化 | Auth 实现包前 | Pending | 待填写 |
+| DEC-042 | 是否提供匿名体验 | 无匿名；公开示例；匿名完整面试 | 只提供公开示例题和示例报告；完整练习登录后进行，避免匿名数据归属、滥用和成本失控 | 漏斗、Auth、限流、数据删除 | 公开站点实现前 | Pending | 待填写 |
+| DEC-043 | 套餐、额度与计费单位 | 次数；分钟；Token；组合权益 | 用户侧用“文本场次 + 语音分钟 + 报告权益”表达，内部记录 Token/秒/调用成本；开始前预估、平台失败释放额度 | Usage、Entitlement、UI、成本、客服 | 权益模块前 | Pending | 待填写 |
+| DEC-044 | 支付渠道、价格与退款 | 微信/支付宝；第三方聚合；暂不支付 | 经营主体、市场和退款规则明确后再选；T1 可用测试权益/邀请码，T2 才接真实支付 | Order、财务、协议、客服、部署 | 支付实现前 | Pending | 待填写 |
+| DEC-045 | 原始音频具体删除 SLA | 即时；24 小时；7 天；默认长期 | 延续 DEC-012，推荐转写成功后立即排队删除、最迟 24 小时；转写失败也设短期上限，用户主动选择重试时除外 | 对象存储、Job、隐私文案、验证 | 真实语音数据前 | Pending | 待填写 |
+| DEC-046 | 转写/回答/报告保留期 | 账户存续；固定 30/90/365 天；用户自定 | 学习档案在账户存续期保存并允许逐项删除；长期不活跃清理周期和注销 SLA 需隐私评审批准 | 数据生命周期、学习趋势、备份、成本 | 真实用户数据前 | Pending | 待填写 |
+| DEC-047 | 数据删除与备份 SLA | 立即逻辑隐藏 + 异步物理删除；同步全删；人工处理 | 立即对用户隐藏，异步删除内部/外部副本；明确备份自然过期窗口、部分失败状态和最小审计，不承诺无法兑现的瞬时全删 | 删除状态机、备份、Provider、客服 | 真实用户数据前 | Pending | 待填写 |
+| DEC-048 | 供应商数据地域与 DPA 门 | 允许跨境；仅境内；逐项同意 | 中国大陆首发默认仅使用可确认境内处理、非训练用途、留存/删除可控的供应商；任何跨境作为新的 L3 决策 | LLM/ASR/TTS、隐私政策、上线门 | 真实 Provider 前 | Pending | 待填写 |
+| DEC-049 | 管理员敏感访问 | 普通 RBAC；MFA + reason code + 审计；共享管理员 | 采用独立管理员角色、MFA、短会话、reason code 和访问审计；默认不允许内容管理员查看用户音频/简历 | Admin、Auth、审计、隐私 | 管理后台真实数据前 | Pending | 待填写 |
+| DEC-050 | 日志、审计与备份保留 | 统一周期；按数据分类；永久 | 按分类设置：业务审计、技术日志、备份分别定期；任何日志禁止完整回答、转写、音频、简历和密钥 | 可观测性、合规、存储、排障 | 生产环境前 | Pending | 待填写 |
+
+### 3.3 工程、部署与上线质量
+
+| ID | 决策问题 | 主要选项 | 推荐及理由 | 影响范围 | 最晚决定时间 | 状态 | 用户决定 |
+|---|---|---|---|---|---|---|---|
+| DEC-051 | 开发/测试/生产环境 | 本地 + 测试 + 生产；仅一套云环境；完整多环境 | 至少隔离本地、测试、生产；测试不得使用生产用户数据或生产 Secret | 配置、CI/CD、数据、成本 | 部署设计前 | Pending | 待填写 |
+| DEC-052 | 首发部署平台 | 国内云 VM/容器服务；Kubernetes；Serverless | MVP 选一个国内云的托管数据库/Redis/对象存储 + 单体容器服务或 VM；不引入 Kubernetes | 运维、网络、成本、扩容、合规 | 部署实现前 | Pending | 待填写 |
+| DEC-053 | CI/CD 与 Git 分支策略 | trunk-based；GitFlow；手工发布 | 小团队采用短分支 + 受保护主分支 + PR 检查；生产发布继续单独授权并有回滚记录 | 协作、质量门、发布 | 仓库初始化/CI 前 | Pending | 待填写 |
+| DEC-054 | 自动化测试基线 | JUnit/Mock；Testcontainers；端到端浏览器；组合 | 推荐 JUnit 5 + Testcontainers(PostgreSQL/Redis) + API 契约 + 关键 Playwright 流程 + Golden Set；外部 Provider 用契约 Stub，真实链路单独授权 | 任务估算、CI、证据、成本 | 测试计划前 | Pending | 待填写 |
+| DEC-055 | SLO 与压测门 | 沿用 PRD 候选；上线后再看；更严格目标 | 原型记录基线，T1 批准文本/语音首响应、会话恢复和报告时限；T2 上线前完成容量与降级压测 | 架构、监控、验收、成本 | T1/T2 验收设计前 | Pending | 待填写 |
+| DEC-056 | 可观测性出口 | OpenTelemetry + 云监控；厂商 SDK；仅日志 | 代码使用 OpenTelemetry 标准，Collector/Exporter 在部署时选择；指标按 Provider、模型、错误码、延迟和成本分层 | 监控、告警、供应商替换、成本 | 生产部署前 | Pending | 待填写 |
+| DEC-057 | Feature Flag 方案 | 数据库配置；开源平台；云厂商平台 | P0 用受审计的数据库/配置型 Flag，支持 Provider、语音和新评分版本按环境关闭；规模出现后再引入平台 | 灰度、回滚、运维、权限 | 外部链路上线前 | Pending | 待填写 |
+| DEC-058 | 外部调用韧性与成本上限 | 无限重试；固定重试；按操作预算 | 每个操作定义超时、可重试错误、最大次数、总时长和成本预算；熔断后降级文本/待处理，禁止无界 Agent 循环 | Provider、Job、用量、用户体验 | Provider 实现前 | Pending | 待填写 |
+
+## 4. Gate C：明确延后，不进入当前开发计划
+
+这些项目建议现在直接批准为 `Deferred`。如果未来恢复，必须重新完成产品/架构决策和任务授权，不能从路线图自动推导为已批准范围。
+
+| ID | 决策主题 | 当前选项 | 推荐及理由 | 影响范围 | 最早重评门槛 | 状态 | 用户决定 |
+|---|---|---|---|---|---|---|---|
+| DEC-059 | 端到端 Realtime/WebRTC 语音 | 延后 / 纳入 MVP | **延后**。先证明级联语音的付费价值、延迟瓶颈和中断恢复 | 语音、网关、Provider、成本 | T1 语音指标与用户反馈完成 | Pending | 待填写 |
+| DEC-060 | B2B/高校/培训机构 | 延后 / B2B 优先 | **延后**。先验证个人闭环；数据模型仅保留 tenant 演进能力 | 组织、套餐、报表、销售 | 个人留存和付费成立 | Pending | 待填写 |
+| DEC-061 | 企业 SSO/SCIM | 延后 / 现在实现 | **延后**。属于 B2B 能力 | Auth、组织、合规 | DEC-060 恢复后 | Pending | 待填写 |
+| DEC-062 | Kafka/RabbitMQ | 延后 / 现在引入 | **延后**。先用 PostgreSQL Outbox + Job；出现吞吐、重放或独立扩缩容证据后再评估 | 异步、运维、可靠性 | 数据库 Job 无法满足批准 SLO | Pending | 待填写 |
+| DEC-063 | Elasticsearch/独立向量数据库 | 延后 / 现在引入 | **延后**。PostgreSQL 筛选、全文和可选 pgvector 足够验证 MVP | 检索、同步、运维 | 检索评测证明 PostgreSQL 不足 | Pending | 待填写 |
+| DEC-064 | Kubernetes | 延后 / 首发使用 | **延后**。单体和初始流量不值得承担集群复杂度 | 部署、成本、值班 | 多服务/多团队/弹性证据出现 | Pending | 待填写 |
+| DEC-065 | 微服务拆分 | 延后 / 现在拆分 | **延后**。模块化单体先建立领域边界；按独立扩缩容、故障域或团队所有权证据拆分 | 代码、数据、部署、组织 | 明确拆分指标达到 | Pending | 待填写 |
+| DEC-066 | 报告公开分享/招聘方链接 | 延后 / MVP | **延后**。涉及隐私、撤销、过期和误用，先只允许本人查看/导出 | 报告、权限、隐私、增长 | 用户需求与隐私设计完成 | Pending | 待填写 |
+| DEC-067 | 英文及更多语言 | 延后 / 双语首发 | **延后**。先完成中文题库、ASR 术语和评测校准 | 内容、模型、语音、UI | 中文质量门通过 | Pending | 待填写 |
+| DEC-068 | 视频、表情评分、数字人、声音克隆 | 永久排除当前路线 / 后续考虑 | **当前排除**。不做面部、情绪或人格推断，不做声音克隆；数字人只有独立价值与伦理评审后才可重开 | 隐私、伦理、成本、品牌 | 新 L3 专项批准 | Pending | 待填写 |
+
+### 2.3 多端前端方案：Vue 3 + RuoYi-Vue3 改造与未来 SPEC 钩子（Draft / 用户未批）
+
+下列决策是 2026-08-16 用户对话**追加**的子决策。这组决策的存在**不**意味着 Gate A 已批；它是 Gate A 的**候选**，等待用户回填或拒绝。按 `AGENTS.md` 第 30 行 / 本表第 168 行，未批之前**不得据此进入代码或 tasks**。
+
+> 修改日期：2026-08-16；理由：用户希望复用现成后台脚手架并把 PC / 移动端纳入 Vue 3 生态；影响范围：`DEC-022` / PRD v0.3 / 技术架构第 8 节 / 现有 React 前端 80+ 文件与 Foundation Wave 01-04 开发记录 / 未来 `apps/` 目录新建。
+
+| ID | 决策问题 | 主要选项 | 候选推荐及理由 | 影响范围 | 最晚决定时间 | 状态 | 用户决定 |
+|---|---|---|---|---|---|---|---|
+| **DEC-070** | 后台管理前端脚手架 | A. RuoYi-Vue3（官方 Vue3 原版，MIT）；B. RuoYi-Vue-Plus（Dromara 维护，Vue 3，GPL-3.0 部分）；C. 自研 Vue 3 + Element Plus；D. 沿用 React | **A（已接受）**。`git clone` 上游并以 `apps/admin-web/.upstream/ruoyi-vue3/` 作为参考仓；现有 `frontend/src/features/{identity,catalog,practice,interview,voice,evaluation,learning,billing,privacy,status,admin,dashboard,landing}` 13 个 feature 全部移植到 RuoYi 的 `apps/admin-web/src/views/` 下（RuoYi 默认 views 与业务 feature 双轨并行）。迁移完成后 `frontend/` 进入 `frontend-legacy/` 归档。评审结论见 `docs/licenses/ruoyi-vue3.md`。 | 后台前端、License 文档、frontend 归档、.upstream 占位、MIT-LICENSE-NOTICE | R1 SPEC 批准前 | Accepted | A：RuoYi-Vue3，git clone + 迁移 frontend 功能 |
+| **DEC-071** | 用户前台前端技术 | A. 自研 Vue 3 + Vite + TypeScript + Pinia；B. 沿用现有 React 19 + Vite；C. Nuxt 3 SSR | **A（已接受）**。前台**自研** Vue 3 框架；**不**再寻找 portal 上游 fork（用户要求 portal-web 也"按相同模式重做"，但 portal-web 找不到干净的 RuoYi-同源上游——vben / Soybean / mall-cook 等均为后台或商城模板，会把门户风格带偏）。采用与 `apps/admin-web/` 同一套 Vue 3 技术栈 + Element Plus，但保持 portal 风格（landing 引导、learn/list/result 列表式页面）独立空间；`frontend/src/features/{landing,interview,voice,learning}` 视具体子页可重用 Pinia store + 路由命名约定迁移。`frontend/` 整体归档为 `frontend-legacy/`。与 DEC-022 C 联动。 | PC Web、i18n、测试、frontend 归档 | R1 SPEC 批准前 | Accepted | A：自研 Vue 3，与 admin-web 同栈但独立空间 |
+| **DEC-072** | 移动端前端框架 | A. uni-app Vue 3（H5 + 微信小程序一码多端）；B. Taro Vue 3；C. 单独的 H5 / 单独小程序；D. 不上移动端（DEC 撤回） | **A（已接受）**。一码多端降低维护；uni-app Vue 3 与 DEC-071 自研 Vue 3 同语言、共用 Pinia。DEC-008 / 035 / 036 决定音频链必须走服务端签名 URL，移动端不能直连 Provider。移动端**不**复用 RuoYi 上游（uni-app 与 RuoYi 生态无重叠）。 | 移动端、小程序录音授权声明、Provider 接入 | R1 SPEC 批准前 | Accepted | A：uni-app Vue 3 |
+| **DEC-073** | 前端鉴权策略（与 DEC-028 衔接） | A. 后端 Cookie Session + `fetch(..., { credentials: 'include' })`，前端不存 Token；B. localStorage JWT；C. 不复制 RuoYi 鉴权（自研模块化） | **A（已接受）**。DEC-028 推荐位不变；本条把候选从"React + Hooks 上下文"扩展到"Vue 3 + Pinia store + 路由守卫统一从 `/api/v1/identity/profile` 派生 user / roles / permissions"。**禁止 localStorage Token（B）**。迁移策略：在 `frontend/src/features/identity/pages/` 现有 React 鉴权页面里**只**抽取"逻辑层"（login API + 派生 user）重写到 Pinia store；**视图层**全部用 admin-web / portal-web 各自的 Element Plus / 自研组件**重写**，不复制 React 组件。 | admin-web / portal-web / mobile 三端鉴权、CSRF、CORS | R1 SPEC 批准前 | Accepted | A：Cookie Session + Pinia 派生 |
+
+**进入下一步的条件**：`DEC-070` 与 `DEC-071` / `DEC-072` / `DEC-073` 至少 `Accepted` 1 项，方可进入 R1 PRD 收敛与 4 份 SPEC（`SPEC-portal-web` / `SPEC-admin-web-ruoyivue3` / `SPEC-mobile-uniapp` / `SPEC-backend-bridges`）的 Draft 起草；任一未决时不得跨过 Gate A。
+
+**否决条件**：四候选**全部**被 Rejected 或 Deferred，恢复到 `DEC-022 A.1 React + TypeScript + Vite` 现存技术栈；现有 React 前端代码与四个开发记录归档保留。
+
+**R0 阶段的明确不可执行动作**：创建 `apps/admin-web/` `apps/portal-web/` `apps/mobile/` 任意目录；`git clone` `RuoYi-Vue3` 或任何上游；修改 `backend/pom.xml`；修改 `frontend/`；执行 `pnpm install` / `mvn spring-boot:run` / `vue-tsc` / `git init`；调用任何真实 LLM / ASR / TTS / 录音 / 支付。所有执行必须等 R1 SPEC Approved 后进入 R2 起单独授权。本表只增不删，先记录候选再说。
+
+### 2.4 方案 B 模式生效与执行边界（2026-08-16 用户对话追加）
+
+> 修改日期：2026-08-16；理由：用户要求把现有 React 19 `frontend/` 全部迁移到 RuoYi-Vue3 的 `views/` 下，`frontend/` 归档/删除，`portal-web` 也按相同模式重做；影响范围：DEC-022 / DEC-070 / DEC-071 / DEC-072 / DEC-073 / 现有 React 前端 80+ 文件 / `frontend/` 处置 / `apps/admin-web/.upstream/` 占位策略 / `MIT-LICENSE-NOTICE.md` 强约束。
+
+**模式声明**：方案 B 进入"已决策但仍 Draft"阶段——决策表用户决定列已填 A（DEC-022 / 070 / 071 / 072 / 073），但 4 份 SPEC 草案仍是 Draft。物理动作（含 `git clone`）的触发条件**没有**因为决策表填 A 而放宽。
+
+**R0 → R1 触发条件的更新**（在第 167 行基础上叠加，不替换）：
+
+| 触发动作 | 现有门槛 | 方案 B 叠加的额外门槛 |
+|---|---|---|
+| `git clone RuoYi-Vue3` | R1 SPEC Approved + 单独授权 | + 1. RuoYi 上游评审报告（`docs/licenses/ruoyi-vue3.md`）写完且用户签收；2. 锁定上游 commit hash（HEAD / tag / 指定 commit 三选一，由用户拍板）；3. `apps/admin-web/.upstream/ruoyi-vue3/` 占位策略（A 永久参考仓 / B 临时 patch / C fork 名）由用户拍板 |
+| 创建 `apps/admin-web/` 物理目录 | R1 SPEC Approved + 单独授权 | + 在 `apps/admin-web/` 内首屏必须出现 `MIT-LICENSE-NOTICE.md`（基于 `docs/licenses/ruoyi-vue3.md` 第 2 节）；4 份 SPEC 仍是 Draft 不得改名 |
+| 创建 `apps/portal-web/` 物理目录 | R1 SPEC Approved + 单独授权 | + portal-web 子问题已答：自研 Vue 3（DEC-071 A），不引入额外上游 |
+| 创建 `apps/mobile/` 物理目录 | R1 SPEC Approved + 单独授权 | + DEC-072 A 落地；微信 AppID 由用户单独提供 |
+| 移动 / 归档 / 删除 `frontend/` | 用户级授权 | + 归档目录名 `frontend-legacy/` 锁定；如选择"删除"必须用户二次确认；归档动作**只**走 `git mv`，不走 OS 物理删除，保留历史证据 |
+| 修改 `backend/pom.xml` | 用户级授权 | + 不变 |
+
+**与第 165 行"否决条件"的关系**：第 165 行"DEC-070/071/072/073 全部 Rejected/Deferred 恢复到 DEC-022 A"**保留**。方案 B 不满足时该机制仍生效。
+
+**否决条件（方案 B 专属）**：以下任一发生即退回方案 A（自研 Vue 3 + 不 git clone + 保留 `frontend/`）：
+
+- RuoYi 上游评审报告结论为"不推荐引入"（许可证失效 / 维护停滞 / CVE 不可控 / 与现有 Spring Security 改造碰撞过大）。
+- 用户撤回"git clone"授权。
+- 归档 `frontend/` 时丢失超出已盘点 27 个 feature 子目录 + `app/` + `shared/` + `dist/` 之外的内容。
+
+## 5. 推荐的一键决策包
+
+为了降低拍板成本，建议采用以下默认包：
+
+1. 接受 `DEC-001` 至 `DEC-032` 的全部推荐项，作为编写原型与开发计划的产品/技术基线。
+2. `DEC-033` 至 `DEC-058` 保持 `Pending`，在开发计划中成为对应实现包的前置决策，不阻塞计划正文。
+3. 接受 `DEC-059` 至 `DEC-068` 的推荐延后项，当前计划明确排除。
+
+若接受该包，下一步不是直接编码，而是：
+
+1. 把 Gate A 决定回写 PRD 与技术架构，形成新的 Draft 基线供最终批准。
+2. 完成阶段 4 的关键页面和异常/恢复原型。
+3. 根据原型回流修订并批准 Canonical Feature Spec 与技术设计。
+4. 再编写 `tasks.md`、依赖关系、里程碑和逐项执行包。
+
+## 6. 决策变更与追溯规则
+
+- 已接受决策发生变化时，不直接覆盖历史；在本表更新状态并记录日期、原因、影响的 `REQ/BR/AC/DES/TASK`。
+- Gate A 变更可能要求退回阶段 2/3/4/5，并重新评估计划；不能在代码任务中暗改产品范围。
+- Gate B 只有在进入相应实现包前才成为阻断项；未决定时必须保留 Adapter、配置或任务边界，不得猜测供应商和合规结论。
+- Gate C 恢复时属于范围扩大，至少重新评估风险、PRD、架构、原型、验收和授权。
+- 本文只记录决策，不取代 PRD、技术架构、原型或 `tasks.md` 的唯一事实职责。
+
+## 7. 当前结论
+
+- 当前可执行动作：用户阅读并填写 Gate A；Gate B 可暂不逐项拍板；Gate C 建议整体批准延后。
+- 当前不可执行动作：源码创建、依赖安装、构建、测试、启动服务、真实模型/语音调用、录音上传、部署、支付和 Git。
+- 进入开发计划编写的门：`DEC-002` 至 `DEC-032` 全部为 `Accepted` 或有明确替代决定，且 `DEC-059` 至 `DEC-068` 已确认是否延后。
+

@@ -1,0 +1,228 @@
+# 窗口 49 提示词：RuoYi 语音运行链路收口
+
+> 文档类型：Phase / 执行提示模板
+> 文档状态：Draft
+> owner / 责任边界：platform / interview / frontend；本文件只编排 `TASK-RUOYI-03/04` 的语音切片，不替代 Canonical Feature Spec、设计或 `tasks.md`
+> 创建时间：2026-08-23
+> 更新时间：2026-08-23
+> Feature / 任务 ID：FEAT-INTERVIEW-001 / TASK-RUOYI-VOICE-02
+> 风险等级：L3
+> 产出阶段：6 任务拆分
+> 阶段状态：WaitingForApproval
+> 证据结果：NotRun
+> 关联：[`../../architecture/ruoyi-platform-convergence.md`](../../architecture/ruoyi-platform-convergence.md)、[`../phase-19-ruoyi-platform-convergence.md`](../phase-19-ruoyi-platform-convergence.md)、[`../../development-records/2026-08-23-ruoyi-voice-migration.md`](../../development-records/2026-08-23-ruoyi-voice-migration.md)
+
+```text
+你负责在唯一 RuoYi 后端中收口语音面试运行链路。目标不是让按钮“看起来可用”，而是让 PostgreSQL 语音事实、受控对象存储、ASR/TTS 适配、WebSocket 音频流和 SSE 恢复形成可验证的垂直闭环；缺少真实外部条件时必须保持 fail-closed，并准确记录 NotRun/Blocked。
+
+项目目录：D:\2025Ai\26-05-23\ai-interview-coach
+Feature / TASK：FEAT-INTERVIEW-001；TASK-RUOYI-03、TASK-RUOYI-04 的语音子任务 TASK-RUOYI-VOICE-02
+风险：L3
+起始局部阶段：6 任务拆分；执行包批准后进入 7 开发实现，完成后进入 8 审查验证
+
+一、开始前强制读取
+
+1. 用户级 `C:\Users\admin\.codex\AGENTS.md` 与当前会话注入的 AGENTS 指令。
+2. 项目根 `AGENTS.md`；若文件确实不存在，记录治理缺口，不得伪称已读取，继续读取 `docs/specs/README.md`，若规则冲突则停止。
+3. 完整读取：
+   - `C:\Users\admin\.codex\specs\README.md`
+   - `agent-governance.md`
+   - `architecture-spec.md`
+   - `development-spec.md`
+   - `quality-delivery-spec.md`
+   - `documentation-spec.md`
+   - 进入 UAT 前再完整读取 `user-acceptance-spec.md`
+4. 项目事实源：
+   - `docs/specs/README.md`
+   - `docs/architecture/ruoyi-platform-convergence.md`（已批准的 RuoYi 收敛事实源）
+   - `docs/phases/phase-19-ruoyi-platform-convergence.md`
+   - `docs/development-records/2026-08-23-ruoyi-voice-migration.md`
+   - `docs/development-records/2026-08-23-ruoyi-convergence-wave-02.md`
+   - `docs/reference/migration-status-and-todo.md`
+   - `contracts/openapi/voice.yaml`
+   - `contracts/asyncapi/voice-events.yaml`
+5. 读取实际源码、配置、已有差异和当前运行状态；不要依据旧记录猜现状。重点包括：
+   - `apps/platform-backend/ruoyi-interview/**`
+   - `apps/platform-backend/ruoyi-framework/**/TokenService.java`
+   - `apps/platform-backend/ruoyi-admin/src/main/resources/application*.yml`
+   - `frontend/src/features/voice/**` 与 SSE hook
+   - `apps/portal-web/src/features/interview/**`
+   - `apps/mobile/pages/interview/**`、`apps/mobile/api/interview/**`
+   - 旧 `backend/interview-boot/.../V007__voice_artifacts_and_transcripts.sql`、`V010__durable_stream_events.sql` 仅作迁移参考，不作为新 Flyway 权威入口
+
+第一次更新必须用中文说明：已加载规范、L3、当前局部阶段、实际基线、A/B/C 授权包状态、预计修改和停止条件。项目根目前不是 Git worktree 的历史记录只能作为线索，必须重新只读确认；不得执行 Git。
+
+二、已知事实与必须先关闭的裂缝
+
+1. 唯一启动容器必须是 `apps/platform-backend/ruoyi-admin`；禁止启动或恢复旧 `backend/interview-boot`。
+2. 唯一身份事实源是 RuoYi JWT/Redis/SecurityContext。WebSocket 可使用 `aic.voice.v1` + `ruoyi-bearer.<RuoYi JWT>` 子协议和一次性、主体绑定的 socket ticket；ticket 不是第二套登录态。
+3. `contracts/asyncapi/voice-events.yaml` 顶部已写 RuoYi Bearer principal，但 `x-socket-contract.authentication` 仍残留旧 Cookie Session 描述。先按已批准的 RuoYi 收敛设计修正文档内部冲突，再实现；不得保留两种权威认证语义。
+4. 新 RuoYi Flyway 目前只有 V1/V2；旧 V007 引用了 `identity.membership`，不能直接复制。新迁移必须改为 RuoYi `ruoyi_user_id BIGINT` 与业务 tenant 边界，不创建账号、密码、角色、权限或 session 表，也不建立 PostgreSQL 到 MySQL 的物理外键。
+5. `JdbcVoiceRepository`、`JdbcDurableStreamRepository`、本地对象存储、Volcengine ASR/TTS adapter、Voice WebSocket handler/coordinator 已有候选代码；先审计和复用，不平行重写。
+6. 当前 SSE Controller 明确返回 `INTERVIEW_STREAM_NOT_READY`；真实 PostgreSQL、对象存储、ASR/TTS 未形成运行证据。构建历史 Pass 不代表本轮 Pass。
+7. `docs/architecture/technical-architecture.md` 中旧 Cookie 身份语义与已批准 RuoYi 设计冲突时，以 `ruoyi-platform-convergence.md` 为准；不要在本任务顺手重写整份历史 Draft。
+
+三、目标与非目标
+
+目标闭环：
+
+`RuoYi 登录主体 -> 语音 preflight/consent -> voice session/ticket -> WS hello -> audio start/chunk/stop -> 对象存储 -> PostgreSQL AudioArtifact -> ASR final -> PostgreSQL Transcript/version -> 用户修正确认 -> AnswerVersion/稳定轮次 -> TTS state/chunk/cancel -> durable stream -> SSE Last-Event-ID 恢复 -> REST snapshot 兜底`
+
+必须覆盖麦克风拒绝、无权限、同意缺失、重复/乱序 chunk、背压、大小/时长/codec 超限、断线重连、取消、ASR/TTS/存储失败、转写修正、删除/TTL 和完整文本降级。
+
+非目标：
+
+- 不新增第二个 Boot main、SecurityFilterChain、账号、Cookie Session 或认证入口。
+- 不删除、移动或重命名旧 `backend/`、`frontend/` 或历史迁移。
+- 不实现 Realtime speech-to-speech；本轮仍是级联 ASR -> 文本面试 -> TTS。
+- 不扩展报告、学习、支付、管理后台等无关业务。
+- 不猜对象存储供应商、区域、桶、Secret、Provider 模型、价格或保留天数。
+- 不把本地文件 adapter/fake Provider/Mock/Testcontainers 证据描述为真实云对象存储或真实 ASR/TTS 通过。
+
+四、任务顺序
+
+TASK-VOICE-01 契约与装配矩阵收口
+
+- 对照 OpenAPI、AsyncAPI、REST/WS/SSE 代码及三端 client，形成 operation/event -> handler/use case/port/adapter/schema/client/EV 矩阵。
+- 修复 AsyncAPI 内部认证冲突；只允许兼容性修正，不新增未经规格支持的 endpoint/event/state。
+- 列出所有未就绪 Bean、配置键、reasonCode、默认关闭条件和真实外部依赖。
+- 若必须改变公共 API 字段、事件语义、权限意图或 AC，停止并退回阶段 3/5，不在代码中暗改。
+
+TASK-VOICE-02 PostgreSQL 语音与 durable stream 权威迁移
+
+- 在 `apps/platform-backend/ruoyi-interview/src/main/resources/db/migration/` 新增顺序迁移；不得修改已执行可能性未知的 V1/V2。
+- 只迁入本闭环需要的 `interview`、`governance`、`voice`、`platform.stream_event` 最小前置事实。先核对现有 schema，禁止创建重复/冲突表。
+- `voice.audio_artifact`、`voice.transcript`、`voice.transcript_version`、confidence span、turn execution 必须与领域对象和 `JdbcVoiceRepository` 一致。
+- 移除旧 `identity.membership` 外键语义，使用 `ruoyi_user_id BIGINT` 记录操作者；继续以 `tenant_id` 做业务隔离，跨库不建物理外键。
+- 保留乐观锁、不可变 transcript version、唯一约束、turn/artifact/transcript scope、删除状态、TTL、幂等和 stream sequence/cursor 约束。
+- Flyway 仍由 `ruoyi-interview` 唯一拥有，MySQL RuoYi schema 不进入该迁移；`cleanDisabled(true)` 保持。
+- 迁移源码完成不等于迁移执行完成。实际运行 PostgreSQL migration 属 B 包。
+
+TASK-VOICE-03 对象存储与敏感数据边界
+
+- 复核并加固现有 `LocalFileObjectStorageAdapter`：根目录由配置提供且默认关闭，路径必须 tenant/artifact 隔离，禁止目录穿越和覆盖，分片顺序/重复可判定，临时文件原子完成，取消/失败可清理，读取/删除按 owner 校验。
+- 原始音频不进入 PostgreSQL、日志、异常、截图或浏览器持久化；数据库只保存加密 opaque object reference、hash、大小、时长、状态和审计 ID。
+- 未有受控 `SensitiveEnvelopeCipher` key 时 persistence fail-closed；禁止固定 key、Base64 伪加密和明文降级。
+- 云对象存储 adapter 只有在供应商、依赖、bucket/region、凭据来源和费用另行批准后才实现/启用。否则保留稳定 `OBJECT_STORAGE_NOT_READY`，不假装完成真实云存储。
+
+TASK-VOICE-04 ASR/TTS 与 Provider 配置
+
+- 复用 `SpeechToTextPort`、`TextToSpeechPort` 和现有 Volcengine adapters；配置使用校验后的 properties/env，默认关闭，禁止把 Secret 写入代码、配置样例、日志或证据。
+- ASR 成功产生不可变 TranscriptVersion、confidence spans、providerInvocationId；失败保留稳定错误类别、可重试语义并无损降级到文字。
+- TTS 必须实现 AsyncAPI 已定义的 `tts.state`、`tts.chunk`、`client.tts.cancel`；取消 TTS 不改变 Interview Session 的业务状态。
+- Provider timeout、限流、schema/codec 错误、空结果、超额和取消均有限重试/无重试边界；禁止无限重试或自动切换未批准供应商。
+- 为自动化测试新增最小 deterministic fake adapter，文件名和 package 明确为 test-only；不得在生产 profile 装配成功 fake。
+- 真实 Provider 调用、真实音频发送和可能费用属于 C 包，未批准时结果保持 NotRun。
+
+TASK-VOICE-05 WebSocket 完整音频分片
+
+- 严格实现 `client.hello/audio.start/audio.chunk/audio.stop/audio.cancel/tts.cancel` 与 server hello/flow-control/ack/nack/asr.partial/asr.final/speech.failed/tts/turn/terminal。
+- 校验 RuoYi principal、`interview:voice:upload`/`confirm` 权限、session owner、consent、ticket 单次使用/过期/主体绑定；禁止 query token、Cookie fallback 或只信前端 user/tenant。
+- client/server sequence 独立单调；重复帧 ACK 后丢弃，gap NACK/resync；socketGeneration 防旧连接写入；落实 max chunk、总字节、总时长、codec/sample rate/channel、in-flight/backpressure 限制。
+- 断线后 partial 可丢，已持久化 artifact/transcript/confirmed answer 必须从 REST snapshot/durable stream 恢复；取消要终止 capture、清理未确认对象并保持文本输入可用。
+- WS handler 只做协议和连接状态；事务、领域迁移、存储和 Provider 编排留在 application/coordinator/adapter 边界。
+
+TASK-VOICE-06 SSE durable replay
+
+- 用现有 `DurableStreamPort/JdbcDurableStreamRepository` 替换 `InterviewStreamController` 未就绪桩，响应 `text/event-stream`，先做 RuoYi principal、权限和 owner 校验。
+- 支持 `Last-Event-ID` opaque cursor、空 cursor、有效 replay、过期 cursor 的 410/snapshot 恢复、重复去重、顺序、heartbeat、断开清理、有限 replay 数和 retention。
+- SSE 不传密码、Token、音频、完整回答/转写或 Provider Secret；未知事件客户端安全忽略并可诊断。
+- 前端必须沿用同一 RuoYi Token 渠道。若原生 EventSource 无法满足 header 认证，复用现有 fetch stream 或已批准的短时单用途 stream ticket；不得创建第二套 session。
+
+TASK-VOICE-07 三端接入与恢复
+
+- 主 React、Portal Web、Mobile H5 对齐同一契约和状态机；不复制三套不同错误语义。
+- 覆盖权限/设备/麦克风拒绝、录音、背压、上传、转写编辑确认、TTS 播放/取消、断线恢复、刷新恢复、失败转文字和资源清理。
+- 非 H5 只在现有平台 API 能满足契约时接入；不能在浏览器证据基础上宣称小程序/原生 App 通过。
+- Admin 只展示真实 capability/状态，不提供伪成功控制面。
+
+TASK-VOICE-08 最小测试、审查与证据
+
+- 允许在 `ruoyi-interview/src/test/**` 增加最小单元/集成/契约测试，以及为这些测试所需的 test-scope 依赖；优先复用项目设施。
+- 至少覆盖：Repository round-trip/tenant 隔离/乐观锁、迁移约束、对象路径与删除、ticket 主体绑定/单次、WS sequence/backpressure/cancel/reconnect、ASR/TTS 成功与失败 fake、SSE cursor/replay/410、401/403、Secret/敏感日志扫描。
+- 测试必须区分 fake/Testcontainers 与真实外部链路。没有 Docker、数据库或凭据时记录 Blocked，不改成低保真假测试来凑 Pass。
+- 更新或新建 `docs/development-records/<日期>-ruoyi-voice-runtime-completion.md`，记录实际差异、命令、退出码、EV、未执行项和下一门；不得反向篡改历史记录。
+
+五、允许修改范围
+
+- `apps/platform-backend/ruoyi-interview/src/main/**`
+- `apps/platform-backend/ruoyi-interview/src/test/**`
+- 仅必要时：`apps/platform-backend/ruoyi-interview/pom.xml` 的 test-scope 或实现所必需的最小依赖
+- 仅同一 JWT 原生校验确有缺口时：`apps/platform-backend/ruoyi-framework/**/TokenService.java`；禁止新增 filter chain
+- `contracts/openapi/voice.yaml`、`contracts/asyncapi/voice-events.yaml`：仅修复已批准 RuoYi 设计下的内部不一致
+- `frontend/src/features/voice/**`、现有 interview/SSE hook 与对应最小类型/API
+- `apps/portal-web/src/features/interview/**`、对应最小 API/client
+- `apps/mobile/pages/interview/**`、`apps/mobile/api/interview/**`、对应最小 socket/client
+- `apps/admin-web/src/views/interview/**` 与对应最小 route/API
+- 本 TASK 的开发记录、验证记录和必要实现参考
+
+不得修改：旧 `backend/` 生产源码/迁移、RuoYi 身份/RBAC 事实表、无关业务模块、产品范围、报告/学习/支付、部署文件。不得删除、移动、重命名、归档或压缩历史内容。
+
+六、授权包和命令
+
+A 包：本地实现与非外部验证
+
+- 本地代码/配置/文档修改：Pending，等待用户在新会话明确回复“批准 A 包”。
+- 测试代码和 test-scope 依赖：Pending，同上。
+- 批准后可运行：
+  1. `mvn -pl ruoyi-interview -am test`（工作目录 `apps/platform-backend`；可能下载测试依赖、使用本机 Docker/Testcontainers；无 Docker 时停止并记录 Blocked）
+  2. `mvn -pl ruoyi-admin -am -DskipTests package`（同目录；只证明构建）
+  3. `npm run build`（`frontend`）
+  4. `npm run build`（`apps/portal-web`）
+  5. `npm run build:h5`（`apps/mobile`）
+  6. `npm run build:prod`（`apps/admin-web`）
+- 允许对失败做一次与本次差异直接相关的修复后重跑；第二次仍失败、需换命令/扩大模块/安装额外系统软件时停止并汇报。
+
+B 包：本地数据库迁移、服务启动和联机验证
+
+- 默认 NotRequested。开始前单独列出精确命令、MySQL/PostgreSQL 数据库类别、端口、迁移写入、测试账号角色、测试数据和清理/恢复方式，再取得批准。
+- Secret 只由用户在启动 shell/Secret 管理中注入；不得让用户在聊天中提供明文，不得回显。
+- 只启动 RuoYi JAR；禁止启动旧 Boot。实际 migration、REST/SSE/WS、401/403、重连与浏览器联机证据都在 B 包。
+
+C 包：真实 ASR/TTS/云对象存储
+
+- 默认 NotRequested。供应商、区域、数据处理条款、模型/voice、费用上限、最小音频、凭据注入、留存/删除和停止条件逐项批准后才能调用。
+- 没有 C 包，只能结论为“Provider/云 adapter 已实现或已装配未做真实验证”，不得写真实链路 Pass。
+
+UAT、上线准备、发布、回滚、`git add/commit/push/PR/tag` 均为 NotRequested；不得执行。
+
+七、停止与退回条件
+
+立即停止并报告：
+
+- 需要第二套账号/session/filter chain 或接受前端 userId/tenant/role 为权威值。
+- 需要改变产品行为、AC、公共 API/event 语义或未批准 schema，而不是修复已知冲突。
+- 旧迁移与当前实际数据库历史无法安全前向兼容，或需要删除/重命名/破坏性回填。
+- 发现 Secret、Token、Cookie、原始音频、完整转写/回答进入日志、源码、截图或仓库。
+- 真实外部调用产生未批准费用/写入/数据出境，或缺少清理/补偿。
+- 本地存储路径越出配置根、tenant/owner 隔离失效、重复 chunk 造成重复持久化、断线后已确认事实丢失。
+- 需要修改禁止目录、运行未列命令、扩大测试或执行 Git/部署。
+
+退回规则：实现缺陷留在阶段 7；契约/schema/模块边界不成立退回阶段 5/6；产品规则或 AC 变化退回阶段 3/4；新增目标或风险升级退回阶段 1。
+
+八、完成定义和最终交接
+
+A 包完成只允许声明“范围内实现 + 自动化/构建证据”，不能声明真实数据库、Provider、浏览器或 UAT 通过。
+
+完整技术验证至少要求 A + 获批 B：PostgreSQL migration 实际 Pass；唯一 RuoYi 进程启动；认证/403；语音 REST；WS 分片/ACK/NACK/背压/取消/重连；对象写入与删除；ASR/TTS fake 或沙箱边界；Transcript 确认；SSE replay/410/snapshot；文本降级均有 EV。
+
+真实外部能力只有获批 C 并取得最小真实调用、回读和删除证据后才能记录对应 Pass。用户 UAT 仍需独立验收包和用户结论。
+
+最终汇报必须包含：
+
+- TASK/阶段/状态/风险、输入版本和实际修改文件。
+- 契约与代码矩阵、数据迁移、Bean/配置、REST/WS/SSE/三端状态。
+- 每条实际命令、工作目录、退出码、关键证据和 EV 结果。
+- A/B/C、UAT、发布和 Git 的授权及实际状态。
+- NotRun/Fail/Blocked、真实 Provider/云存储边界、残余风险、恢复方式和下一阶段门。
+- 不得把文件存在、构建 Pass、fake、截图或 Agent 操作记录单独写成业务交付完成。
+```
+
+## 使用说明
+
+在新会话粘贴上面的完整提示词。若希望新会话直接进入本地实现和列出的非外部验证，请在同一条消息末尾明确补充：
+
+```text
+批准 A 包，按 TASK-RUOYI-VOICE-02 执行；B/C 包、UAT、发布和 Git 不授权。
+```
+

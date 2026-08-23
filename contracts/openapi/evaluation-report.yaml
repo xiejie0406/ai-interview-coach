@@ -1,0 +1,101 @@
+openapi: 3.1.0
+info: { title: AI Interview Coach Evaluation and Report API, version: 0.1.0 }
+servers: [{ url: /api/v1 }]
+security: [{ sessionCookie: [] }]
+paths:
+  /answers/{answerVersionId}/evaluations:
+    post:
+      operationId: requestAnswerEvaluation
+      parameters:
+        - { name: answerVersionId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { $ref: '#/components/parameters/IdempotencyKey' }
+        - { $ref: '#/components/parameters/CsrfToken' }
+      responses:
+        '202': { description: Evaluation job durably accepted, content: { application/json: { schema: { $ref: '#/components/schemas/OperationAccepted' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+  /evaluations/{evaluationId}:
+    get:
+      operationId: getEvaluation
+      parameters: [{ name: evaluationId, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: Evaluation status or immutable version, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/EvaluationView' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /evaluations/{evaluationId}/feedback:
+    post:
+      operationId: submitEvaluationFeedback
+      parameters:
+        - { name: evaluationId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { $ref: '#/components/parameters/IdempotencyKey' }
+        - { $ref: '#/components/parameters/CsrfToken' }
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false, required: [type], properties: { type: { type: string, enum: [INACCURATE, UNHELPFUL, MISSING_CONTEXT, OTHER] }, comment: { type: string, maxLength: 2000 } } } } } }
+      responses:
+        '201': { description: Private feedback recorded }
+  /reports/{reportId}:
+    get:
+      operationId: getReport
+      parameters: [{ name: reportId, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: Report state or immutable report version, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/ReportView' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /interviews/{interviewId}/report:
+    get:
+      operationId: getInterviewReport
+      description: Resolves an owner-scoped interview to its report root; the interview ID is never treated as a report ID.
+      parameters: [{ name: interviewId, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: Current report root and immutable version state, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/ReportView' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes: { sessionCookie: { type: apiKey, in: cookie, name: AIC_SESSION } }
+  parameters:
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128 } }
+    CsrfToken: { name: X-AIC-XSRF-TOKEN, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 512 } }
+  responses:
+    Error: { description: Error envelope, content: { application/json: { schema: { $ref: './common.yaml#/components/schemas/ErrorEnvelope' } } } }
+  headers:
+    ETag: { description: Current aggregate version, schema: { type: string, pattern: '^"v[0-9]+"$' } }
+  schemas:
+    OperationAccepted: { type: object, additionalProperties: false, required: [operationId, statusUrl], properties: { operationId: { type: string, format: uuid }, statusUrl: { type: string, format: uri-reference } } }
+    EvaluationView:
+      type: object
+      additionalProperties: false
+      required: [id, state, stage, inputVersionId, configVersionId, evaluationVersionId, failureCode, dimensions, limitations, streamCursor, version]
+      properties:
+        id: { type: string, format: uuid }
+        state: { type: string, enum: [PENDING, RUNNING, SUCCEEDED, FAILED_RETRYABLE, FAILED_FINAL, CANCELLED] }
+        stage: { type: string, enum: [QUEUED, EVIDENCE_EXTRACTING, RUBRIC_JUDGING, REPORT_COMPOSING, MANUAL_REVIEW, COMPLETE] }
+        inputVersionId: { type: string, format: uuid }
+        configVersionId: { type: string, maxLength: 128 }
+        evaluationVersionId: { type: [string, 'null'], format: uuid }
+        failureCode: { type: [string, 'null'], maxLength: 96 }
+        dimensions:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [dimensionId, judgement, confidence, insufficientEvidence, reasonCodes, evidenceRefs]
+            properties:
+              dimensionId: { type: string }
+              judgement: { type: string, enum: [CORRECT, PARTIAL, INCORRECT, INSUFFICIENT, CONFLICTING] }
+              confidence: { type: string, enum: [LOW, MEDIUM, HIGH] }
+              insufficientEvidence: { type: boolean }
+              reasonCodes: { type: array, items: { type: string, maxLength: 96 }, uniqueItems: true }
+              evidenceRefs: { type: array, items: { type: string, format: uuid } }
+        limitations: { type: array, items: { type: string, maxLength: 500 } }
+        streamCursor: { type: [string, 'null'], maxLength: 512 }
+        version: { type: integer, minimum: 0 }
+    ReportView:
+      type: object
+      additionalProperties: false
+      required: [id, evaluationId, sourceInterviewId, state, version]
+      properties:
+        id: { type: string, format: uuid }
+        evaluationId: { type: string, format: uuid, description: Evaluation aggregate ID accepted by the feedback endpoint. }
+        sourceInterviewId: { type: string, format: uuid }
+        state: { type: string, enum: [PENDING, RUNNING, READY, PARTIAL, FAILED, CANCELLED] }
+        reportVersionId: { type: [string, 'null'], format: uuid }
+        evaluationVersionId: { type: [string, 'null'], format: uuid }
+        sections: { type: array, items: { type: object, additionalProperties: false, required: [sectionId, title, body, judgementRefs, evidenceRefs], properties: { sectionId: { type: string, maxLength: 128 }, title: { type: string }, body: { type: string }, judgementRefs: { type: array, items: { type: string, maxLength: 128 } }, evidenceRefs: { type: array, items: { type: string, format: uuid } } } } }
+        actions: { type: array, maxItems: 3, items: { type: string } }
+        limitations: { type: array, items: { type: string } }
+        version: { type: integer, minimum: 0 }

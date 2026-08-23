@@ -1,0 +1,64 @@
+openapi: 3.1.0
+info: { title: AI Interview Coach Practice API, version: 0.1.0 }
+servers: [{ url: /api/v1 }]
+security: [{ sessionCookie: [] }]
+paths:
+  /practice-attempts:
+    post:
+      operationId: startPractice
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/CsrfToken' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/StartPracticeRequest' } } } }
+      responses:
+        '201': { description: Practice attempt, content: { application/json: { schema: { $ref: '#/components/schemas/PracticeAttemptView' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+    get:
+      operationId: listPracticeHistory
+      responses:
+        '200': { description: Owner-scoped practice history, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/PracticeAttemptView' } } } } }
+  /practice-attempts/{attemptId}/draft:
+    put:
+      operationId: savePracticeDraft
+      parameters: [{ $ref: '#/components/parameters/AttemptId' }, { $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/IfMatch' }, { $ref: '#/components/parameters/CsrfToken' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false, required: [text], properties: { text: { type: string, maxLength: 20000 } } } } } }
+      responses:
+        '200': { description: Draft saved, content: { application/json: { schema: { $ref: '#/components/schemas/PracticeAttemptView' } } } }
+        '412': { $ref: '#/components/responses/Error' }
+  /practice-attempts/{attemptId}/submit:
+    post:
+      operationId: submitPracticeAnswer
+      parameters: [{ $ref: '#/components/parameters/AttemptId' }, { $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/IfMatch' }, { $ref: '#/components/parameters/CsrfToken' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/SubmitAnswerRequest' } } } }
+      responses:
+        '201': { description: Immutable answer accepted, content: { application/json: { schema: { $ref: '#/components/schemas/PracticeAttemptView' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes: { sessionCookie: { type: apiKey, in: cookie, name: AIC_SESSION } }
+  parameters:
+    AttemptId: { name: attemptId, in: path, required: true, schema: { type: string, format: uuid } }
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128 } }
+    IfMatch: { name: If-Match, in: header, required: true, schema: { type: string, pattern: '^"v[0-9]+"$' } }
+    CsrfToken: { name: X-AIC-XSRF-TOKEN, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 512 } }
+  responses:
+    Error: { description: Error envelope, content: { application/json: { schema: { $ref: './common.yaml#/components/schemas/ErrorEnvelope' } } } }
+  schemas:
+    StartPracticeRequest:
+      type: object
+      additionalProperties: false
+      required: [questionVersionId]
+      properties: { questionVersionId: { type: string, format: uuid } }
+    SubmitAnswerRequest:
+      type: object
+      additionalProperties: false
+      required: [text]
+      properties: { text: { type: string, minLength: 1, maxLength: 20000 }, contentHash: { type: string, pattern: '^[A-Fa-f0-9]{64}$' } }
+    PracticeAttemptView:
+      type: object
+      additionalProperties: false
+      required: [id, questionVersionId, state, answerVersions, version]
+      properties:
+        id: { type: string, format: uuid }
+        questionVersionId: { type: string, format: uuid }
+        state: { type: string, enum: [DRAFT, SUBMITTED, CANCELLED] }
+        answerVersions: { type: array, items: { type: object, additionalProperties: false, required: [id, version, submittedAt], properties: { id: { type: string, format: uuid }, version: { type: integer, minimum: 1 }, submittedAt: { type: string, format: date-time } } } }
+        evaluationStatus: { type: string, enum: [NOT_REQUESTED, PENDING, SUCCEEDED, FAILED, UNAVAILABLE] }
+        version: { type: integer, minimum: 0 }

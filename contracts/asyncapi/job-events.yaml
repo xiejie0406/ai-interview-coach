@@ -1,0 +1,24 @@
+asyncapi: 3.0.0
+info: { title: AI Interview Coach Job and Report SSE, version: 0.1.0 }
+channels:
+  evaluationStream:
+    address: /api/v1/streams/evaluations/{evaluationId}
+    parameters: { evaluationId: { description: Owner-scoped evaluation ID } }
+    messages:
+      state: { $ref: '#/components/messages/State' }
+      progress: { $ref: '#/components/messages/Progress' }
+      reportReady: { $ref: '#/components/messages/ReportReady' }
+operations:
+  receiveEvaluationEvents: { action: receive, channel: { $ref: '#/channels/evaluationStream' } }
+components:
+  schemas:
+    Envelope:
+      $ref: './common.yaml#/components/schemas/EventEnvelope'
+  messages:
+    State: { name: evaluation.state.changed, payload: { $ref: '#/components/schemas/Envelope' } }
+    Progress:
+      name: evaluation.progress
+      description: Ephemeral progress hint; final state must be recovered with REST.
+      payload: { $ref: '#/components/schemas/Envelope' }
+    ReportReady: { name: evaluation.report.ready, payload: { $ref: '#/components/schemas/Envelope' } }
+x-stream-contract: { heartbeat: configured-and-bounded, resumeHeader: Last-Event-ID, cursorExpiredStatus: 410, recoveryEndpoint: GET /api/v1/evaluations/{evaluationId} }

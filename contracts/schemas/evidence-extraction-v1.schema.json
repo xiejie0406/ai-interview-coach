@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-interview-coach.local/contracts/evidence-extraction-v1.json",
+  "title": "EvidenceExtractionV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["answerVersionId", "answerHash", "spans"],
+  "properties": {
+    "answerVersionId": {"type": "string", "minLength": 1, "maxLength": 128},
+    "answerHash": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"},
+    "spans": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["evidenceId", "type", "start", "end", "quoteHash"],
+        "properties": {
+          "evidenceId": {"type": "string", "minLength": 1, "maxLength": 128},
+          "type": {"type": "string", "enum": ["SUPPORTS", "CONTRADICTS", "OMISSION_SIGNAL", "UNCLEAR"]},
+          "start": {"type": "integer", "minimum": 0},
+          "end": {"type": "integer", "minimum": 1},
+          "quoteHash": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"},
+          "reasonCode": {"type": ["string", "null"], "maxLength": 96}
+        }
+      }
+    }
+  }
+}

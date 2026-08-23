@@ -1,0 +1,164 @@
+openapi: 3.1.0
+info: { title: AI Interview Coach Voice API, version: 0.2.0 }
+servers: [{ url: /api/v1 }]
+security: [{ bearerAuth: [] }]
+paths:
+  /interviews/{interviewId}/voice-preflight:
+    post:
+      operationId: voicePreflight
+      parameters: [{ $ref: '#/components/parameters/InterviewId' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false, required: [turnId, codecCandidates], properties: { turnId: { type: string, format: uuid }, codecCandidates: { type: array, minItems: 1, uniqueItems: true, items: { type: string, enum: ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/wav'] } } } } } } }
+      responses:
+        '200': { description: Capability, consent and limits without creating an artifact or calling a provider, content: { application/json: { schema: { $ref: '#/components/schemas/VoicePreflight' } } } }
+        '403': { $ref: '#/components/responses/Error' }
+  /interviews/{interviewId}/voice-sessions:
+    post:
+      operationId: openVoiceSession
+      parameters: [{ $ref: '#/components/parameters/InterviewId' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false, required: [turnId, codec, expectedSessionVersion], properties: { turnId: { type: string, format: uuid }, codec: { type: string }, expectedSessionVersion: { type: integer, minimum: 0 } } } } } }
+      responses:
+        '201': { description: Short-lived one-use socket handle with server-selected flow limits, content: { application/json: { schema: { $ref: '#/components/schemas/VoiceSessionHandle' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+  /transcripts/{transcriptId}:
+    get:
+      operationId: getTranscript
+      parameters: [{ $ref: '#/components/parameters/TranscriptId' }]
+      responses:
+        '200': { description: Owner-scoped authoritative transcript snapshot for refresh recovery, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/TranscriptView' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /transcripts/{transcriptId}/commands/confirm:
+    post:
+      operationId: confirmTranscript
+      parameters:
+        - { $ref: '#/components/parameters/TranscriptId' }
+        - { $ref: '#/components/parameters/IdempotencyKey' }
+        - { $ref: '#/components/parameters/IfMatch' }
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false, required: [transcriptVersionId, lowConfidenceAcknowledged], properties: { transcriptVersionId: { type: string, format: uuid }, correctedText: { type: string, minLength: 1, maxLength: 30000 }, lowConfidenceAcknowledged: { type: boolean } } } } } }
+      responses:
+        '201': { description: Immutable confirmed transcript and durably accepted interview-answer continuation, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/ConfirmedTranscriptView' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+  /audio-artifacts/{artifactId}:
+    get:
+      operationId: getAudioArtifactStatus
+      parameters: [{ $ref: '#/components/parameters/ArtifactId' }]
+      responses:
+        '200': { description: Lifecycle metadata without storage key or provider payload, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/AudioArtifactView' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /audio-artifacts/{artifactId}/commands/delete:
+    post:
+      operationId: deleteAudioArtifact
+      parameters: [{ $ref: '#/components/parameters/ArtifactId' }, { $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/IfMatch' }]
+      responses:
+        '202': { description: Artifact deletion durably queued; physical deletion is not implied, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/AudioArtifactView' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes: { bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT } }
+  parameters:
+    InterviewId: { name: interviewId, in: path, required: true, schema: { type: string, format: uuid } }
+    TranscriptId: { name: transcriptId, in: path, required: true, schema: { type: string, format: uuid } }
+    ArtifactId: { name: artifactId, in: path, required: true, schema: { type: string, format: uuid } }
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128 } }
+    IfMatch: { name: If-Match, in: header, required: true, schema: { type: string, pattern: '^"v[0-9]+"$' } }
+  headers:
+    ETag: { description: Current aggregate version, schema: { type: string, pattern: '^"v[0-9]+"$' } }
+  responses:
+    Error: { description: Error envelope, content: { application/json: { schema: { $ref: './common.yaml#/components/schemas/ErrorEnvelope' } } } }
+  schemas:
+    VoicePreflight:
+      type: object
+      additionalProperties: false
+      required: [enabled, consentRequired, supportedCodecs, maxDurationSeconds, maxBytes, unavailableReasonCode]
+      properties:
+        enabled: { type: boolean }
+        consentRequired: { type: boolean }
+        supportedCodecs: { type: array, items: { type: string } }
+        maxDurationSeconds: { type: integer, minimum: 1 }
+        maxBytes: { type: integer, minimum: 1 }
+        unavailableReasonCode: { type: [string, 'null'], maxLength: 96 }
+    VoiceSessionHandle:
+      type: object
+      additionalProperties: false
+      required: [voiceSessionId, voiceExecutionId, inputArtifactId, websocketPath, socketTicket, expiresAt, codec, protocolVersion, socketGeneration, initialServerSequence, maxInFlightChunks, maxChunkBytes, maxBufferedDurationMs, maxDurationSeconds, maxBytes]
+      properties:
+        voiceSessionId: { type: string, format: uuid }
+        voiceExecutionId: { type: string, format: uuid }
+        inputArtifactId: { type: string, format: uuid }
+        websocketPath: { type: string, pattern: '^/ws/v1/interviews/' }
+        socketTicket: { type: string, minLength: 32, maxLength: 4096, writeOnly: true }
+        expiresAt: { type: string, format: date-time }
+        codec: { type: string }
+        protocolVersion: { type: integer, const: 1 }
+        socketGeneration: { type: integer, minimum: 1 }
+        initialServerSequence: { type: integer, minimum: 0 }
+        maxInFlightChunks: { type: integer, minimum: 1 }
+        maxChunkBytes: { type: integer, minimum: 1 }
+        maxBufferedDurationMs: { type: integer, minimum: 1 }
+        maxDurationSeconds: { type: integer, minimum: 1 }
+        maxBytes: { type: integer, minimum: 1 }
+    TranscriptView:
+      type: object
+      additionalProperties: false
+      required: [id, state, sessionId, turnId, audioArtifactId, latestVersion, confirmedVersionId, version]
+      properties:
+        id: { type: string, format: uuid }
+        state: { type: string, enum: [OPEN, ASR_FINAL, CONFIRMED, CANCELLED] }
+        sessionId: { type: string, format: uuid }
+        turnId: { type: string, format: uuid }
+        audioArtifactId: { type: string, format: uuid }
+        latestVersion: { anyOf: [{ $ref: '#/components/schemas/TranscriptVersionView' }, { type: 'null' }] }
+        confirmedVersionId: { type: [string, 'null'], format: uuid }
+        version: { type: integer, minimum: 0 }
+    TranscriptVersionView:
+      type: object
+      additionalProperties: false
+      required: [id, versionNo, source, text, language, offsetUnit, lowConfidenceSpans, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        versionNo: { type: integer, minimum: 1 }
+        source: { type: string, enum: [ASR, USER_CORRECTION] }
+        text: { type: string, minLength: 1, maxLength: 30000 }
+        language: { type: string, maxLength: 32 }
+        offsetUnit: { type: string, enum: [UTF16, UNICODE_CODE_POINT] }
+        lowConfidenceSpans: { type: array, items: { $ref: '#/components/schemas/ConfidenceSpan' } }
+        createdAt: { type: string, format: date-time }
+    ConfidenceSpan:
+      type: object
+      additionalProperties: false
+      required: [startInclusive, endExclusive, confidence]
+      properties:
+        startInclusive: { type: integer, minimum: 0 }
+        endExclusive: { type: integer, minimum: 1 }
+        confidence: { type: number, minimum: 0, maximum: 1 }
+    ConfirmedTranscriptView:
+      type: object
+      additionalProperties: false
+      required: [transcriptId, confirmedTranscriptVersionId, answerVersionId, nextStepOperation, version]
+      properties:
+        transcriptId: { type: string, format: uuid }
+        confirmedTranscriptVersionId: { type: string, format: uuid }
+        answerVersionId: { type: string, format: uuid }
+        nextStepOperation: { $ref: '#/components/schemas/OperationAccepted' }
+        version: { type: integer, minimum: 0 }
+    OperationAccepted:
+      type: object
+      additionalProperties: false
+      required: [operationId, statusUrl]
+      properties:
+        operationId: { type: string, format: uuid }
+        jobId: { type: [string, 'null'], format: uuid }
+        statusUrl: { type: string, format: uri-reference }
+    AudioArtifactView:
+      type: object
+      additionalProperties: false
+      required: [id, state, purpose, expiresAt, codec, bytes, durationMillis, failureCode, deleteStatus, version]
+      properties:
+        id: { type: string, format: uuid }
+        state: { type: string, enum: [CREATED, UPLOADING, UPLOADED, TRANSCRIBING, TRANSCRIBED, SYNTHESIZING, SYNTHESIZED, DELETE_QUEUED, DELETED, UPLOAD_FAILED, TRANSCRIBE_FAILED, SYNTHESIS_FAILED, DELETE_PARTIAL] }
+        purpose: { type: string, enum: [ANSWER_TRANSCRIPTION, TTS_PLAYBACK] }
+        expiresAt: { type: string, format: date-time }
+        codec: { type: [string, 'null'], maxLength: 128 }
+        bytes: { type: [integer, 'null'], minimum: 1 }
+        durationMillis: { type: [integer, 'null'], minimum: 1 }
+        failureCode: { type: [string, 'null'], maxLength: 96 }
+        deleteStatus: { type: [string, 'null'], enum: [QUEUED, RUNNING, COMPLETED, PARTIAL_FAILED, null] }
+        version: { type: integer, minimum: 0 }

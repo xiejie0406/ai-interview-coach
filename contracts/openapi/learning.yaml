@@ -1,0 +1,139 @@
+openapi: 3.1.0
+info: { title: AI Interview Coach Learning API, version: 0.1.0 }
+servers: [{ url: /api/v1 }]
+security: [{ sessionCookie: [] }]
+paths:
+  /dashboard:
+    get:
+      operationId: getLearningDashboard
+      responses:
+        '200': { description: Tenant-scoped dashboard projection, content: { application/json: { schema: { $ref: '#/components/schemas/DashboardView' } } } }
+  /learning-plans:
+    get:
+      operationId: listLearningPlans
+      parameters:
+        - { name: cursor, in: query, required: false, schema: { type: string, maxLength: 512 } }
+        - { name: limit, in: query, required: false, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+      responses:
+        '200': { description: Owner-scoped learning plans for refresh recovery, content: { application/json: { schema: { $ref: '#/components/schemas/LearningPlanPage' } } } }
+  /learning-plans/{planId}:
+    get:
+      operationId: getLearningPlan
+      parameters: [{ name: planId, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: Authoritative learning plan snapshot, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/LearningPlanView' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /reports/{reportId}/learning-plans:
+    post:
+      operationId: createLearningPlanCandidate
+      parameters: [{ name: reportId, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/CsrfToken' }]
+      responses:
+        '201': { description: Guarded learning plan candidate, content: { application/json: { schema: { $ref: '#/components/schemas/LearningPlanView' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+  /learning-plans/{planId}/commands/{command}:
+    post:
+      operationId: applyLearningPlanCommand
+      parameters:
+        - { name: planId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: command, in: path, required: true, schema: { type: string, enum: [confirm, cancel] } }
+        - { $ref: '#/components/parameters/IdempotencyKey' }
+        - { $ref: '#/components/parameters/IfMatch' }
+        - { $ref: '#/components/parameters/CsrfToken' }
+      responses:
+        '200': { description: Updated plan, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/LearningPlanView' } } } }
+  /learning-items/{itemId}/commands/{command}:
+    post:
+      operationId: applyLearningItemCommand
+      parameters:
+        - { name: itemId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: command, in: path, required: true, schema: { type: string, enum: [complete, skip, reschedule] } }
+        - { $ref: '#/components/parameters/IdempotencyKey' }
+        - { $ref: '#/components/parameters/IfMatch' }
+        - { $ref: '#/components/parameters/CsrfToken' }
+      requestBody: { content: { application/json: { schema: { type: object, additionalProperties: false, properties: { scheduledAt: { type: string, format: date-time }, reasonCode: { type: string, maxLength: 96 } } } } } }
+      responses: { '200': { description: Updated authoritative plan containing the item, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/LearningPlanView' } } } } }
+components:
+  securitySchemes: { sessionCookie: { type: apiKey, in: cookie, name: AIC_SESSION } }
+  parameters:
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128 } }
+    IfMatch: { name: If-Match, in: header, required: true, schema: { type: string, pattern: '^"v[0-9]+"$' } }
+    CsrfToken: { name: X-AIC-XSRF-TOKEN, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 512 } }
+  responses:
+    Error: { description: Error envelope, content: { application/json: { schema: { $ref: './common.yaml#/components/schemas/ErrorEnvelope' } } } }
+  headers:
+    ETag: { description: Current aggregate version, schema: { type: string, pattern: '^"v[0-9]+"$' } }
+  schemas:
+    LearningPlanPage:
+      type: object
+      additionalProperties: false
+      required: [items, nextCursor]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/LearningPlanView' } }
+        nextCursor: { type: [string, 'null'], maxLength: 512 }
+    LearningPlanView:
+      type: object
+      additionalProperties: false
+      required: [id, state, sourceReportVersionId, items, limitations, version]
+      properties:
+        id: { type: string, format: uuid }
+        state: { type: string, enum: [CANDIDATE, CONFIRMED, COMPLETED, CANCELLED] }
+        sourceReportVersionId: { type: string, format: uuid }
+        items: { type: array, items: { $ref: '#/components/schemas/LearningItemView' } }
+        limitations: { type: array, items: { type: string } }
+        version: { type: integer, minimum: 0 }
+    LearningItemView:
+      type: object
+      additionalProperties: false
+      required: [id, questionVersionId, questionTitle, state, reasonCodes, scheduledAt, version]
+      properties:
+        id: { type: string, format: uuid }
+        questionVersionId: { type: string, format: uuid }
+        questionTitle: { type: string, minLength: 1, maxLength: 300 }
+        state: { type: string, enum: [PENDING, IN_PROGRESS, COMPLETED, SKIPPED, CANCELLED] }
+        reasonCodes: { type: array, items: { type: string, maxLength: 96 } }
+        scheduledAt: { type: [string, 'null'], format: date-time }
+        version: { type: integer, minimum: 0 }
+    DashboardView:
+      type: object
+      additionalProperties: false
+      required: [projectionVersion, projectionGeneratedAt, refreshState, todayItems, recentReports, trends]
+      properties:
+        projectionVersion: { type: integer, minimum: 0 }
+        projectionGeneratedAt: { type: string, format: date-time }
+        refreshState: { type: string, enum: [FRESH, REFRESHING, STALE, FAILED] }
+        todayItems: { type: array, items: { $ref: '#/components/schemas/DashboardLearningItem' } }
+        recentReports: { type: array, items: { $ref: '#/components/schemas/DashboardReport' } }
+        trends: { type: array, items: { $ref: '#/components/schemas/DashboardTrend' } }
+    DashboardLearningItem:
+      type: object
+      additionalProperties: false
+      required: [learningItemId, learningPlanId, questionVersionId, questionTitle, state, scheduledAt, reasonCodes, version]
+      properties:
+        learningItemId: { type: string, format: uuid }
+        learningPlanId: { type: string, format: uuid }
+        questionVersionId: { type: string, format: uuid }
+        questionTitle: { type: string, minLength: 1, maxLength: 300 }
+        state: { type: string, enum: [PENDING, IN_PROGRESS] }
+        scheduledAt: { type: [string, 'null'], format: date-time }
+        reasonCodes: { type: array, items: { type: string, maxLength: 96 } }
+        version: { type: integer, minimum: 0 }
+    DashboardReport:
+      type: object
+      additionalProperties: false
+      required: [reportId, reportVersionId, state, completedAt, limitationCount]
+      properties:
+        reportId: { type: string, format: uuid }
+        reportVersionId: { type: [string, 'null'], format: uuid }
+        state: { type: string, enum: [PENDING, RUNNING, READY, PARTIAL, FAILED, CANCELLED] }
+        completedAt: { type: [string, 'null'], format: date-time }
+        limitationCount: { type: integer, minimum: 0 }
+    DashboardTrend:
+      type: object
+      additionalProperties: false
+      required: [dimensionId, comparable, reasonCode, direction, sampleCount]
+      properties:
+        dimensionId: { type: string, minLength: 1, maxLength: 128 }
+        comparable: { type: boolean }
+        reasonCode: { type: string, minLength: 1, maxLength: 96 }
+        direction: { type: string, enum: [IMPROVING, STABLE, DECLINING, UNKNOWN] }
+        sampleCount: { type: integer, minimum: 0 }

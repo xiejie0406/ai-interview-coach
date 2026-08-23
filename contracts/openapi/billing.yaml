@@ -1,0 +1,106 @@
+openapi: 3.1.0
+info: { title: AI Interview Coach Billing API, version: 0.1.0 }
+servers: [{ url: /api/v1 }]
+paths:
+  /plans:
+    get:
+      operationId: listPublicPlans
+      security: []
+      responses: { '200': { description: Active public price versions, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/PlanView' } } } } } }
+  /entitlements:
+    get:
+      operationId: getEntitlements
+      responses: { '200': { description: Current deterministic entitlement projection, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/EntitlementView' } } } } } }
+  /usage:
+    get:
+      operationId: getUsage
+      responses: { '200': { description: Reservation, settlement and release summary; provider cost remains a separate privileged ledger, content: { application/json: { schema: { $ref: '#/components/schemas/UsageView' } } } } }
+  /orders:
+    post:
+      operationId: createOrder
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/CsrfToken' }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false, required: [priceVersionId, acknowledgement], properties: { priceVersionId: { type: string, format: uuid }, acknowledgement: { type: boolean, const: true } } } } } }
+      responses:
+        '201': { description: Order and checkout state, content: { application/json: { schema: { $ref: '#/components/schemas/OrderView' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+  /orders/{orderId}:
+    get:
+      operationId: getOrder
+      parameters: [{ name: orderId, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses: { '200': { description: Owner-scoped order, content: { application/json: { schema: { $ref: '#/components/schemas/OrderView' } } } } }
+components:
+  securitySchemes: { sessionCookie: { type: apiKey, in: cookie, name: AIC_SESSION } }
+  parameters:
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128 } }
+    CsrfToken: { name: X-AIC-XSRF-TOKEN, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 512 } }
+  responses:
+    Error: { description: Error envelope, content: { application/json: { schema: { $ref: './common.yaml#/components/schemas/ErrorEnvelope' } } } }
+  schemas:
+    PlanView:
+      type: object
+      additionalProperties: false
+      required: [planId, priceVersionId, code, currency, currencyExponent, amountMinor, entitlements]
+      properties: { planId: { type: string, format: uuid }, priceVersionId: { type: string, format: uuid }, code: { type: string }, currency: { type: string, pattern: '^[A-Z]{3}$' }, currencyExponent: { type: integer, minimum: 0, maximum: 6 }, amountMinor: { type: integer, minimum: 0, maximum: 9007199254740991 }, entitlements: { type: array, items: { $ref: '#/components/schemas/PlanEntitlement' } } }
+    PlanEntitlement:
+      type: object
+      additionalProperties: false
+      required: [capability, quantity, unit]
+      properties:
+        capability: { type: string, minLength: 1, maxLength: 96 }
+        quantity: { type: integer, minimum: 0 }
+        unit: { type: string, minLength: 1, maxLength: 64 }
+    EntitlementView:
+      type: object
+      additionalProperties: false
+      required: [capability, granted, remaining, unit, source]
+      properties: { capability: { type: string }, granted: { type: boolean }, remaining: { type: integer, minimum: 0 }, unit: { type: string }, source: { type: string, enum: [FREE, PROMOTION, PURCHASE, ADMIN_GRANT] } }
+    OrderView:
+      type: object
+      additionalProperties: false
+      required: [id, state, priceVersionId, currency, currencyExponent, amountMinor, version]
+      properties: { id: { type: string, format: uuid }, state: { type: string, enum: [DRAFT, PENDING_PAYMENT, PAID, CANCELLED, REFUND_PENDING, REFUNDED, FAILED] }, priceVersionId: { type: string, format: uuid }, currency: { type: string, pattern: '^[A-Z]{3}$' }, currencyExponent: { type: integer, minimum: 0, maximum: 6 }, amountMinor: { type: integer, minimum: 0, maximum: 9007199254740991 }, checkoutUrl: { type: [string, 'null'], format: uri }, version: { type: integer, minimum: 0 } }
+    UsageView:
+      type: object
+      additionalProperties: false
+      required: [projectionVersion, asOf, reservations, settlements, releases]
+      properties:
+        projectionVersion: { type: integer, minimum: 0 }
+        asOf: { type: string, format: date-time }
+        reservations: { type: array, items: { $ref: '#/components/schemas/UsageReservationView' } }
+        settlements: { type: array, items: { $ref: '#/components/schemas/UsageSettlementView' } }
+        releases: { type: array, items: { $ref: '#/components/schemas/UsageReleaseView' } }
+    UsageReservationView:
+      type: object
+      additionalProperties: false
+      required: [reservationId, businessOperationId, capability, quantity, unit, state, createdAt, expiresAt]
+      properties:
+        reservationId: { type: string, format: uuid }
+        businessOperationId: { type: string, minLength: 1, maxLength: 128 }
+        capability: { type: string, minLength: 1, maxLength: 96 }
+        quantity: { type: integer, minimum: 0 }
+        unit: { type: string, minLength: 1, maxLength: 64 }
+        state: { type: string, enum: [RESERVED, SETTLED, RELEASED, EXPIRED] }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+    UsageSettlementView:
+      type: object
+      additionalProperties: false
+      required: [settlementId, reservationId, actualQuantity, unit, settledAt]
+      properties:
+        settlementId: { type: string, format: uuid }
+        reservationId: { type: string, format: uuid }
+        actualQuantity: { type: integer, minimum: 0 }
+        unit: { type: string, minLength: 1, maxLength: 64 }
+        settledAt: { type: string, format: date-time }
+    UsageReleaseView:
+      type: object
+      additionalProperties: false
+      required: [releaseId, reservationId, releasedQuantity, unit, reasonCode, releasedAt]
+      properties:
+        releaseId: { type: string, format: uuid }
+        reservationId: { type: string, format: uuid }
+        releasedQuantity: { type: integer, minimum: 0 }
+        unit: { type: string, minLength: 1, maxLength: 64 }
+        reasonCode: { type: string, minLength: 1, maxLength: 96 }
+        releasedAt: { type: string, format: date-time }
+security: [{ sessionCookie: [] }]

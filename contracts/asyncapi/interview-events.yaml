@@ -1,0 +1,55 @@
+asyncapi: 3.0.0
+info: { title: AI Interview Coach Interview SSE, version: 0.1.0 }
+servers:
+  sameOrigin:
+    host: '{host}'
+    protocol: https
+    variables: { host: { default: localhost } }
+channels:
+  interviewStream:
+    address: /api/v1/streams/interviews/{interviewId}
+    parameters: { interviewId: { description: Owner-scoped interview ID } }
+    messages:
+      questionCommitted: { $ref: '#/components/messages/QuestionCommitted' }
+      sessionState: { $ref: '#/components/messages/SessionState' }
+      textDelta: { $ref: '#/components/messages/TextDelta' }
+      terminal: { $ref: '#/components/messages/Terminal' }
+operations:
+  receiveInterviewEvents:
+    action: receive
+    channel: { $ref: '#/channels/interviewStream' }
+components:
+  schemas:
+    Envelope:
+      $ref: './common.yaml#/components/schemas/EventEnvelope'
+  messages:
+    QuestionCommitted:
+      name: interview.question.committed
+      payload:
+        allOf:
+          - { $ref: '#/components/schemas/Envelope' }
+          - type: object
+            properties: { data: { type: object, required: [turnId, turnSequence, text], properties: { turnId: { type: string }, turnSequence: { type: integer }, text: { type: string } } } }
+    SessionState:
+      name: interview.session.state
+      payload:
+        allOf:
+          - { $ref: '#/components/schemas/Envelope' }
+          - type: object
+            properties: { data: { type: object, required: [state, aggregateVersion], properties: { state: { type: string }, aggregateVersion: { type: integer } } } }
+    TextDelta:
+      name: interview.question.delta
+      description: Ephemeral UI hint. It is not a persisted business fact and may be discarded on reconnect.
+      payload:
+        allOf:
+          - { $ref: '#/components/schemas/Envelope' }
+          - type: object
+            properties: { data: { type: object, required: [turnId, delta], properties: { turnId: { type: string }, delta: { type: string } } } }
+    Terminal:
+      name: interview.stream.terminal
+      payload: { $ref: '#/components/schemas/Envelope' }
+x-stream-contract:
+  heartbeat: configured-and-bounded
+  resumeHeader: Last-Event-ID
+  cursorExpiredError: STREAM_CURSOR_EXPIRED
+  recoveryEndpoint: GET /api/v1/interviews/{interviewId}

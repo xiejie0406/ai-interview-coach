@@ -1,0 +1,240 @@
+openapi: 3.1.0
+info: { title: AI Interview Coach Catalog API, version: 0.2.0 }
+servers: [{ url: /api/v1 }]
+paths:
+  /questions:
+    get:
+      operationId: searchPublishedQuestions
+      security: []
+      parameters:
+        - { name: query, in: query, schema: { type: string, maxLength: 200 } }
+        - { name: category, in: query, schema: { type: string, maxLength: 96 } }
+        - { name: difficulty, in: query, schema: { type: string, enum: [JUNIOR, MID, SENIOR] } }
+        - { name: cursor, in: query, schema: { type: string, maxLength: 512 } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+      responses:
+        '200': { description: Published question page; answer points, misconceptions and follow-up templates are never returned, content: { application/json: { schema: { $ref: '#/components/schemas/QuestionPage' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+  /questions/{questionId}:
+    get:
+      operationId: getPublishedQuestion
+      security: []
+      parameters: [{ $ref: '#/components/parameters/QuestionId' }]
+      responses:
+        '200': { description: Published immutable user-facing question version, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/QuestionDetail' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /admin/questions:
+    get:
+      operationId: listAdminQuestions
+      parameters:
+        - { name: state, in: query, required: false, schema: { type: string, enum: [DRAFT, IN_REVIEW, PUBLISHED, PUBLISHED_WITH_DRAFT, PUBLISHED_WITH_REVIEW, RETIRED] } }
+        - { name: cursor, in: query, required: false, schema: { type: string, maxLength: 512 } }
+        - { name: limit, in: query, required: false, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+      responses:
+        '200': { description: Content-admin workflow page, content: { application/json: { schema: { $ref: '#/components/schemas/AdminQuestionPage' } } } }
+        '403': { $ref: '#/components/responses/Error' }
+    post:
+      operationId: createQuestionDraft
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/CsrfToken' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/CreateQuestionDraft' } } } }
+      responses:
+        '201': { description: Question root and first immutable draft, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/AdminQuestionDetail' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+  /admin/questions/{questionId}:
+    get:
+      operationId: getAdminQuestion
+      parameters: [{ $ref: '#/components/parameters/QuestionId' }]
+      responses:
+        '200': { description: Content-admin workflow snapshot, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/AdminQuestionDetail' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /admin/questions/{questionId}/versions:
+    post:
+      operationId: createQuestionVersion
+      parameters: [{ $ref: '#/components/parameters/QuestionId' }, { $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/IfMatch' }, { $ref: '#/components/parameters/CsrfToken' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/QuestionDraftContent' } } } }
+      responses:
+        '201': { description: New immutable draft version, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/AdminQuestionDetail' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+  /admin/questions/{questionId}/rubrics:
+    post:
+      operationId: createRubricVersion
+      parameters: [{ $ref: '#/components/parameters/QuestionId' }, { $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/CsrfToken' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/CreateRubricVersion' } } } }
+      responses:
+        '201': { description: New immutable rubric version, content: { application/json: { schema: { $ref: '#/components/schemas/RubricVersionView' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+  /admin/questions/{questionId}/commands/{command}:
+    post:
+      operationId: applyQuestionWorkflowCommand
+      parameters:
+        - { $ref: '#/components/parameters/QuestionId' }
+        - { name: command, in: path, required: true, schema: { type: string, enum: [submit-review, reject-review, publish, retire] } }
+        - { $ref: '#/components/parameters/IdempotencyKey' }
+        - { $ref: '#/components/parameters/IfMatch' }
+        - { $ref: '#/components/parameters/CsrfToken' }
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/QuestionWorkflowCommand' } } } }
+      responses:
+        '200': { description: Updated workflow snapshot and append-only publication/review fact, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/AdminQuestionDetail' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes: { sessionCookie: { type: apiKey, in: cookie, name: AIC_SESSION } }
+  parameters:
+    QuestionId: { name: questionId, in: path, required: true, schema: { type: string, format: uuid } }
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128 } }
+    IfMatch: { name: If-Match, in: header, required: true, schema: { type: string, pattern: '^"v[0-9]+"$' } }
+    CsrfToken: { name: X-AIC-XSRF-TOKEN, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 512 } }
+  headers:
+    ETag: { description: Current aggregate version, schema: { type: string, pattern: '^"v[0-9]+"$' } }
+  responses:
+    Error: { description: Error envelope, content: { application/json: { schema: { $ref: './common.yaml#/components/schemas/ErrorEnvelope' } } } }
+  schemas:
+    QuestionSummary:
+      type: object
+      additionalProperties: false
+      required: [id, versionId, title, category, difficulty, status, version]
+      properties:
+        id: { type: string, format: uuid }
+        versionId: { type: string, format: uuid }
+        title: { type: string, maxLength: 500 }
+        category: { type: string, maxLength: 96 }
+        difficulty: { type: string, enum: [JUNIOR, MID, SENIOR] }
+        estimatedMinutes: { type: integer, minimum: 1, maximum: 120 }
+        status: { type: string, const: PUBLISHED }
+        version: { type: integer, minimum: 1 }
+    QuestionPage:
+      type: object
+      additionalProperties: false
+      required: [items, nextCursor, hasMore]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/QuestionSummary' } }
+        nextCursor: { type: [string, 'null'], maxLength: 512 }
+        hasMore: { type: boolean }
+    QuestionDetail:
+      type: object
+      additionalProperties: false
+      required: [id, versionId, title, category, difficulty, status, version, prompt, answerRequirements, sourceRefs, rubricVersionId]
+      properties:
+        id: { type: string, format: uuid }
+        versionId: { type: string, format: uuid }
+        title: { type: string, maxLength: 500 }
+        category: { type: string, maxLength: 96 }
+        difficulty: { type: string, enum: [JUNIOR, MID, SENIOR] }
+        estimatedMinutes: { type: integer, minimum: 1, maximum: 120 }
+        status: { type: string, const: PUBLISHED }
+        version: { type: integer, minimum: 1 }
+        prompt: { type: string, maxLength: 8000 }
+        answerRequirements: { type: array, maxItems: 20, items: { type: string, maxLength: 500 } }
+        sourceRefs: { type: array, maxItems: 20, items: { type: string, maxLength: 1000 } }
+        rubricVersionId: { type: string, format: uuid }
+    ImmutableVersionRef:
+      type: object
+      additionalProperties: false
+      required: [id, versionNo, contentHash]
+      properties:
+        id: { type: string, format: uuid }
+        versionNo: { type: integer, minimum: 1 }
+        contentHash: { type: string, pattern: '^[a-f0-9]{64}$' }
+    AdminQuestionSummary:
+      type: object
+      additionalProperties: false
+      required: [id, stableKey, state, currentDraftVersion, currentPublishedVersion, version]
+      properties:
+        id: { type: string, format: uuid }
+        stableKey: { type: string, minLength: 1, maxLength: 160 }
+        state: { type: string, enum: [DRAFT, IN_REVIEW, PUBLISHED, PUBLISHED_WITH_DRAFT, PUBLISHED_WITH_REVIEW, RETIRED] }
+        currentDraftVersion: { anyOf: [{ $ref: '#/components/schemas/ImmutableVersionRef' }, { type: 'null' }] }
+        currentPublishedVersion: { anyOf: [{ $ref: '#/components/schemas/ImmutableVersionRef' }, { type: 'null' }] }
+        version: { type: integer, minimum: 0 }
+    AdminQuestionPage:
+      type: object
+      additionalProperties: false
+      required: [items, nextCursor]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/AdminQuestionSummary' } }
+        nextCursor: { type: [string, 'null'], maxLength: 512 }
+    AdminQuestionDetail:
+      type: object
+      additionalProperties: false
+      required: [question, draft, published, rubric]
+      properties:
+        question: { $ref: '#/components/schemas/AdminQuestionSummary' }
+        draft: { anyOf: [{ $ref: '#/components/schemas/QuestionVersionView' }, { type: 'null' }] }
+        published: { anyOf: [{ $ref: '#/components/schemas/QuestionVersionView' }, { type: 'null' }] }
+        rubric: { anyOf: [{ $ref: '#/components/schemas/RubricVersionView' }, { type: 'null' }] }
+    CreateQuestionDraft:
+      type: object
+      additionalProperties: false
+      required: [stableKey, content]
+      properties:
+        stableKey: { type: string, minLength: 1, maxLength: 160 }
+        content: { $ref: '#/components/schemas/QuestionDraftContent' }
+    QuestionDraftContent:
+      type: object
+      additionalProperties: false
+      required: [title, stem, answerPoints, misconceptions, followUpTemplates, difficulty, targetRoles, locale, contentSourceVersionId]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 500 }
+        stem: { type: string, minLength: 1, maxLength: 8000 }
+        answerPoints: { type: array, maxItems: 30, items: { type: string, minLength: 1, maxLength: 1000 } }
+        misconceptions: { type: array, maxItems: 30, items: { type: string, minLength: 1, maxLength: 1000 } }
+        followUpTemplates: { type: array, maxItems: 30, items: { type: string, minLength: 1, maxLength: 1000 } }
+        difficulty: { type: string, enum: [JUNIOR, MID, SENIOR] }
+        targetRoles: { type: array, minItems: 1, uniqueItems: true, items: { type: string, enum: [JAVA_BACKEND, AI_APPLICATION, AGENT_ENGINEER] } }
+        locale: { type: string, const: zh-CN }
+        contentSourceVersionId: { type: [string, 'null'], format: uuid }
+    QuestionVersionView:
+      type: object
+      additionalProperties: false
+      required: [id, versionNo, contentHash, title, stem, answerPoints, misconceptions, followUpTemplates, difficulty, targetRoles, locale, contentSourceVersionId, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        versionNo: { type: integer, minimum: 1 }
+        contentHash: { type: string, pattern: '^[a-f0-9]{64}$' }
+        title: { type: string }
+        stem: { type: string }
+        answerPoints: { type: array, items: { type: string } }
+        misconceptions: { type: array, items: { type: string } }
+        followUpTemplates: { type: array, items: { type: string } }
+        difficulty: { type: string, enum: [JUNIOR, MID, SENIOR] }
+        targetRoles: { type: array, items: { type: string } }
+        locale: { type: string }
+        contentSourceVersionId: { type: [string, 'null'], format: uuid }
+        createdAt: { type: string, format: date-time }
+    CreateRubricVersion:
+      type: object
+      additionalProperties: false
+      required: [questionVersionId, dimensions, refusalPolicy]
+      properties:
+        questionVersionId: { type: string, format: uuid }
+        dimensions: { type: array, minItems: 1, items: { $ref: '#/components/schemas/RubricDimension' } }
+        refusalPolicy: { type: string, minLength: 1, maxLength: 3000 }
+    RubricDimension:
+      type: object
+      additionalProperties: false
+      required: [code, description, evidenceRequired, criteria]
+      properties:
+        code: { type: string, minLength: 1, maxLength: 96 }
+        description: { type: string, minLength: 1, maxLength: 1000 }
+        evidenceRequired: { type: boolean }
+        criteria: { type: array, minItems: 1, items: { type: string, minLength: 1, maxLength: 1000 } }
+    RubricVersionView:
+      type: object
+      additionalProperties: false
+      required: [id, questionVersionId, versionNo, contentHash, dimensions, refusalPolicy, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        questionVersionId: { type: string, format: uuid }
+        versionNo: { type: integer, minimum: 1 }
+        contentHash: { type: string, pattern: '^[a-f0-9]{64}$' }
+        dimensions: { type: array, items: { $ref: '#/components/schemas/RubricDimension' } }
+        refusalPolicy: { type: string }
+        createdAt: { type: string, format: date-time }
+    QuestionWorkflowCommand:
+      type: object
+      additionalProperties: false
+      required: [reasonCode]
+      properties:
+        questionVersionId: { type: [string, 'null'], format: uuid }
+        rubricVersionId: { type: [string, 'null'], format: uuid }
+        reasonCode: { type: string, minLength: 1, maxLength: 96, pattern: '^[A-Z][A-Z0-9_]{0,95}$' }
+security: [{ sessionCookie: [] }]

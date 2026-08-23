@@ -1,0 +1,60 @@
+{
+  "pages": [{
+    "path": "pages/index",
+    "style": { "navigationBarTitleText": "AI 面试教练" }
+  }, {
+    "path": "pages/catalog/index",
+    "style": { "navigationBarTitleText": "面试题库" }
+  }, {
+    "path": "pages/catalog/detail",
+    "style": { "navigationBarTitleText": "题目详情" }
+  }, {
+    "path": "pages/login",
+    "style": {
+      "navigationBarTitleText": "登录"
+    }
+  }, {
+    "path": "pages/interview/index",
+    "style": {
+      "navigationBarTitleText": "模拟面试"
+    }
+  }, {
+    "path": "pages/interview/room",
+    "style": {
+      "navigationBarTitleText": "面试进行中"
+    }
+  }, {
+    "path": "pages/register",
+    "style": {
+      "navigationBarTitleText": "注册"
+    }
+  }],
+  "tabBar": {
+    "color": "#000000",
+    "selectedColor": "#000000",
+    "borderStyle": "white",
+    "backgroundColor": "#ffffff",
+    "list": [{
+        "pagePath": "pages/index",
+        "iconPath": "static/images/tabbar/home.png",
+        "selectedIconPath": "static/images/tabbar/home_.png",
+        "text": "首页"
+      }, {
+        "pagePath": "pages/catalog/index",
+        "iconPath": "static/images/tabbar/work.png",
+        "selectedIconPath": "static/images/tabbar/work_.png",
+        "text": "题库"
+      }, {
+        "pagePath": "pages/interview/index",
+        "iconPath": "static/images/tabbar/mine.png",
+        "selectedIconPath": "static/images/tabbar/mine_.png",
+        "text": "面试"
+      }
+    ]
+  },
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "AI 面试教练",
+    "navigationBarBackgroundColor": "#FFFFFF"
+  }
+}

@@ -1,0 +1,67 @@
+openapi: 3.1.0
+info:
+  title: AI Interview Coach Common API
+  version: 0.1.0
+  description: Shared health and error contracts for the independent AI Interview Coach service.
+servers:
+  - url: /api/v1
+paths:
+  /health:
+    get:
+      operationId: getServiceHealth
+      summary: Read the public service health projection
+      security: []
+      responses:
+        '200':
+          description: The HTTP application is available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceHealth'
+        '503':
+          description: The service is not ready.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+components:
+  schemas:
+    ServiceHealth:
+      type: object
+      additionalProperties: false
+      required: [status, service, version]
+      properties:
+        status:
+          type: string
+          enum: [UP, DEGRADED]
+        service:
+          type: string
+          const: ai-interview-coach
+        version:
+          type: string
+    ErrorEnvelope:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, userMessage, retryable, correlationId]
+          properties:
+            code:
+              type: string
+            userMessage:
+              type: string
+              minLength: 1
+              maxLength: 512
+            retryable:
+              type: boolean
+            retryAfterSeconds:
+              type: [integer, 'null']
+              minimum: 0
+            correlationId:
+              type: string
+            details:
+              type: object
+              additionalProperties: true

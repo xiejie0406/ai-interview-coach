@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-interview-coach.local/contracts/report-composition-v1.json",
+  "title": "ReportCompositionV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["evaluationVersionId", "sections", "actions", "limitations"],
+  "properties": {
+    "evaluationVersionId": {"type": "string", "minLength": 1, "maxLength": 128},
+    "sections": {
+      "type": "array",
+      "maxItems": 24,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sectionId", "title", "body", "judgementRefs", "evidenceRefs"],
+        "properties": {
+          "sectionId": {"type": "string", "minLength": 1, "maxLength": 128},
+          "title": {"type": "string", "minLength": 1, "maxLength": 200},
+          "body": {"type": "string", "minLength": 1, "maxLength": 8000},
+          "judgementRefs": {"type": "array", "maxItems": 64, "items": {"type": "string"}, "uniqueItems": true},
+          "evidenceRefs": {"type": "array", "maxItems": 64, "items": {"type": "string"}, "uniqueItems": true}
+        }
+      }
+    },
+    "actions": {"type": "array", "maxItems": 3, "items": {"type": "string", "minLength": 1, "maxLength": 500}},
+    "limitations": {"type": "array", "maxItems": 16, "items": {"type": "string", "minLength": 1, "maxLength": 500}}
+  }
+}

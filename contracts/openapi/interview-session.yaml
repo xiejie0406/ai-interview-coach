@@ -1,0 +1,137 @@
+openapi: 3.1.0
+info: { title: AI Interview Coach Interview Session API, version: 0.1.0 }
+servers: [{ url: /api/v1 }]
+security: [{ sessionCookie: [] }]
+paths:
+  /interviews:
+    post:
+      operationId: createInterviewSession
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/CsrfToken' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [confirmedPlanId, planVersionNo]
+              properties:
+                confirmedPlanId: { type: string, format: uuid }
+                planVersionNo: { type: integer, minimum: 1 }
+      responses:
+        '201': { description: Ready session, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewSnapshot' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+  /interviews/{interviewId}:
+    get:
+      operationId: recoverInterviewSession
+      parameters: [{ $ref: '#/components/parameters/InterviewId' }]
+      responses:
+        '200': { description: Authoritative recovery snapshot, headers: { ETag: { schema: { type: string } } }, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewSnapshot' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /interviews/{interviewId}/commands/{command}:
+    post:
+      operationId: applyInterviewCommand
+      parameters:
+        - { $ref: '#/components/parameters/InterviewId' }
+        - { name: command, in: path, required: true, schema: { type: string, enum: [start, pause, resume, skip, complete, cancel] } }
+        - { $ref: '#/components/parameters/IdempotencyKey' }
+        - { $ref: '#/components/parameters/IfMatch' }
+        - { $ref: '#/components/parameters/CsrfToken' }
+      requestBody: { content: { application/json: { schema: { type: object, additionalProperties: false, properties: { reasonCode: { type: string, maxLength: 96 } } } } } }
+      responses:
+        '200': { description: Updated snapshot, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewSnapshot' } } } }
+        '202': { description: Durable job accepted, content: { application/json: { schema: { $ref: '#/components/schemas/OperationAccepted' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+  /interviews/{interviewId}/answers:
+    post:
+      operationId: submitInterviewAnswer
+      parameters: [{ $ref: '#/components/parameters/InterviewId' }, { $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/IfMatch' }, { $ref: '#/components/parameters/CsrfToken' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/SubmitInterviewAnswer' } } } }
+      responses:
+        '202': { description: Answer committed and next-step job accepted, content: { application/json: { schema: { $ref: '#/components/schemas/OperationAccepted' } } } }
+        '409': { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes: { sessionCookie: { type: apiKey, in: cookie, name: AIC_SESSION } }
+  parameters:
+    InterviewId: { name: interviewId, in: path, required: true, schema: { type: string, format: uuid } }
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128 } }
+    IfMatch: { name: If-Match, in: header, required: true, schema: { type: string, pattern: '^"v[0-9]+"$' } }
+    CsrfToken: { name: X-AIC-XSRF-TOKEN, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 512 } }
+  responses:
+    Error: { description: Error envelope, content: { application/json: { schema: { $ref: './common.yaml#/components/schemas/ErrorEnvelope' } } } }
+  schemas:
+    InterviewSnapshot:
+      type: object
+      additionalProperties: false
+      required: [id, planId, planVersionNo, planContentHash, mode, state, turns, lastStableTurnSequence, pendingJobIds, reservation, report, voiceSummary, allowedCommands, streamCursor, recoveryExpiresAt, failureCode, version]
+      properties:
+        id: { type: string, format: uuid }
+        planId: { type: string, format: uuid }
+        planVersionNo: { type: integer, minimum: 1 }
+        planContentHash: { type: string, pattern: '^[a-f0-9]{64}$' }
+        mode: { type: string, enum: [TEXT, CASCADE_VOICE] }
+        state: { type: string, enum: [READY, IN_PROGRESS, PAUSED, COMPLETING, COMPLETED, CANCELLED, FAILED_RECOVERABLE, FAILED_FINAL] }
+        turns:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [turnId, sequence, kind, state]
+            properties:
+              turnId: { type: string, format: uuid }
+              sequence: { type: integer, minimum: 1 }
+              kind: { type: string, enum: [PRIMARY, FOLLOW_UP, CLARIFICATION] }
+              state: { type: string, enum: [PLANNED, QUESTION_COMMITTED, ANSWER_CONFIRMED, CLOSED, SKIPPED, CANCELLED, FAILED] }
+              questionText: { type: [string, 'null'], maxLength: 30000 }
+              answerVersionId: { type: [string, 'null'], format: uuid }
+        lastStableTurnSequence: { type: integer, minimum: 0 }
+        pendingJobIds: { type: array, items: { type: string, format: uuid }, uniqueItems: true }
+        reservation:
+          type: object
+          additionalProperties: false
+          required: [id, state]
+          properties:
+            id: { type: string, format: uuid }
+            state: { type: string, enum: [RESERVED, SETTLED, RELEASED, EXPIRED] }
+        report:
+          type: object
+          additionalProperties: false
+          required: [id, state]
+          properties:
+            id: { type: [string, 'null'], format: uuid }
+            state: { type: string, enum: [NOT_REQUESTED, PENDING, RUNNING, READY, PARTIAL, FAILED, CANCELLED] }
+        voiceSummary:
+          anyOf:
+            - type: object
+              additionalProperties: false
+              required: [executionId, state, transcriptId, audioArtifactId]
+              properties:
+                executionId: { type: string, format: uuid }
+                state: { type: string, enum: [IDLE, LISTENING, TRANSCRIBING, CONFIRMING, THINKING, SPEAKING, DEGRADED, CANCELLED] }
+                transcriptId: { type: [string, 'null'], format: uuid }
+                audioArtifactId: { type: [string, 'null'], format: uuid }
+            - { type: 'null' }
+        allowedCommands: { type: array, items: { type: string, enum: [START, PAUSE, RESUME, SKIP, SUBMIT_ANSWER, COMPLETE, CANCEL, RECOVER] }, uniqueItems: true }
+        streamCursor: { type: [string, 'null'], maxLength: 512 }
+        recoveryExpiresAt: { type: [string, 'null'], format: date-time }
+        failureCode: { type: [string, 'null'], maxLength: 96 }
+        version: { type: integer, minimum: 0 }
+    SubmitInterviewAnswer:
+      type: object
+      additionalProperties: false
+      required: [turnId, turnSequence]
+      oneOf:
+        - required: [text]
+        - required: [confirmedTranscriptVersionId]
+      properties:
+        turnId: { type: string, format: uuid }
+        turnSequence: { type: integer, minimum: 1 }
+        text: { type: string, minLength: 1, maxLength: 30000 }
+        confirmedTranscriptVersionId: { type: string, format: uuid }
+    OperationAccepted:
+      type: object
+      additionalProperties: false
+      required: [operationId, statusUrl]
+      properties:
+        operationId: { type: string, format: uuid }
+        statusUrl: { type: string, format: uri-reference }
