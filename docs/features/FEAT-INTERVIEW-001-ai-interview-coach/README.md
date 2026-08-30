@@ -4,16 +4,18 @@
 > 文档状态：Draft  
 > owner / 责任边界：产品 owner 维护产品规格；架构/任务/质量 owner 维护对应下游；用户形成批准和验收结论  
 > 创建时间：2026-08-02  
-> 更新时间：2026-08-03  
+> 更新时间：2026-08-29  
 > Feature ID：FEAT-INTERVIEW-001  
 > 风险等级：L3  
 > 当前阶段：3 功能规格  
 > 阶段状态：WaitingForApproval  
-> 目标版本：T0 → T1 → T2（规划/未实现）
+> 目标版本：RuoYi V2（题库 → 文本面试 → Web 语音）
+
+> **V2 收敛说明**：本控制页原先描述的 18 期完整产品路线已不再是本轮实施范围。当前唯一执行基线是 [`../FEAT-QBANK-001-public-catalog/`](../FEAT-QBANK-001-public-catalog/) 与 [`../../architecture/ruoyi-qbank-voice-convergence-plan.md`](../../architecture/ruoyi-qbank-voice-convergence-plan.md)；支付、学习计划、报告扩展、移动 App 和多 Provider 均延期，不得以本页旧任务状态宣称已实现。
 
 ## 1. 目标与非目标
 
-- 目标：完成面向 Java 开发者转型 AI 应用/Agent 开发的题库、文本/级联语音模拟面试、证据化评测、复练、个人权益、隐私和生产治理闭环。
+- 目标：在若依统一 JWT/RBAC 下完成面试题库、最小文本面试会话和 Web 语音面试闭环；题库与语音是本轮 P0。
 - 非目标：Realtime/WebRTC、B2B、SSO/SCIM、Kubernetes、微服务、Kafka、独立向量库、视频数字人、声音克隆、真实面试隐蔽代答。
 
 ## 2. 产物与版本
@@ -42,21 +44,21 @@
 
 ## 4. 当前控制信息
 
-- 阻断：Canonical 截断、Gate A/C 未关闭、原型未获用户评审、设计未 Approved、执行包未 Approved。
-- 当前已获授权：文档完善与子 Agent 并行；用户目标明确要求最终完成编码。
+- 阻断：V2 Feature Spec/技术设计仍为 Draft；构建、测试、启动、Provider、浏览器 UAT 和删除尚未获得独立授权。
+- 当前已获授权：按 V2 执行包进行本地源码和文档修改；用户目标明确要求开始实现。
 - 仍需独立决定：测试代码、构建/测试/启动、真实 Provider/语音/支付、部署、Git。
-- 下一门：产品/原型/技术候选合并并取得用户决定，随后批准 `tasks.md` 执行包。
+- 下一门：题库与语音代码只读审查完成，随后分别请求验证授权；验收完成后再请求旧项目精确删除清单确认。
 - 退回条件：产品范围/权限/数据/AC 变化回阶段 3；公共契约不成立回阶段 5。
 
 ### 4.1 工作流状态
 
 | 工作流 | owner | 当前阶段 | 状态 | 上游 | 下一门 |
 |---|---|---|---|---|---|
-| PRODUCT-RECOVERY | product_recovery Agent | 3 | WaitingForApproval | PRD/统一产品审查与恢复候选 | 用户决定、回写 Canonical |
-| PROTOTYPE-PACK | prototype_pack Agent | 4 | NotStarted | 前瞻 `prototype/html-v1` Draft | 阶段 3 通过后用户原型评审 |
-| ARCH-CONTRACTS | architecture_contracts Agent | 5 | NotStarted | 前瞻技术战略/架构深化 Draft | 阶段 4 通过后架构评审 |
-| MASTER-TASKS | 主 Agent | 6 准备 | NotStarted | 18 期 Draft 路线 | 上游通过后执行包批准 |
-| IMPLEMENTATION | 待分配 | 7 | NotStarted | Approved tasks | 分波次编码 |
+| PRODUCT-RECOVERY | 主会话 | 3/5 | Superseded | 旧 PRD/18 期路线 | 以 RuoYi V2 收敛方案为准 |
+| PROTOTYPE-PACK | 主会话 | 4 | Skipped | 本轮 Web 优先，复用现有页面 | 关键交互由代码与 UAT 验证 |
+| ARCH-CONTRACTS | 主会话 | 5 | InProgress | RuoYi V2 收敛方案 | 题库/语音契约审查 |
+| MASTER-TASKS | 主会话 | 6 | InProgress | V2 Feature 任务包 | 验证执行包授权 |
+| IMPLEMENTATION | 主会话 + 子 Agent | 7 | InProgress | 题库/语音分片 | 阻断问题关闭后进入阶段 8 |
 
 ### 4.2 独立授权矩阵
 

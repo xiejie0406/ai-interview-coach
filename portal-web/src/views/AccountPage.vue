@@ -1,0 +1,33 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useSessionStore } from '@/stores/session'
+
+const session = useSessionStore()
+const router = useRouter()
+const loggingOut = ref(false)
+onMounted(() => session.ensureLoaded())
+async function logout() {
+  if (loggingOut.value) return
+  loggingOut.value = true
+  try {
+    await session.logout()
+    await router.replace('/login')
+  } finally {
+    loggingOut.value = false
+  }
+}
+</script>
+
+<template>
+  <section class="page-width section-page narrow-page">
+    <span class="eyebrow">ACCOUNT</span>
+    <h1>账号中心</h1>
+    <div class="content-card" v-if="session.account">
+      <strong>{{ session.account.displayName }}</strong>
+      <p>{{ session.account.email }}</p>
+      <p class="muted">账号资料、隐私导出和删除请求将在后续迁移波次接入。</p>
+      <button class="danger-button" type="button" :disabled="loggingOut" @click="logout">{{ loggingOut ? '退出中…' : '退出登录' }}</button>
+    </div>
+  </section>
+</template>

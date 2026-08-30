@@ -1,0 +1,26 @@
+# Portal RuoYi 登录审查与验证
+
+> Feature ID：`FEAT-RUOYI-PORTAL-LOGIN-001`  
+> 阶段：8 审查验证  
+> 阶段状态：InProgress  
+> 证据结果：Pass（构建/静态/UI 部分）+ Blocked（真实后端链路）
+
+## AC—EV 矩阵
+
+| AC | 证据 | 方法 | 结果 | 限制 |
+|---|---|---|---|---|
+| AC-PORTAL-LOGIN-01 | EV-01 | In-app 浏览器访问 `/interviews/new` | Pass | 只验证未登录路由；后端未运行 |
+| AC-PORTAL-LOGIN-02 | EV-01 | 浏览器空表单提交、验证码加载失败态 | Pass | 真实验证码接口因 8081 无监听返回 502 |
+| AC-PORTAL-LOGIN-03 | EV-02 | `npm run build` | Pass | 不证明真实登录账号 |
+| AC-PORTAL-LOGIN-04 | EV-01 / EV-03 | 源码扫描、移动视口 390px | Pass | 真实 `/logout`、401 未执行 |
+
+## 实际证据
+
+- `EV-01`（2026-08-23）：`http://127.0.0.1:5174/login` 可打开；显示 Portal 文案、账号/密码/验证码、刷新验证码、错误提示和登录 loading 控件。空表单显示三个字段校验。访问 `/interviews/new` 重定向到 `/login?redirect=/interviews/new`。Portal 源码无旧 `localStorage`、`sessionStorage`、`AIC_SESSION`、`/auth/*` 或 `/me` 认证入口。
+- `EV-02`（2026-08-23）：`apps/portal-web` 执行 `npm run build`，`vue-tsc` 和 `vite build` 均成功；仅有分包和大 chunk warning。
+- `EV-03`（2026-08-23）：390px 视口下 `scrollWidth=391`、表单宽约 `363px`、验证码行宽约 `327px`，未见横向溢出。浏览器截图/交互由本地浏览器会话完成，未输入账号密码或验证码。
+- `EV-04`（2026-08-23）：`127.0.0.1:8081` 无监听，`/captchaImage` 经 Vite proxy 返回连接拒绝/502；真实验证码、正确/错误账号登录、`/getInfo`、`/getRouters`、401/403、`/logout` 未运行，记为 `Blocked/NotRun`。
+
+## 审查结论
+
+范围内代码审查通过：认证入口统一为 RuoYi，Token 仅为 `Admin-Token` Cookie；未修改 `backend/`、Provider 或 Interview API。真实后端链路需在已授权的 RuoYi 运行环境中补验。

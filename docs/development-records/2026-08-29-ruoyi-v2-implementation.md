@@ -1,0 +1,69 @@
+# 若依 V2 题库与语音面试实现记录
+
+> 文档类型：开发记录
+> 文档状态：Draft
+> owner / 责任边界：platform、interview、admin-web、portal-web；用户负责业务验收和删除确认
+> 创建时间：2026-08-29
+> 更新时间：2026-08-30
+> Feature / 任务 ID：FEAT-QBANK-001、FEAT-INTERVIEW-001、TASK-RUOYI-V2-01
+> 风险等级：L3
+> 当前阶段：8 审查验证
+> 阶段状态：InProgress
+> 证据结果：Blocked
+> 关联方案：[`../architecture/ruoyi-qbank-voice-convergence-plan.md`](../architecture/ruoyi-qbank-voice-convergence-plan.md)
+
+## 1. 本轮执行边界
+
+用户于 2026-08-29 要求“规划下，进行实现”。本轮按 V2 方案实施两个功能的代码收口：
+
+- Wave 1：题库公开读取、个人答案和 Admin 工作流。
+- Wave 2：最小文本面试依赖（仅在语音实现需要时补齐）。
+- Wave 3：Web 语音面试闭环和可靠性补全。
+
+明确不在本轮执行：删除/移动旧项目、真实 Provider 外部调用、生产数据迁移、服务发布、Git `add/commit/push`。构建、测试、启动和浏览器验收分别记录授权与实际结果，不以代码存在代替验证。
+
+## 2. 保护的现有用户改动
+
+开始前已发现并保留以下未提交改动，不覆盖、不恢复、不纳入本轮无关重构：
+
+- `apps/portal-web/src/App.vue`
+- `apps/portal-web/src/features/identity/LoginPage.vue`
+- `apps/portal-web/src/features/interview/InterviewRoomPage.vue`
+- `apps/portal-web/src/router/index.ts`
+- `apps/portal-web/src/shared/api/client.ts`
+- `apps/portal-web/src/stores/session.ts`
+- `apps/portal-web/src/views/AccountPage.vue`
+- `apps/platform-backend/bin/run-local.ps1`
+- `apps/portal-web/src/assets/`
+- `docs/features/FEAT-RUOYI-PORTAL-LOGIN-001/`
+
+## 3. TASK 执行包
+
+| TASK | 目标 | 允许范围 | 状态 | 验证 |
+|---|---|---|---|---|
+| `TASK-QBANK-V2-01` | 公开 GET 与匿名权限拆分 | `ruoyi-interview` catalog controller/config | InProgress | 静态/契约 |
+| `TASK-QBANK-V2-02` | Admin 草稿、版本、Rubric、审核发布下线 | catalog application/controller/persistence/test | InProgress | 单元/集成/API |
+| `TASK-QBANK-V2-03` | Admin 管理工作台 | `apps/admin-web` catalog API/view | InProgress | 前端构建/UI |
+| `TASK-VOICE-V2-01` | 语音 ticket、WS/SSE、Provider fail-closed | `ruoyi-interview` voice/configuration/infrastructure | InProgress | 协议/集成 |
+| `TASK-VOICE-V2-02` | Portal Web 录音、转写和降级 | 既有 interview/voice 文件的最小差异 | Pending | 浏览器 UAT |
+| `TASK-RUOYI-V2-VERIFY` | 审查、EV、UAT 和 HTML 报告 | Feature 证据目录 | Pending | 用户验收 |
+| `TASK-RUOYI-RETIRE-001` | 备份后删除旧栈 | 精确删除清单内文件 | Blocked（等待验收和二次确认） | 删除前后复核 |
+
+## 4. 实际修改与证据
+
+| 日期 | TASK | 实际修改 | 证据结果 | 限制/下一步 |
+|---|---|---|---|---|
+| 2026-08-29 | V2 规划 | 更新 V2 方案和本记录 | NotRun | 等待实现交接 |
+| 2026-08-30 | `TASK-RUOYI-V2-VERIFY` | 修复业务数据源 Bean 冲突；新增 V10/V11 题库收口迁移；Maven reactor 构建；启动新 JAR；接口与 Playwright 页面检查 | Pass（构建/启动/606 条回读/页面局部）；整体 Blocked | 606 条已回读且 12 模块覆盖、来源 registry 606 条 VERIFIED；登录态 Admin、真实 ASR/TTS/对象存储和用户 UAT 未完成 |
+| 2026-08-30 | `TASK-VOICE-V2-02` | 验收 `/interviews/new?mode=voice`，修复 URL 参数未初始化为 `CASCADE_VOICE`；刷新后“语音面试”默认选中，控制台无 error | Pass（入口页面级） | 生成计划/真实麦克风、ASR/TTS 和语音会话仍需登录态与真实依赖验收 |
+
+## 5. 停止条件
+
+- 需要第二套身份、Session、Spring Boot main 或修改用户已有登录改动时停止。
+- 需要真实数据库密码、Provider Key、外部对象存储或生产数据时暂停并重新确认执行包。
+- 发现公共 API、数据 schema、权限或用户流程需要超出 V2 范围的变化时退回阶段 3/5/6。
+- 删除动作仅在题库和语音关键 UAT 结论、备份校验和用户精确清单二次确认齐备后执行。
+
+## 6. 当前交接
+
+当前阶段为 8 审查验证；构建、启动、接口回读和页面级浏览器检查已有局部 Pass，整体仍因真实登录态、外部语音依赖和用户 UAT 为 Blocked。旧项目删除、上线发布和 Git 均未执行。

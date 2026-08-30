@@ -84,7 +84,7 @@ components:
         voiceExecutionId: { type: string, format: uuid }
         inputArtifactId: { type: string, format: uuid }
         websocketPath: { type: string, pattern: '^/ws/v1/interviews/' }
-        socketTicket: { type: string, minLength: 32, maxLength: 4096, writeOnly: true }
+        socketTicket: { type: string, minLength: 32, maxLength: 4096, description: One-use ticket for the matching WebSocket connection; never log or persist it in browser storage }
         expiresAt: { type: string, format: date-time }
         codec: { type: string }
         protocolVersion: { type: integer, const: 1 }

@@ -1,0 +1,12 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>FEAT-RUOYI-PORTAL-LOGIN-001 验证报告</title>
+<h1>Portal RuoYi 登录验证报告</h1>
+<p>Feature：FEAT-RUOYI-PORTAL-LOGIN-001 · 时间：2026-08-23 · 环境：Portal Vite 5174</p>
+<p>总体结论：构建、静态检查和部分浏览器 UI 通过；真实 RuoYi 后端链路 Blocked，用户验收未完成。</p>
+<table border="1" cellpadding="6"><thead><tr><th>证据</th><th>场景</th><th>结果</th><th>限制</th></tr></thead><tbody>
+<tr><td>EV-01</td><td>登录页、空表单、受保护路由</td><td>Pass</td><td>验证码接口因 8081 无监听失败</td></tr>
+<tr><td>EV-02</td><td>npm run build</td><td>Pass</td><td>仅有分包 warning</td></tr>
+<tr><td>EV-03</td><td>390px 移动布局</td><td>Pass</td><td>未执行真实登录</td></tr>
+<tr><td>EV-04</td><td>登录、刷新恢复、401/403、退出</td><td>Blocked/NotRun</td><td>需要 RuoYi 8081 运行实例</td></tr>
+</tbody></table>

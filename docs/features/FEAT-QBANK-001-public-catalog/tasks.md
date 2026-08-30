@@ -1,17 +1,43 @@
-# FEAT-QBANK-001 任务包
+# FEAT-QBANK-001 V2 任务包
 
-| TASK | 内容 | 状态 | 验证 |
-|---|---|---|---|
-| TASK-QBANK-01 | 组合根绑定 `SearchPublishedQuestions`，公开租户配置 | Completed | Maven / HTTP |
-| TASK-QBANK-02 | 实现公开列表、标题关键词、难度筛选、详情 DTO | Completed | HTTP / Chrome |
-| TASK-QBANK-03 | 添加 Agent 模块种子：12 个模块各 50 道深入版标准答案题 | Completed | 数据库 / HTTP |
-| TASK-QBANK-04 | 三栏工作台：可收缩模块栏、可搜索题目列表和右侧标准答案 | Completed | Vite / Chrome |
-| TASK-QBANK-05 | Chrome 模块、题目、答案深度、搜索和收缩交互回归 | Completed | UAT |
-| TASK-QBANK-06 | 当前工作台新增公共题目弹窗、公共题目写入和公开查询 | Completed | HTTP / Chrome |
-| TASK-QBANK-07 | 用户级加密答案覆盖、原地编辑保存和系统答案临时查看 | Completed | 数据库 / Chrome |
+> 文档状态：Draft  
+> 风险等级：L3  
+> 当前阶段：6 任务拆分 / 7 开发实现  
+> 执行授权：仅本地源码与文档；构建、测试、启动、外部 Provider、数据库迁移、删除和 Git 另行授权
 
-种子规模：Agent 基础、大模型基础、Prompt Engineering、RAG、知识库、知识库工作流、工具调用、Agent Memory、多 Agent 协作、Agent 评测、Agent 安全、Agent 工程化共 12 个模块，每模块 10 个知识主题 × 5 个问题角度 = 600 道深入版标准答案题。数据库中旧题保留为历史数据，新的模块入口只展示深入版模块题库。
+## 1. 目标与非目标
 
-## 禁止动作
+目标是把题库收敛为若依统一身份下的“公开读取 + 个人答案 + Admin 内容治理”垂直切片。非目标包括普通用户公共投稿、AI 批量生成、收藏/练习计划、支付和移动原生 App。
 
-本轮只开放当前题库工作台的公共题目新增和用户答案保存；不启用管理后台写入、不接真实模型、不上传录音、不执行支付、不执行 Git 提交或发布。
+## 2. 任务索引
+
+| TASK | 目标 | 允许范围 | 状态 | 验证 |
+|---|---|---|---|---|
+| `TASK-QBANK-V2-01` | 公开 GET 与匿名权限拆分，默认开关和错误边界 | `ruoyi-interview` catalog controller/config/security | InProgress | 静态/契约，尚未执行 |
+| `TASK-QBANK-V2-02` | Admin 列表、详情、草稿、版本、Rubric、审核/发布/下线 | `ruoyi-interview` catalog application/controller/persistence | InProgress | 单元/集成/API，尚未执行 |
+| `TASK-QBANK-V2-03` | Admin 管理工作台与状态恢复 | `apps/admin-web` catalog API/view | InProgress | 前端构建/UI，尚未执行 |
+| `TASK-QBANK-V2-04` | Portal 公开浏览和个人答案边界 | `apps/portal-web/src/features/catalog` | InProgress | 静态/浏览器，尚未执行 |
+| `TASK-QBANK-V2-05` | 12 模块/600 题导入校验与发布版本回读 | catalog seed/migration/import tooling | Pending | 数据库/契约，需授权 |
+| `TASK-QBANK-V2-06` | 权限、跨租户、ETag、幂等和错误 envelope 证据 | backend + admin/portal test assets | Pending | 测试/审查，需授权 |
+| `TASK-QBANK-V2-07` | V1 文档和证据迁移为 Superseded，建立 V2 回链 | 本 Feature 文档目录 | InProgress | 只读一致性检查 |
+
+## 3. 任务执行边界
+
+允许：在上述目录内修改源码、配置、契约和必要的文档；保留用户已有改动；新增最小测试代码须先列入验证执行包。
+
+禁止：删除/移动旧项目，调用真实数据库/ASR/TTS/对象存储，构建/测试/启动服务，执行浏览器 UAT，修改用户未授权文件，`git add/commit/push`。
+
+## 4. 完成条件
+
+- 需求与 `feature-spec.md` 的 `REQ/BR/AC` 双向可追溯；
+- Admin 工作流不再返回 `CAPABILITY_UNAVAILABLE` 占位；未就绪依赖仍以稳定 fail-closed 错误结束；
+- 公开 GET 匿名可用，所有写操作有明确 RuoYi JWT/RBAC 权限；
+- Portal 无普通用户公共新增入口；
+- 代码审查完成后，验证记录只写实际运行结果，未运行项保持 `NotRun`/`Blocked`；
+- 用户 UAT 完成前不得形成 `ReleaseReady`，也不得删除旧项目。
+
+## 5. 依赖与停止条件
+
+- 依赖：RuoYi `ruoyi-admin` JWT/RBAC、catalog application port、PostgreSQL schema、统一错误处理和前端 API client。
+- 若需要第二套身份、修改用户登录/面试房间改动、改变公共 API/schema、真实凭据或外部写入，立即停止并回到阶段 3/5/6 重新确认。
+- 发现并行 Agent 修改同一共享契约时，由主会话统一合并；不得互相覆盖。

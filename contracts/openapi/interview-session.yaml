@@ -1,12 +1,12 @@
 openapi: 3.1.0
-info: { title: AI Interview Coach Interview Session API, version: 0.1.0 }
+info: { title: RuoYi AI Interview Interview Session API, version: 0.2.0 }
 servers: [{ url: /api/v1 }]
-security: [{ sessionCookie: [] }]
+security: [{ bearerAuth: [] }]
 paths:
   /interviews:
     post:
       operationId: createInterviewSession
-      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/CsrfToken' }]
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
       requestBody:
         required: true
         content:
@@ -19,44 +19,52 @@ paths:
                 confirmedPlanId: { type: string, format: uuid }
                 planVersionNo: { type: integer, minimum: 1 }
       responses:
-        '201': { description: Ready session, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewSnapshot' } } } }
+        '201': { description: Ready session, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewSnapshot' } } } }
         '409': { $ref: '#/components/responses/Error' }
   /interviews/{interviewId}:
     get:
       operationId: recoverInterviewSession
       parameters: [{ $ref: '#/components/parameters/InterviewId' }]
       responses:
-        '200': { description: Authoritative recovery snapshot, headers: { ETag: { schema: { type: string } } }, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewSnapshot' } } } }
+        '200': { description: Authoritative recovery snapshot, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewSnapshot' } } } }
         '404': { $ref: '#/components/responses/Error' }
+  /interviews/{interviewId}/commands/start:
+    post:
+      operationId: startInterview
+      parameters: [{ $ref: '#/components/parameters/InterviewId' }, { $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/IfMatch' }]
+      responses:
+        '200': { description: Started session snapshot, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewSnapshot' } } } }
+        '409': { $ref: '#/components/responses/Error' }
   /interviews/{interviewId}/commands/{command}:
     post:
       operationId: applyInterviewCommand
       parameters:
         - { $ref: '#/components/parameters/InterviewId' }
-        - { name: command, in: path, required: true, schema: { type: string, enum: [start, pause, resume, skip, complete, cancel] } }
+        - { name: command, in: path, required: true, schema: { type: string, enum: [pause, resume, skip, complete, cancel, recover] } }
         - { $ref: '#/components/parameters/IdempotencyKey' }
         - { $ref: '#/components/parameters/IfMatch' }
-        - { $ref: '#/components/parameters/CsrfToken' }
       requestBody: { content: { application/json: { schema: { type: object, additionalProperties: false, properties: { reasonCode: { type: string, maxLength: 96 } } } } } }
       responses:
-        '200': { description: Updated snapshot, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewSnapshot' } } } }
+        '200': { description: Updated snapshot, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewSnapshot' } } } }
         '202': { description: Durable job accepted, content: { application/json: { schema: { $ref: '#/components/schemas/OperationAccepted' } } } }
         '409': { $ref: '#/components/responses/Error' }
   /interviews/{interviewId}/answers:
     post:
       operationId: submitInterviewAnswer
-      parameters: [{ $ref: '#/components/parameters/InterviewId' }, { $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/IfMatch' }, { $ref: '#/components/parameters/CsrfToken' }]
+      parameters: [{ $ref: '#/components/parameters/InterviewId' }, { $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/IfMatch' }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/SubmitInterviewAnswer' } } } }
       responses:
-        '202': { description: Answer committed and next-step job accepted, content: { application/json: { schema: { $ref: '#/components/schemas/OperationAccepted' } } } }
+        '200': { description: Answer committed and current session snapshot returned by the RuoYi REST controller, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewSnapshot' } } } }
+        '202': { description: Answer committed and next-step job accepted by an asynchronous implementation, content: { application/json: { schema: { $ref: '#/components/schemas/OperationAccepted' } } } }
         '409': { $ref: '#/components/responses/Error' }
 components:
-  securitySchemes: { sessionCookie: { type: apiKey, in: cookie, name: AIC_SESSION } }
+  securitySchemes: { bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT } }
   parameters:
     InterviewId: { name: interviewId, in: path, required: true, schema: { type: string, format: uuid } }
     IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128 } }
     IfMatch: { name: If-Match, in: header, required: true, schema: { type: string, pattern: '^"v[0-9]+"$' } }
-    CsrfToken: { name: X-AIC-XSRF-TOKEN, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 512 } }
+  headers:
+    ETag: { description: Current interview-session aggregate version, schema: { type: string, pattern: '^"v[0-9]+"$' } }
   responses:
     Error: { description: Error envelope, content: { application/json: { schema: { $ref: './common.yaml#/components/schemas/ErrorEnvelope' } } } }
   schemas:
@@ -119,15 +127,11 @@ components:
     SubmitInterviewAnswer:
       type: object
       additionalProperties: false
-      required: [turnId, turnSequence]
-      oneOf:
-        - required: [text]
-        - required: [confirmedTranscriptVersionId]
+      required: [turnId, turnSequence, text]
       properties:
         turnId: { type: string, format: uuid }
         turnSequence: { type: integer, minimum: 1 }
         text: { type: string, minLength: 1, maxLength: 30000 }
-        confirmedTranscriptVersionId: { type: string, format: uuid }
     OperationAccepted:
       type: object
       additionalProperties: false

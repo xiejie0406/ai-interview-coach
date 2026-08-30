@@ -4,19 +4,19 @@
 > 文档状态：Draft  
 > owner / 责任边界：主协调 Agent 维护候选；用户批准后成为唯一实施任务源  
 > 创建时间：2026-08-02  
-> 更新时间：2026-08-02  
+> 更新时间：2026-08-29  
 > Feature ID：FEAT-INTERVIEW-001  
 > 风险等级：L3  
 > Spec / 原型 / 设计基线：均为 Draft，见控制页  
 > 产出阶段：6 任务拆分（提前准备）  
-> 阶段状态：WaitingForApproval
+> 阶段状态：Superseded（由 RuoYi V2 垂直任务包替代）
 
-## 1. 目标、非目标与完成边界
+> 本文件保留旧的 18 期候选拆分，作为历史索引，不再是执行任务源。当前可执行任务唯一见 [`../FEAT-QBANK-001-public-catalog/tasks.md`](../FEAT-QBANK-001-public-catalog/tasks.md) 和 [`../../development-records/2026-08-29-ruoyi-v2-implementation.md`](../../development-records/2026-08-29-ruoyi-v2-implementation.md)。
 
-- 目标：把合并后的 18 期路线转成一个可追溯、可分波次并行、共享文件不冲突的完整实施候选。
-- 非目标：本文件当前不授权代码/测试/命令；不把 Phase 复制成第二套任务正文；不包含 Gate C 延后能力。
-- 批准范围：待 Canonical PRD、原型和设计批准后从本候选中锁定。
-- 完成边界：范围内代码实现 + 适用 EV + 用户 UAT + 上线就绪判断；发布和 Git 仍独立。
+## 1. 历史候选说明
+
+- 以下内容是 2026-08-02 的完整产品候选，已因 V2 收敛而全部标记为历史；其中支付、学习计划、报告扩展、移动端和多 Provider 不得重新进入本轮执行。
+- V2 完成边界：题库公开读取/个人答案/Admin 治理、最小文本面试会话、Web 语音闭环；构建/测试/UAT/发布/Git 仍独立授权。
 
 ## 2. 波次与任务索引
 

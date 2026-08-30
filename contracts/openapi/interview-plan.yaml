@@ -1,15 +1,15 @@
 openapi: 3.1.0
-info: { title: AI Interview Coach Interview Plan API, version: 0.1.0 }
+info: { title: RuoYi AI Interview Interview Plan API, version: 0.2.0 }
 servers: [{ url: /api/v1 }]
-security: [{ sessionCookie: [] }]
+security: [{ bearerAuth: [] }]
 paths:
   /interview-plans:
     post:
       operationId: createInterviewPlan
-      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/CsrfToken' }]
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewSetup' } } } }
       responses:
-        '201': { description: Draft plan with deterministic estimate, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewPlanView' } } } }
+        '201': { description: Draft plan with deterministic estimate, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewPlanView' } } } }
         '409': { $ref: '#/components/responses/Error' }
   /interview-plans/{planId}:
     get:
@@ -18,7 +18,7 @@ paths:
       responses:
         '200':
           description: Owner-scoped authoritative plan snapshot
-          headers: { ETag: { schema: { type: string, pattern: '^"v[0-9]+"$' } } }
+          headers: { ETag: { $ref: '#/components/headers/ETag' } }
           content: { application/json: { schema: { $ref: '#/components/schemas/InterviewPlanView' } } }
         '404': { $ref: '#/components/responses/Error' }
   /interview-plans/{planId}/commands/{command}:
@@ -29,18 +29,18 @@ paths:
         - { name: command, in: path, required: true, schema: { type: string, enum: [confirm, cancel] } }
         - { $ref: '#/components/parameters/IdempotencyKey' }
         - { $ref: '#/components/parameters/IfMatch' }
-        - { $ref: '#/components/parameters/CsrfToken' }
       requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false, required: [acknowledgedEstimateVersion], properties: { acknowledgedEstimateVersion: { type: string, maxLength: 128 } } } } } }
       responses:
-        '200': { description: Updated plan and reservation state, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewPlanView' } } } }
+        '200': { description: Updated plan and reservation state, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/InterviewPlanView' } } } }
         '409': { $ref: '#/components/responses/Error' }
 components:
-  securitySchemes: { sessionCookie: { type: apiKey, in: cookie, name: AIC_SESSION } }
+  securitySchemes: { bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT } }
   parameters:
     PlanId: { name: planId, in: path, required: true, schema: { type: string, format: uuid } }
     IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128 } }
     IfMatch: { name: If-Match, in: header, required: true, schema: { type: string, pattern: '^"v[0-9]+"$' } }
-    CsrfToken: { name: X-AIC-XSRF-TOKEN, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 512 } }
+  headers:
+    ETag: { description: Current interview-plan aggregate version, schema: { type: string, pattern: '^"v[0-9]+"$' } }
   responses:
     Error: { description: Error envelope, content: { application/json: { schema: { $ref: './common.yaml#/components/schemas/ErrorEnvelope' } } } }
   schemas:
@@ -65,7 +65,7 @@ components:
         mode: { type: string, enum: [TEXT, CASCADE_VOICE] }
         questionCount: { type: integer, minimum: 1 }
         followUpBudget: { type: integer, minimum: 0 }
-        estimatedUsage: { type: object, additionalProperties: false, required: [unit, quantity, estimateVersion], properties: { unit: { type: string, enum: [TEXT_SESSION, VOICE_SECOND] }, quantity: { type: integer, minimum: 0 }, estimateVersion: { type: string } } }
+        estimatedUsage: { type: object, additionalProperties: false, required: [unit, quantity, estimateVersion], properties: { unit: { type: string, enum: [TEXT_SESSION, VOICE_SECOND] }, quantity: { type: number, minimum: 0 }, estimateVersion: { type: string } } }
         reservationId: { type: [string, 'null'], format: uuid }
         expiresAt: { type: string, format: date-time }
         version: { type: integer, minimum: 0 }

@@ -1,27 +1,40 @@
-# FEAT-QBANK-001 验证记录
+# FEAT-QBANK-001 V2 验证记录
 
-> 验证结果：Pass（范围内）；Maven 测试代码未执行，前端 `tsc -b` 仍受既有 TypeScript 配置阻塞。
+> 当前阶段：8 审查验证（局部运行证据已取得，整体仍未通过）  
+> 总体证据结果：Blocked  
+> 更新时间：2026-08-30
 
-| EV | 实际验证 | 结果 |
+本轮已获本地构建、启动和浏览器验收授权。以下结果仅代表当前本地环境的实际证据；数据库题库数据、真实 Provider、登录态 Admin 流程和用户验收仍未通过，不能据此宣称 V2 整体完成。
+
+## 1. V2 验证计划
+
+| EV | 对应 AC | 计划验证 | 当前结果 |
+|---|---|---|---|
+| `EV-QBANK-V2-01` | AC-01 | 匿名公开列表/详情；匿名写入被拒；登录态不被公开 GET 错误清除 | Pass（本地）：列表与详情均返回 `200`；匿名详情不再误触发 `401`；个人答案写入仍受保护 |
+| `EV-QBANK-V2-02` | AC-02 | 12 模块/600 题数量、关键词、难度、游标与版本回读 | Pass（本地回读）：7 页游标共 606 条，全部 `PUBLISHED`，12 模块均有数据；Flyway v10/v11 已执行；606 个来源版本为 `VERIFIED` |
+| `EV-QBANK-V2-03` | AC-03 | 公开 DTO 字段白名单、下线/草稿不可见 | NotRun |
+| `EV-QBANK-V2-04` | AC-04 | 个人答案加密、公共/用户租户隔离、他人不可读、系统答案不变 | NotRun |
+| `EV-QBANK-V2-05` | AC-05 | 编辑角色草稿→版本→Rubric→提交审核 | NotRun |
+| `EV-QBANK-V2-06` | AC-06 | 审核角色驳回/发布/下线、非法转换、RBAC、跨租户和 `If-Match` | NotRun |
+| `EV-QBANK-V2-07` | AC-07 | 同 key 同 payload 重放、同 key 不同 payload 冲突、无重复审计事实 | NotRun |
+| `EV-QBANK-V2-08` | AC-08 | Portal 无公共新增入口；Admin 加载/空态/错误/403/409 恢复 | Pass（局部）：Portal 题库页显示 12 固定模块和空态；Admin 登录页可渲染；受保护路由未登录跳转登录 |
+| `EV-QBANK-V2-09` | AC-09 | 文档、契约和源码不再把普通用户公共新增视为 V2 能力 | NotRun |
+
+## 2. 旧版证据迁移
+
+2026-08-29 前记录的 `EV-QBANK-01..21` 属于旧栈/旧范围，状态统一为 `Superseded`，仅保留以下历史事实：旧版曾运行公开读取、三栏 UI、个人答案和普通用户公共新增流程。它们不能证明若依 V2 的 Admin 工作流、RuoYi JWT/RBAC、幂等、ETag、跨租户或当前构建状态。
+
+其中旧 `EV-QBANK-20`“Chrome 新增公共题目”与 V2 明确冲突，已废止且不得重新启用。
+
+## 3. 已执行验证与证据
+
+| EV | 实际命令/步骤 | 结果/证据 |
 |---|---|---|
-| EV-QBANK-01 | `mvn -pl backend/interview-boot -am -DskipTests package` | Pass |
-| EV-QBANK-02 | `category` 分别请求 12 个模块，每个模块返回 50 条，合计 600 条新模块题 | Pass |
-| EV-QBANK-03 | `GET /api/v1/questions?category=RAG_DEEP_V3&limit=100` 返回 50 条 RAG 深入题目 | Pass |
-| EV-QBANK-04 | `GET /api/v1/questions?category=AGENT_SECURITY_DEEP_V3&limit=100` 返回 50 条安全深入题目 | Pass |
-| EV-QBANK-05 | 题目详情只返回 prompt、referenceAnswer、versionId 等元数据，不返回 answerRequirements/sourceRefs | Pass |
-| EV-QBANK-06 | `npx vite build` | Pass |
-| EV-QBANK-07 | `npm run build` | Blocked：项目既有 `baseUrl`/`paths` TypeScript 配置与当前 TypeScript 版本不兼容 |
-| EV-QBANK-08 | `GET /actuator/health` | Pass：`UP` |
-| EV-QBANK-09 | RAG 模块题目详情返回完整标准答案正文 | Pass |
-| EV-QBANK-10 | 数据库已存在不可变历史版本时重启，新模块题目幂等插入且每模块保持 50 条 | Pass |
-| EV-QBANK-11 | Chrome 三栏工作台包含模块栏、题目列表和答案阅读区，页面标题为 32px | Pass |
-| EV-QBANK-12 | Chrome 点击模块收缩、搜索“召回” | Pass：模块栏可收缩，题目结果为 5 条 |
-| EV-QBANK-13 | Chrome 标准答案阅读区 | Pass：6 段深入内容，包含结论、工程实现、具体例子、误区和验收方式 |
-| EV-QBANK-14 | Chrome 答案区可见内容 | Pass：无来源链接、回答要求、答题思路和在线作答入口 |
-| EV-QBANK-15 | Chrome 全屏工作区布局 | Pass：无 `.page-heading`；工作区从导航底部开始，占满可用宽度和高度 |
-| EV-QBANK-16 | Chrome 收缩模块栏 | Pass：模块栏由 190px 收缩到 72px，显示 `AG` 等可识别缩写，并可通过无障碍标签重新展开 |
-| EV-QBANK-17 | Maven / Vite 构建 | Pass：新增写入适配器、V014/V015 和前端编辑组件编译通过 |
-| EV-QBANK-18 | Chrome 未编辑答案状态 | Pass：只显示“编辑答案”，不显示“查看系统答案”“我的答案”或“标准答案”标题 |
-| EV-QBANK-19 | Chrome 保存个人答案 | Pass：保存后正文切换为用户答案，并出现“查看系统答案”；系统答案可临时查看并返回 |
-| EV-QBANK-20 | Chrome 新增公共题目 | Pass：弹窗保存成功，新题自动选中且公开查询可检索到 |
-| EV-QBANK-21 | 跨租户数据作用域 | Pass：个人答案分别记录公共题库租户、用户租户和用户 ID；匿名详情只返回系统基础答案 |
+| `EV-QBANK-RUN-01` | `mvn -pl ruoyi-admin -am package -DskipTests`（`apps/platform-backend`） | Pass：reactor 全部 SUCCESS，`ruoyi-admin` 执行 `spring-boot:repackage` |
+| `EV-QBANK-RUN-02` | 使用新 JAR 启动 8081，开启 Flyway v10/v11、catalog/business REST，关闭 Provider/对象存储/后台任务 | Pass：日志出现 `Started RuoYiApplication`，当前实例保持运行 |
+| `EV-QBANK-RUN-03` | `GET /`、`GET /captchaImage`、匿名题库/面试/consent 请求 | `/` 200；验证码 200；题库列表/详情 200；受保护面试/consent 返回 `code:401` |
+| `EV-QBANK-RUN-04` | Playwright 访问 Portal 首页、`/questions`、模拟面试入口、语音入口、Admin 5173 | Pass（页面级）：页面可渲染；截图见 `output/playwright/portal-home.png`、`portal-questions.png`、`portal-interview.png`、`admin-login.png` |
+
+## 4. 预定验证命令与环境
+
+后端、Admin Web（5173）和 Portal Web（5174）当前保持运行。真实 Provider、对象存储、登录态 Admin 流程和用户业务 UAT 未执行；旧项目删除仍需独立备份、manifest 和二次确认。

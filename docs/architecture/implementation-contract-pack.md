@@ -654,6 +654,7 @@ SSE 只做服务端到浏览器事件，不上传回答或音频。连接时重�
 - client/server sequence 各自独立单调递增；重复 chunk/控制帧按 message ID/sequence 丢弃并 ACK，gap 发送 NACK，超出窗口关闭。
 - 服务端下发 `maxInFlightChunks/maxChunkBytes/maxBufferedDurationMs`；客户端达到上限必须暂停采集发送。持续违约关闭 4408。
 - partial audio/transcript 在断线后允许丢弃并明确提示重录；已确认 Transcript/Answer 不得丢失。TTS 断线后按 committed text 与同一 business operation 重放/重合成，结算仍幂等。
+- 当前 Voice WebSocket v1 不伪造 durable replay：`resumeFromServerSequence` 为非零时，服务端在 ticket 主体绑定后拒绝恢复，发送 `server.resync-required` 并以 4409 关闭；客户端先读取 `snapshotUrl` 的 REST 快照，再申请新的 voice session。已确认事实只能从 REST/持久化事实恢复，不能依赖 partial 或旧 socket 重放。
 - 用户取消录音立即停止采集/外传，未确认 Artifact 进入删除路径；取消 TTS 不取消 Session；取消 Session 必须走 REST command。
 - 候选 close code：4401 未认证、4403 无权/未同意、4408 背压/协议违规、4409 stale turn/generation、4413 payload/codec、4429 限流、4503 capability unavailable。最终代码表进入 AsyncAPI。
 - WS 不承载普通 CRUD、支付、删除确认或管理员命令。

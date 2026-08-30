@@ -1,5 +1,5 @@
 openapi: 3.1.0
-info: { title: AI Interview Coach Catalog API, version: 0.2.0 }
+info: { title: RuoYi AI Interview Catalog API, version: 0.3.0 }
 servers: [{ url: /api/v1 }]
 paths:
   /questions:
@@ -8,7 +8,7 @@ paths:
       security: []
       parameters:
         - { name: query, in: query, schema: { type: string, maxLength: 200 } }
-        - { name: category, in: query, schema: { type: string, maxLength: 96 } }
+        - { name: category, in: query, schema: { type: string, maxLength: 96, enum: [AGENT_BASICS_DEEP_V3, LLM_FOUNDATION_DEEP_V3, PROMPT_ENGINEERING_DEEP_V3, RAG_DEEP_V3, KNOWLEDGE_BASE_DEEP_V3, WORKFLOW_DEEP_V3, TOOL_CALLING_DEEP_V3, MEMORY_DEEP_V3, MULTI_AGENT_DEEP_V3, EVALUATION_DEEP_V3, AGENT_SECURITY_DEEP_V3, AGENT_ENGINEERING_DEEP_V3] } }
         - { name: difficulty, in: query, schema: { type: string, enum: [JUNIOR, MID, SENIOR] } }
         - { name: cursor, in: query, schema: { type: string, maxLength: 512 } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
@@ -23,11 +23,21 @@ paths:
       responses:
         '200': { description: Published immutable user-facing question version, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/QuestionDetail' } } } }
         '404': { $ref: '#/components/responses/Error' }
+  /questions/{questionId}/my-answer:
+    put:
+      operationId: saveMyAnswer
+      parameters: [{ $ref: '#/components/parameters/QuestionId' }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/SaveMyAnswer' } } } }
+      responses:
+        '204': { description: Personal answer saved; the answer is never written to the public question version }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
   /admin/questions:
     get:
       operationId: listAdminQuestions
       parameters:
         - { name: state, in: query, required: false, schema: { type: string, enum: [DRAFT, IN_REVIEW, PUBLISHED, PUBLISHED_WITH_DRAFT, PUBLISHED_WITH_REVIEW, RETIRED] } }
+        - { name: category, in: query, required: false, schema: { type: string, enum: [GENERAL, AGENT_BASICS_DEEP_V3, LLM_FOUNDATION_DEEP_V3, PROMPT_ENGINEERING_DEEP_V3, RAG_DEEP_V3, KNOWLEDGE_BASE_DEEP_V3, WORKFLOW_DEEP_V3, TOOL_CALLING_DEEP_V3, MEMORY_DEEP_V3, MULTI_AGENT_DEEP_V3, EVALUATION_DEEP_V3, AGENT_SECURITY_DEEP_V3, AGENT_ENGINEERING_DEEP_V3] } }
         - { name: cursor, in: query, required: false, schema: { type: string, maxLength: 512 } }
         - { name: limit, in: query, required: false, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
       responses:
@@ -35,7 +45,7 @@ paths:
         '403': { $ref: '#/components/responses/Error' }
     post:
       operationId: createQuestionDraft
-      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/CsrfToken' }]
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/CreateQuestionDraft' } } } }
       responses:
         '201': { description: Question root and first immutable draft, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/AdminQuestionDetail' } } } }
@@ -50,7 +60,7 @@ paths:
   /admin/questions/{questionId}/versions:
     post:
       operationId: createQuestionVersion
-      parameters: [{ $ref: '#/components/parameters/QuestionId' }, { $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/IfMatch' }, { $ref: '#/components/parameters/CsrfToken' }]
+      parameters: [{ $ref: '#/components/parameters/QuestionId' }, { $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/IfMatch' }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/QuestionDraftContent' } } } }
       responses:
         '201': { description: New immutable draft version, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/AdminQuestionDetail' } } } }
@@ -58,10 +68,10 @@ paths:
   /admin/questions/{questionId}/rubrics:
     post:
       operationId: createRubricVersion
-      parameters: [{ $ref: '#/components/parameters/QuestionId' }, { $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/CsrfToken' }]
+      parameters: [{ $ref: '#/components/parameters/QuestionId' }, { $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/IfMatch' }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/CreateRubricVersion' } } } }
       responses:
-        '201': { description: New immutable rubric version, content: { application/json: { schema: { $ref: '#/components/schemas/RubricVersionView' } } } }
+        '201': { description: New immutable rubric version, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/RubricVersionView' } } } }
         '409': { $ref: '#/components/responses/Error' }
   /admin/questions/{questionId}/commands/{command}:
     post:
@@ -71,18 +81,16 @@ paths:
         - { name: command, in: path, required: true, schema: { type: string, enum: [submit-review, reject-review, publish, retire] } }
         - { $ref: '#/components/parameters/IdempotencyKey' }
         - { $ref: '#/components/parameters/IfMatch' }
-        - { $ref: '#/components/parameters/CsrfToken' }
       requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/QuestionWorkflowCommand' } } } }
       responses:
         '200': { description: Updated workflow snapshot and append-only publication/review fact, headers: { ETag: { $ref: '#/components/headers/ETag' } }, content: { application/json: { schema: { $ref: '#/components/schemas/AdminQuestionDetail' } } } }
         '409': { $ref: '#/components/responses/Error' }
 components:
-  securitySchemes: { sessionCookie: { type: apiKey, in: cookie, name: AIC_SESSION } }
+  securitySchemes: { bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT } }
   parameters:
     QuestionId: { name: questionId, in: path, required: true, schema: { type: string, format: uuid } }
     IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 128 } }
     IfMatch: { name: If-Match, in: header, required: true, schema: { type: string, pattern: '^"v[0-9]+"$' } }
-    CsrfToken: { name: X-AIC-XSRF-TOKEN, in: header, required: true, schema: { type: string, minLength: 16, maxLength: 512 } }
   headers:
     ETag: { description: Current aggregate version, schema: { type: string, pattern: '^"v[0-9]+"$' } }
   responses:
@@ -96,7 +104,7 @@ components:
         id: { type: string, format: uuid }
         versionId: { type: string, format: uuid }
         title: { type: string, maxLength: 500 }
-        category: { type: string, maxLength: 96 }
+        category: { type: string, maxLength: 96, enum: [AGENT_BASICS_DEEP_V3, LLM_FOUNDATION_DEEP_V3, PROMPT_ENGINEERING_DEEP_V3, RAG_DEEP_V3, KNOWLEDGE_BASE_DEEP_V3, WORKFLOW_DEEP_V3, TOOL_CALLING_DEEP_V3, MEMORY_DEEP_V3, MULTI_AGENT_DEEP_V3, EVALUATION_DEEP_V3, AGENT_SECURITY_DEEP_V3, AGENT_ENGINEERING_DEEP_V3] }
         difficulty: { type: string, enum: [JUNIOR, MID, SENIOR] }
         estimatedMinutes: { type: integer, minimum: 1, maximum: 120 }
         status: { type: string, const: PUBLISHED }
@@ -112,20 +120,20 @@ components:
     QuestionDetail:
       type: object
       additionalProperties: false
-      required: [id, versionId, title, category, difficulty, status, version, prompt, answerRequirements, sourceRefs, rubricVersionId]
+      required: [id, versionId, title, category, difficulty, status, version, prompt, referenceAnswer, systemAnswer, hasUserAnswer]
       properties:
         id: { type: string, format: uuid }
         versionId: { type: string, format: uuid }
         title: { type: string, maxLength: 500 }
-        category: { type: string, maxLength: 96 }
+        category: { type: string, maxLength: 96, enum: [AGENT_BASICS_DEEP_V3, LLM_FOUNDATION_DEEP_V3, PROMPT_ENGINEERING_DEEP_V3, RAG_DEEP_V3, KNOWLEDGE_BASE_DEEP_V3, WORKFLOW_DEEP_V3, TOOL_CALLING_DEEP_V3, MEMORY_DEEP_V3, MULTI_AGENT_DEEP_V3, EVALUATION_DEEP_V3, AGENT_SECURITY_DEEP_V3, AGENT_ENGINEERING_DEEP_V3] }
         difficulty: { type: string, enum: [JUNIOR, MID, SENIOR] }
         estimatedMinutes: { type: integer, minimum: 1, maximum: 120 }
         status: { type: string, const: PUBLISHED }
         version: { type: integer, minimum: 1 }
         prompt: { type: string, maxLength: 8000 }
-        answerRequirements: { type: array, maxItems: 20, items: { type: string, maxLength: 500 } }
-        sourceRefs: { type: array, maxItems: 20, items: { type: string, maxLength: 1000 } }
-        rubricVersionId: { type: string, format: uuid }
+        referenceAnswer: { type: array, maxItems: 30, items: { type: string, maxLength: 1000 } }
+        systemAnswer: { type: array, maxItems: 30, items: { type: string, maxLength: 1000 } }
+        hasUserAnswer: { type: boolean }
     ImmutableVersionRef:
       type: object
       additionalProperties: false
@@ -171,8 +179,9 @@ components:
     QuestionDraftContent:
       type: object
       additionalProperties: false
-      required: [title, stem, answerPoints, misconceptions, followUpTemplates, difficulty, targetRoles, locale, contentSourceVersionId]
+      required: [category, title, stem, answerPoints, misconceptions, followUpTemplates, difficulty, targetRoles, locale, contentSourceVersionId]
       properties:
+        category: { type: string, enum: [AGENT_BASICS_DEEP_V3, LLM_FOUNDATION_DEEP_V3, PROMPT_ENGINEERING_DEEP_V3, RAG_DEEP_V3, KNOWLEDGE_BASE_DEEP_V3, WORKFLOW_DEEP_V3, TOOL_CALLING_DEEP_V3, MEMORY_DEEP_V3, MULTI_AGENT_DEEP_V3, EVALUATION_DEEP_V3, AGENT_SECURITY_DEEP_V3, AGENT_ENGINEERING_DEEP_V3] }
         title: { type: string, minLength: 1, maxLength: 500 }
         stem: { type: string, minLength: 1, maxLength: 8000 }
         answerPoints: { type: array, maxItems: 30, items: { type: string, minLength: 1, maxLength: 1000 } }
@@ -185,11 +194,12 @@ components:
     QuestionVersionView:
       type: object
       additionalProperties: false
-      required: [id, versionNo, contentHash, title, stem, answerPoints, misconceptions, followUpTemplates, difficulty, targetRoles, locale, contentSourceVersionId, createdAt]
+      required: [id, versionNo, contentHash, category, title, stem, answerPoints, misconceptions, followUpTemplates, difficulty, targetRoles, locale, contentSourceVersionId, createdAt]
       properties:
         id: { type: string, format: uuid }
         versionNo: { type: integer, minimum: 1 }
         contentHash: { type: string, pattern: '^[a-f0-9]{64}$' }
+        category: { type: string, enum: [GENERAL, AGENT_BASICS_DEEP_V3, LLM_FOUNDATION_DEEP_V3, PROMPT_ENGINEERING_DEEP_V3, RAG_DEEP_V3, KNOWLEDGE_BASE_DEEP_V3, WORKFLOW_DEEP_V3, TOOL_CALLING_DEEP_V3, MEMORY_DEEP_V3, MULTI_AGENT_DEEP_V3, EVALUATION_DEEP_V3, AGENT_SECURITY_DEEP_V3, AGENT_ENGINEERING_DEEP_V3] }
         title: { type: string }
         stem: { type: string }
         answerPoints: { type: array, items: { type: string } }
@@ -237,4 +247,10 @@ components:
         questionVersionId: { type: [string, 'null'], format: uuid }
         rubricVersionId: { type: [string, 'null'], format: uuid }
         reasonCode: { type: string, minLength: 1, maxLength: 96, pattern: '^[A-Z][A-Z0-9_]{0,95}$' }
-security: [{ sessionCookie: [] }]
+    SaveMyAnswer:
+      type: object
+      additionalProperties: false
+      required: [answer]
+      properties:
+        answer: { type: string, minLength: 1, maxLength: 20000 }
+security: [{ bearerAuth: [] }]

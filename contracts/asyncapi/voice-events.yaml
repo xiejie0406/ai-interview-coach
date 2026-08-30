@@ -304,7 +304,7 @@ x-socket-contract:
   ordering: Client and server sequences are independent and monotonic. Duplicate frames are ACKed and discarded; gaps are NACKed or require resync.
   backpressure: The client must pause when maxInFlightChunks or maxBufferedDurationMs is reached and resume only after ACK/flow-control permits it.
   cancellation: client.audio.cancel stops capture and queues unconfirmed input for deletion; client.tts.cancel never changes Interview Session state.
-  recovery: Partials may be discarded. Confirmed Transcript/Answer facts are recovered through REST snapshot before any replay.
+  recovery: Partials may be discarded. The current v1 runtime does not provide durable WebSocket replay; a non-zero resumeFromServerSequence is rejected after ticket binding with server.resync-required and close 4409, and clients must recover confirmed Transcript/Answer facts from the supplied REST snapshot before requesting a new voice session.
   closeCodes:
     4401: unauthenticated
     4403: forbidden-or-consent-required
