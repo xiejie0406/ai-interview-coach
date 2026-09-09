@@ -9,8 +9,8 @@ if (-not (Test-Path $envFile)) {
 }
 
 Get-Content $envFile | ForEach-Object {
-  if ($_ -match '^RUOYI_(DB_URL|DB_USERNAME|DB_PASSWORD|SERVER_PORT)=(.*)$') {
-    [Environment]::SetEnvironmentVariable($Matches[0].Split('=')[0], $Matches[2], 'Process')
+  if ($_ -match '^(RUOYI_(DB_URL|DB_USERNAME|DB_PASSWORD|SERVER_PORT)|INTERVIEW_(DB_URL|DB_USERNAME|DB_PASSWORD|CATALOG_PUBLIC_TENANT_ID|FLYWAY_ENABLED|CATALOG_SEED_ENABLED))=(.*)$') {
+    [Environment]::SetEnvironmentVariable($Matches[0].Split('=')[0], $Matches[4], 'Process')
   }
 }
 
@@ -29,5 +29,5 @@ if ($existing) {
   exit 0
 }
 
-$process = Start-Process -FilePath 'java' -ArgumentList '-jar', $jar -WorkingDirectory (Split-Path $jar) -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden -PassThru
+$process = Start-Process -FilePath 'java' -ArgumentList '-jar', $jar, '--spring.profiles.active=druid,local' -WorkingDirectory (Split-Path $jar) -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden -PassThru
 Write-Output "Started RuoYi PID $($process.Id)."

@@ -34,7 +34,7 @@
 
 ## 3. Foundation capability locks
 
-下列 `interview.foundation-safety.*` 当前固定为 `false`：业务 REST、SSE、WebSocket、真实 Provider、对象存储写入、后台 Job。改变任何一项都需要相应垂直切片完成端口、权限、状态、数据、失败恢复与任务边界；不能靠环境变量提前打开。
+下列 `interview.foundation-safety.*` 默认固定为 `false`：业务 REST、SSE、WebSocket、真实 Provider、对象存储写入、后台 Job。仅本地 `platform-backend/bin/run-local.ps1` 显式加载 `local` profile 开放已实现的业务 REST；其他环境仍需相应垂直切片完成端口、权限、状态、数据、失败恢复与任务边界，不能靠环境变量提前打开。
 
 ## 4. 未执行
 

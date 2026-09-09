@@ -1,0 +1,4 @@
+# 本地开发 profile：只开放已实现的面试业务 REST，其他 foundation-safety 开关继续沿用默认值。
+interview:
+  foundation-safety:
+    business-rest-endpoints-enabled: true

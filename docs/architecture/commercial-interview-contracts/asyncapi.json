@@ -1,0 +1,322 @@
+{
+  "asyncapi": "3.0.0",
+  "info": {
+    "title": "商业面试V2语音与状态流",
+    "version": "0.1.0",
+    "description": "Draft，2026-09-08。应用作为收发视角；同源TLS、RuoYi主体+Origin检查、首帧一次性ticket。WS子协议aic.voice.v2；认证子协议不得进入日志。"
+  },
+  "channels": {
+    "voice": {
+      "address": "/ws/v2/interviews/{interviewId}/voice",
+      "parameters": {
+        "interviewId": {
+          "description": "owner范围内会话UUID"
+        }
+      },
+      "messages": {
+        "client.hello": {
+          "$ref": "#/components/messages/client.hello"
+        },
+        "server.hello": {
+          "$ref": "#/components/messages/server.hello"
+        },
+        "client.audio.start": {
+          "$ref": "#/components/messages/client.audio.start"
+        },
+        "client.audio.chunk": {
+          "$ref": "#/components/messages/client.audio.chunk"
+        },
+        "client.audio.stop": {
+          "$ref": "#/components/messages/client.audio.stop"
+        },
+        "client.audio.cancel": {
+          "$ref": "#/components/messages/client.audio.cancel"
+        },
+        "client.ack": {
+          "$ref": "#/components/messages/client.ack"
+        },
+        "server.ack": {
+          "$ref": "#/components/messages/server.ack"
+        },
+        "server.nack": {
+          "$ref": "#/components/messages/server.nack"
+        },
+        "server.flow_control": {
+          "$ref": "#/components/messages/server.flow_control"
+        },
+        "transcript.partial": {
+          "$ref": "#/components/messages/transcript.partial"
+        },
+        "transcript.final": {
+          "$ref": "#/components/messages/transcript.final"
+        },
+        "tts.chunk": {
+          "$ref": "#/components/messages/tts.chunk"
+        },
+        "tts.state": {
+          "$ref": "#/components/messages/tts.state"
+        },
+        "client.tts.cancel": {
+          "$ref": "#/components/messages/client.tts.cancel"
+        },
+        "resync.required": {
+          "$ref": "#/components/messages/resync.required"
+        },
+        "voice.degraded": {
+          "$ref": "#/components/messages/voice.degraded"
+        },
+        "terminal": {
+          "$ref": "#/components/messages/terminal"
+        },
+        "client.tts.replay": {
+          "$ref": "#/components/messages/client.tts.replay"
+        }
+      },
+      "description": "双向sequence独立、每generation从1递增；先hello，再音频；8帧在途、2秒缓冲，decoded chunk≤256KiB；ACK不触发ACK。断线新generation不重传旧音频。"
+    },
+    "interview": {
+      "address": "/api/v2/streams/interviews/{interviewId}",
+      "parameters": {
+        "interviewId": {
+          "description": "owner范围内会话UUID"
+        }
+      },
+      "messages": {
+        "event": {
+          "$ref": "#/components/messages/interviewEvent"
+        }
+      },
+      "description": "SSE至少一次投递；eventId去重；Last-Event-ID恢复；15秒注释心跳；7天候选保留与删除策略取更早。"
+    }
+  },
+  "operations": {
+    "receiveVoice": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/voice"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/voice/messages/client.hello"
+        },
+        {
+          "$ref": "#/channels/voice/messages/client.audio.start"
+        },
+        {
+          "$ref": "#/channels/voice/messages/client.audio.chunk"
+        },
+        {
+          "$ref": "#/channels/voice/messages/client.audio.stop"
+        },
+        {
+          "$ref": "#/channels/voice/messages/client.audio.cancel"
+        },
+        {
+          "$ref": "#/channels/voice/messages/client.ack"
+        },
+        {
+          "$ref": "#/channels/voice/messages/client.tts.cancel"
+        },
+        {
+          "$ref": "#/channels/voice/messages/client.tts.replay"
+        }
+      ]
+    },
+    "sendVoice": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/voice"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/voice/messages/server.hello"
+        },
+        {
+          "$ref": "#/channels/voice/messages/server.ack"
+        },
+        {
+          "$ref": "#/channels/voice/messages/server.nack"
+        },
+        {
+          "$ref": "#/channels/voice/messages/server.flow_control"
+        },
+        {
+          "$ref": "#/channels/voice/messages/transcript.partial"
+        },
+        {
+          "$ref": "#/channels/voice/messages/transcript.final"
+        },
+        {
+          "$ref": "#/channels/voice/messages/tts.chunk"
+        },
+        {
+          "$ref": "#/channels/voice/messages/tts.state"
+        },
+        {
+          "$ref": "#/channels/voice/messages/resync.required"
+        },
+        {
+          "$ref": "#/channels/voice/messages/voice.degraded"
+        },
+        {
+          "$ref": "#/channels/voice/messages/terminal"
+        }
+      ]
+    },
+    "sendInterview": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/interview"
+      },
+      "messages": [
+        {
+          "$ref": "#/channels/interview/messages/event"
+        }
+      ]
+    }
+  },
+  "components": {
+    "messages": {
+      "client.hello": {
+        "name": "client.hello",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/0"
+        }
+      },
+      "server.hello": {
+        "name": "server.hello",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/1"
+        }
+      },
+      "client.audio.start": {
+        "name": "client.audio.start",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/2"
+        }
+      },
+      "client.audio.chunk": {
+        "name": "client.audio.chunk",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/3"
+        }
+      },
+      "client.audio.stop": {
+        "name": "client.audio.stop",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/4"
+        }
+      },
+      "client.audio.cancel": {
+        "name": "client.audio.cancel",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/5"
+        }
+      },
+      "client.ack": {
+        "name": "client.ack",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/6"
+        }
+      },
+      "server.ack": {
+        "name": "server.ack",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/7"
+        }
+      },
+      "server.nack": {
+        "name": "server.nack",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/8"
+        }
+      },
+      "server.flow_control": {
+        "name": "server.flow_control",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/9"
+        }
+      },
+      "transcript.partial": {
+        "name": "transcript.partial",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/10"
+        }
+      },
+      "transcript.final": {
+        "name": "transcript.final",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/11"
+        }
+      },
+      "tts.chunk": {
+        "name": "tts.chunk",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/12"
+        }
+      },
+      "tts.state": {
+        "name": "tts.state",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/13"
+        }
+      },
+      "client.tts.cancel": {
+        "name": "client.tts.cancel",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/14"
+        }
+      },
+      "resync.required": {
+        "name": "resync.required",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/15"
+        }
+      },
+      "voice.degraded": {
+        "name": "voice.degraded",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/16"
+        }
+      },
+      "terminal": {
+        "name": "terminal",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/17"
+        }
+      },
+      "interviewEvent": {
+        "name": "InterviewEventV2",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/InterviewEventV2"
+        }
+      },
+      "client.tts.replay": {
+        "name": "client.tts.replay",
+        "contentType": "application/json",
+        "payload": {
+          "$ref": "./schemas.json#/$defs/VoiceFrameV2/oneOf/18"
+        }
+      }
+    }
+  }
+}

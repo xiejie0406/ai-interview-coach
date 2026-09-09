@@ -106,6 +106,7 @@ interview:
     # 公开题库租户是业务数据配置，不是认证/RBAC 来源；未配置时业务查询应明确失败。
     public-tenant-id: ${INTERVIEW_CATALOG_PUBLIC_TENANT_ID:}
   foundation-safety:
+    # 默认保持关闭；本地启动脚本通过 local profile 显式开启业务 REST。
     business-rest-endpoints-enabled: false
     catalog-rest-endpoints-enabled: false
     external-provider-calls-enabled: false
