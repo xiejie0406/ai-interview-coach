@@ -46,25 +46,39 @@ public final class VolcengineSpeechToTextAdapter implements SpeechToTextPort, Pr
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
     private final AudioArtifactSource artifactSource;
-    private final String apiKey;
+    private final VolcengineSpeechCredentials credentials;
     private final String modelProfile;
     private final String resourceId;
     private final URI endpoint;
 
     public VolcengineSpeechToTextAdapter(HttpClient httpClient, ObjectMapper objectMapper,
-                                         AudioArtifactSource artifactSource, String apiKey,
-                                         String modelProfile, URI endpoint) {
+                                         AudioArtifactSource artifactSource, String authMode,
+                                         String apiKey, String appId, String accessToken,
+                                         String modelProfile, String configuredResourceId,
+                                         URI endpoint) {
         this.httpClient = Objects.requireNonNull(httpClient, "httpClient");
         this.objectMapper = Objects.requireNonNull(objectMapper, "objectMapper");
         this.artifactSource = Objects.requireNonNull(artifactSource, "artifactSource");
-        this.apiKey = VolcengineSpeechProfiles.normalized(apiKey);
+        this.credentials = VolcengineSpeechCredentials.from(
+                authMode, apiKey, appId, accessToken);
         this.modelProfile = VolcengineSpeechProfiles.normalized(modelProfile);
-        this.resourceId = VolcengineSpeechProfiles.asrResourceId(modelProfile);
+        this.resourceId = VolcengineSpeechProfiles.configuredResourceId(
+                configuredResourceId, VolcengineSpeechProfiles.asrResourceId(modelProfile));
         this.endpoint = validWebSocketEndpoint(endpoint);
     }
 
     @Override
     public Result transcribe(Request request, InvocationContext context) {
+        Result result = transcribeInternal(request, context);
+        observation = java.util.Map.of("status", result instanceof Success ? "PASS" : "FAIL",
+                "observedAt", java.time.Instant.now().toString(), "reasonCode",
+                result instanceof Failure failure ? failure.failure().errorClass() : "AVAILABLE");
+        return result;
+    }
+    private volatile java.util.Map<String,String> observation = java.util.Map.of("status", "NOT_CHECKED");
+    @Override public java.util.Map<String,String> lastObservation() { return observation; }
+
+    private Result transcribeInternal(Request request, InvocationContext context) {
         Objects.requireNonNull(request, "request");
         Objects.requireNonNull(context, "context");
         if (!available()) {
@@ -91,9 +105,10 @@ public final class VolcengineSpeechToTextAdapter implements SpeechToTextPort, Pr
                 requestIdHash);
         final WebSocket socket;
         try {
-            socket = httpClient.newWebSocketBuilder()
-                    .connectTimeout(minimum(context.timeBudget().duration(), Duration.ofSeconds(10)))
-                    .header("X-Api-Key", apiKey)
+            WebSocket.Builder socketBuilder = httpClient.newWebSocketBuilder()
+                    .connectTimeout(minimum(context.timeBudget().duration(), Duration.ofSeconds(10)));
+            credentials.forEachHeader(socketBuilder::header);
+            socket = socketBuilder
                     .header("X-Api-Resource-Id", resourceId)
                     .header("X-Api-Request-Id", requestId)
                     .header("X-Api-Connect-Id", requestId)
@@ -111,6 +126,10 @@ public final class VolcengineSpeechToTextAdapter implements SpeechToTextPort, Pr
             Thread.currentThread().interrupt();
             return failure("PROVIDER_CALL_INTERRUPTED", RetryDisposition.NOT_RETRYABLE, requestIdHash);
         } catch (ExecutionException exception) {
+            if (exception.getCause() instanceof java.net.http.WebSocketHandshakeException handshake) {
+                return failure("ASR_HANDSHAKE_HTTP_" + handshake.getResponse().statusCode(),
+                        RetryDisposition.NOT_RETRYABLE, requestIdHash);
+            }
             return failure("PROVIDER_UNAVAILABLE", RetryDisposition.SAFE_BACKOFF, requestIdHash);
         } catch (JacksonException | IllegalArgumentException exception) {
             return failure("PROVIDER_REQUEST_INVALID", RetryDisposition.NOT_RETRYABLE, requestIdHash);
@@ -121,14 +140,17 @@ public final class VolcengineSpeechToTextAdapter implements SpeechToTextPort, Pr
 
     @Override public String adapterId() { return ADAPTER_ID; }
     @Override public boolean available() {
-        return apiKey != null && resourceId != null && endpoint != null;
+        return credentials.available() && resourceId != null && endpoint != null;
     }
-    @Override public String reasonCode() { return available() ? "AVAILABLE" : NOT_CONFIGURED; }
+    @Override public String reasonCode() {
+        return available() ? "AVAILABLE"
+                : credentials.available() ? NOT_CONFIGURED : credentials.reasonCode();
+    }
 
     private byte[] fullRequest(AudioArtifactSource.AudioContent audio, Request request) throws JacksonException {
         Map<String, Object> audioConfig = new LinkedHashMap<>();
         audioConfig.put("format", audio.format());
-        audioConfig.put("codec", audio.codec());
+        audioConfig.put("codec", audio.codec().contains("opus") ? "opus" : "raw");
         audioConfig.put("rate", audio.sampleRate());
         audioConfig.put("bits", audio.bitsPerSample());
         audioConfig.put("channel", audio.channels());

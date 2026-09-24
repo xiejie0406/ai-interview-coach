@@ -1,0 +1,9 @@
+{
+  "code": 412,
+  "msg": "任务版本已变化，请重新读取快照",
+  "data": null,
+  "errorCode": "ADEN_VERSION_CONFLICT",
+  "retryable": false,
+  "correlationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "details": {"currentVersion": "3"}
+}

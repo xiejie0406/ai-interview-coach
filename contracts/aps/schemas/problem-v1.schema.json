@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aps.local/contracts/schemas/problem-v1.schema.json",
+  "title": "APS Problem v1",
+  "description": "可展示和可定位的 APS 业务问题；不得包含内部异常堆栈或原始求解日志。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contractType",
+    "problemId",
+    "reasonCode",
+    "severity",
+    "title",
+    "detail",
+    "retryable",
+    "objectRefs"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "contractType": { "const": "APS_PROBLEM" },
+    "problemId": { "$ref": "#/$defs/uuid" },
+    "reasonCode": { "$ref": "#/$defs/reasonCode" },
+    "constraintCode": {
+      "type": ["string", "null"],
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^APS-(BR|REQ|VAL)-[0-9]{2,3}$"
+    },
+    "severity": { "enum": ["INFO", "WARNING", "ERROR"] },
+    "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "detail": { "type": "string", "minLength": 1, "maxLength": 1000 },
+    "retryable": { "type": "boolean" },
+    "objectRefs": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 32,
+      "items": { "$ref": "#/$defs/objectRef" }
+    },
+    "timeRange": {
+      "oneOf": [
+        { "$ref": "#/$defs/timeRange" },
+        { "type": "null" }
+      ]
+    },
+    "measurements": {
+      "type": "object",
+      "description": "脱敏后的可解释数值；键必须是稳定机器名。",
+      "propertyNames": { "pattern": "^[a-z][A-Za-z0-9]{0,63}$" },
+      "additionalProperties": {
+        "type": ["string", "number", "integer", "boolean", "null"]
+      },
+      "maxProperties": 32
+    }
+  },
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    },
+    "utcInstant": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    },
+    "reasonCode": {
+      "enum": [
+        "NO_ROUTE",
+        "MISSING_DURATION",
+        "NO_QUALIFIED_RESOURCE",
+        "NO_COMMON_WINDOW",
+        "RESOURCE_OVERLAP",
+        "CAPACITY_EXCEEDED",
+        "PRECEDENCE_VIOLATION",
+        "QUANTITY_NOT_RELEASED",
+        "BATCH_INCOMPATIBLE",
+        "LOCK_CONFLICT",
+        "OPEN_OCCUPANCY_UNKNOWN_RELEASE",
+        "STALE_INPUT",
+        "UNSUPPORTED_SYNC_RULE",
+        "TIME_LIMIT_NO_SOLUTION",
+        "INVALID_INTERVAL",
+        "INVALID_REVISION",
+        "HASH_MISMATCH",
+        "SOLVER_MODEL_INVALID",
+        "UNAUTHORIZED",
+        "NOT_FOUND",
+        "CONFLICT",
+        "STALE_VERSION",
+        "IDEMPOTENCY_CONFLICT",
+        "CONTRACT_VALIDATION_FAILED",
+        "CAPABILITY_NOT_IMPLEMENTED",
+        "SERVICE_UNAVAILABLE",
+        "INTERNAL_ERROR"
+      ]
+    },
+    "objectRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objectType", "objectId"],
+      "properties": {
+        "objectType": {
+          "enum": [
+            "PLAN_VERSION",
+            "ORDER",
+            "ORDER_LINE",
+            "LOT",
+            "TASK",
+            "DEPENDENCY",
+            "OPERATION_SPEC",
+            "OPERATION_PHASE",
+            "RESOURCE_REQUIREMENT",
+            "ITEM",
+            "ROUTE_VERSION",
+            "ROUTE_NODE",
+            "ROUTE_EDGE",
+            "RESOURCE",
+            "AVAILABILITY_WINDOW",
+            "PLAN_JOB",
+            "PLAN_SEGMENT",
+            "PLAN_ALLOCATION",
+            "PLAN_LOCK",
+            "ACTUAL_OCCUPANCY",
+            "REQUEST",
+            "SCHEMA"
+          ]
+        },
+        "objectId": { "$ref": "#/$defs/uuid" },
+        "field": { "type": ["string", "null"], "minLength": 1, "maxLength": 96 }
+      }
+    },
+    "timeRange": {
+      "type": "object",
+      "description": "半开区间 [startAt,endAt)；先后关系由业务校验器验证。",
+      "additionalProperties": false,
+      "required": ["startAt", "endAt"],
+      "properties": {
+        "startAt": { "$ref": "#/$defs/utcInstant" },
+        "endAt": { "$ref": "#/$defs/utcInstant" }
+      }
+    }
+  }
+}

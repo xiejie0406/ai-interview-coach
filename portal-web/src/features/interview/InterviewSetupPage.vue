@@ -63,7 +63,7 @@ async function confirmAndStart() {
       <span class="eyebrow">NEW INTERVIEW</span><h1>配置模拟面试</h1>
       <label>目标岗位<select v-model="form.targetRole"><option value="JAVA_BACKEND">Java 后端</option><option value="AI_APPLICATION">AI 应用</option><option value="AGENT_ENGINEER">Agent 工程</option></select></label>
       <label>目标级别<select v-model="form.targetLevel"><option value="JUNIOR">初级</option><option value="MID">中级</option><option value="SENIOR">高级</option></select></label>
-      <label>面试时长<input v-model.number="form.durationMinutes" type="number" min="10" max="120" /></label>
+      <label>面试时长<input v-model.number="form.durationMinutes" type="number" min="5" max="60" /></label>
       <label>面试模式<select v-model="form.mode"><option value="TEXT">文字面试</option><option value="CASCADE_VOICE">语音面试</option></select></label>
       <button class="primary-button" :disabled="busy">生成面试计划</button>
       <p v-if="error" class="error-message">{{ error }}</p>

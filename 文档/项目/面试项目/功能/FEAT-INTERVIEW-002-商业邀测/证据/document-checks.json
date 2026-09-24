@@ -1,0 +1,63 @@
+{
+  "type": "DOCUMENT_LINK_AND_CHANGE_CHECK",
+  "generatedAt": "2026-09-09T13:31:23.708356+00:00",
+  "feature": "FEAT-INTERVIEW-002",
+  "featureMarkdownFiles": 6,
+  "localLinksChecked": 48,
+  "selfEvidenceLinksGeneratedByThisCheck": 1,
+  "preservedExistingFiles": [
+    {
+      "file": "docs/product/prd.md",
+      "baselineSha256": "0a31a3c083d90d0542e15b51b826f2b329e46fba1be8214b0766d2ab5133feca",
+      "bodyPreservedIgnoringLineEndings": true
+    },
+    {
+      "file": "docs/specs/README.md",
+      "baselineSha256": "7ca6966b14e76518d84d76a434d9c0752e5f5fb1bf00b237bcc81852d05b74cd",
+      "bodyPreservedIgnoringLineEndings": true
+    },
+    {
+      "file": "docs/architecture/commercial-interview-agents-design.md",
+      "baselineSha256": "186e02ce83b79122d956f7ac1c9431118940741d0aab2240aa0eaa285e5208dc",
+      "bodyPreservedIgnoringLineEndings": true
+    },
+    {
+      "file": "docs/research/2026-09-08-commercial-interview-flow-review.md",
+      "baselineSha256": "f578afc6a2e1b5fd8a72f1fda9a851b2027345bd91a93877de334f6ac5be003b",
+      "bodyPreservedIgnoringLineEndings": true
+    },
+    {
+      "file": "docs/research/2026-09-07-commercial-interview-agents-discussion.md",
+      "baselineSha256": "5a64662e234f96b8d4e2359a58ff3f930cba098763c7c08db471b037c70c3920",
+      "bodyPreservedIgnoringLineEndings": true
+    },
+    {
+      "file": "docs/features/FEAT-INTERVIEW-001-ai-interview-coach/README.md",
+      "baselineSha256": "2b937b797f591de71dbc0e8925bc5e8da48a2b0e5aada37a36939f28d8343da2",
+      "bodyPreservedIgnoringLineEndings": true
+    }
+  ],
+  "checks": [
+    "Feature Markdown link existence",
+    "new entry links in six existing docs",
+    "balanced code fences",
+    "UTF-8 replacement characters",
+    "contract evidence hashes",
+    "existing body preservation, allowing newline normalization"
+  ],
+  "inputSha256": {
+    "docs\\features\\FEAT-INTERVIEW-002-commercial-pilot\\design.md": "a44a1a56c6c964f02948e12a586bffbd02b78f6171310b1b881b855d97b8fa6a",
+    "docs\\features\\FEAT-INTERVIEW-002-commercial-pilot\\feature-spec.md": "51408b6b9d91984cb3545caf584d5e988b2eac65745aa37e24b72b4838e81d22",
+    "docs\\features\\FEAT-INTERVIEW-002-commercial-pilot\\prototype.md": "256415aa298eeead4ea2d697cc5bdf78c4de2b8f2c2d33303f771bed7a5abba4",
+    "docs\\features\\FEAT-INTERVIEW-002-commercial-pilot\\README.md": "8757c918c2b691dcdaf61362fb8333e48f41b50aa3fd40b8c61d756ac3baaabc",
+    "docs\\features\\FEAT-INTERVIEW-002-commercial-pilot\\tasks.md": "0f662ad284515d901f89b603e57dd02cf09e95b76f69cc94faa2b7dfa1e53d8e",
+    "docs\\features\\FEAT-INTERVIEW-002-commercial-pilot\\verification.md": "3314d4db5501860c6870fc576d9128d24870b9f47170fc4e46a973ed8eef4422"
+  },
+  "errors": [],
+  "result": "Pass",
+  "limits": [
+    "No legacy-wide broken-link remediation",
+    "No Markdown visual rendering",
+    "No business code execution"
+  ]
+}

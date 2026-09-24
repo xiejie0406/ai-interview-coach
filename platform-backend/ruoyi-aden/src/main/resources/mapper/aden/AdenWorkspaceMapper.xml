@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.aden.infrastructure.persistence.mapper.AdenWorkspaceMapper">
+    <resultMap id="workspaceMembership" type="com.ruoyi.aden.infrastructure.persistence.mapper.AdenWorkspaceRow">
+        <id property="workspaceId" column="workspace_id"/>
+        <result property="workspaceName" column="workspace_name"/>
+        <result property="workspaceStatus" column="workspace_status"/>
+        <result property="version" column="version"/>
+        <result property="createdByRuoYiUserId" column="created_by_ruoyi_user_id"/>
+        <result property="createdAt" column="workspace_created_at"/>
+        <result property="updatedAt" column="workspace_updated_at"/>
+        <result property="memberUserId" column="member_user_id"/>
+        <result property="workspaceRole" column="workspace_role"/>
+        <result property="memberStatus" column="member_status"/>
+        <result property="membershipCreatedAt" column="membership_created_at"/>
+    </resultMap>
+
+    <sql id="activeMembershipSelect">
+        select w.workspace_id, w.workspace_name, w.workspace_status, w.version,
+               w.created_by_ruoyi_user_id,
+               w.created_at as workspace_created_at, w.updated_at as workspace_updated_at,
+               m.ruoyi_user_id as member_user_id, m.workspace_role, m.member_status,
+               m.created_at as membership_created_at
+          from aden_workspace_member m
+          join aden_workspace w on w.workspace_id = m.workspace_id
+         where m.member_status = 'ACTIVE'
+           and w.workspace_status = 'ACTIVE'
+    </sql>
+
+    <select id="selectActiveByUserId" resultMap="workspaceMembership">
+        <include refid="activeMembershipSelect"/>
+           and m.ruoyi_user_id = #{ruoYiUserId}
+         order by w.created_at, w.workspace_id
+         limit #{limit}
+    </select>
+
+    <select id="selectActiveMembership" resultMap="workspaceMembership">
+        <include refid="activeMembershipSelect"/>
+           and m.workspace_id = #{workspaceId}
+           and m.ruoyi_user_id = #{ruoYiUserId}
+         limit 1
+    </select>
+
+    <insert id="insertWorkspace">
+        insert into aden_workspace (
+            workspace_id, workspace_name, workspace_status, last_event_seq, version,
+            created_by_ruoyi_user_id, created_at, updated_at
+        ) values (
+            #{workspaceId}, #{workspaceName}, #{workspaceStatus}, 0, #{version},
+            #{createdByRuoYiUserId}, #{createdAt}, #{updatedAt}
+        )
+    </insert>
+
+    <insert id="insertMember">
+        insert into aden_workspace_member (
+            workspace_id, ruoyi_user_id, workspace_role, member_status, version, created_at, updated_at
+        ) values (
+            #{workspaceId}, #{ruoYiUserId}, #{workspaceRole}, #{memberStatus}, 0, #{createdAt}, #{updatedAt}
+        )
+    </insert>
+
+    <insert id="insertAudit">
+        insert into aden_audit_event (
+            workspace_id, audit_event_id, scope_type, action_code, resource_type, resource_id,
+            actor_type, actor_id, correlation_id, outcome, details_json, occurred_at, created_at
+        ) values (
+            #{workspaceId}, #{auditEventId}, 'WORKSPACE', #{actionCode}, 'WORKSPACE', #{resourceId},
+            'OPERATOR', #{actorId}, #{correlationId}, 'SUCCEEDED', json_object(), #{occurredAt}, #{createdAt}
+        )
+    </insert>
+
+    <insert id="insertWorkspaceForbiddenAudit">
+        insert into aden_audit_event (
+            workspace_id, audit_event_id, scope_type, action_code, resource_type, resource_id,
+            actor_type, actor_id, correlation_id, outcome, details_json, occurred_at, created_at
+        ) values (
+            null, #{auditEventId}, 'PLATFORM', 'ADEN_WORKSPACE_FORBIDDEN', 'WORKSPACE',
+            #{requestedWorkspaceId}, 'OPERATOR', #{actorId}, #{correlationId}, 'REJECTED',
+            json_object(), #{occurredAt}, #{createdAt}
+        )
+    </insert>
+</mapper>

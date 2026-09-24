@@ -25,21 +25,29 @@ public class ProviderProperties {
     }
 
     public static class VolcengineSpeech {
-        private String apiKey;
+        private String authMode, apiKey, appId, accessToken;
         private final Asr asr = new Asr();
         private final Tts tts = new Tts();
+        public String getAuthMode() { return authMode; }
+        public void setAuthMode(String value) { authMode = value; }
         public String getApiKey() { return apiKey; }
         public void setApiKey(String value) { apiKey = value; }
+        public String getAppId() { return appId; }
+        public void setAppId(String value) { appId = value; }
+        public String getAccessToken() { return accessToken; }
+        public void setAccessToken(String value) { accessToken = value; }
         public Asr getAsr() { return asr; }
         public Tts getTts() { return tts; }
     }
 
     public static class Asr {
-        private String model, fallbackModel, language, endpoint;
+        private String model, fallbackModel, resourceId, language, endpoint;
         public String getModel() { return model; }
         public void setModel(String value) { model = value; }
         public String getFallbackModel() { return fallbackModel; }
         public void setFallbackModel(String value) { fallbackModel = value; }
+        public String getResourceId() { return resourceId; }
+        public void setResourceId(String value) { resourceId = value; }
         public String getLanguage() { return language; }
         public void setLanguage(String value) { language = value; }
         public String getEndpoint() { return endpoint; }
@@ -47,10 +55,12 @@ public class ProviderProperties {
     }
 
     public static class Tts {
-        private String model, voice, language, audioFormat, endpoint;
+        private String model, resourceId, voice, language, audioFormat, endpoint;
         private int sampleRate = 24_000;
         public String getModel() { return model; }
         public void setModel(String value) { model = value; }
+        public String getResourceId() { return resourceId; }
+        public void setResourceId(String value) { resourceId = value; }
         public String getVoice() { return voice; }
         public void setVoice(String value) { voice = value; }
         public String getLanguage() { return language; }

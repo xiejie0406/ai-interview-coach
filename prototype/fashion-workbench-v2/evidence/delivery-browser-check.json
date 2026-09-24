@@ -1,0 +1,39 @@
+{
+  "checkedAt": "2026-09-11T03:05:26.823Z",
+  "findings": [
+    {
+      "fileURLImageExport": {
+        "supported": false,
+        "reason": "浏览器限制直接打开本地文件时的图片处理。请通过本地预览服务打开原型，再重试图片导出。"
+      }
+    },
+    {
+      "result": "pass",
+      "browser": "152.0.7977.83",
+      "pages": 21,
+      "pptxEmbeddedImages": 11,
+      "zipImages": 10,
+      "checked": [
+        "core check blocks empty snapshots",
+        "four-category snapshot created via quote confirmation button",
+        "page selection",
+        "actual PPTX/CSV/ZIP download",
+        "editable OOXML tables",
+        "fixed historical export after price update",
+        "template version stays immutable",
+        "historical version selection",
+        "material disabled blocks exports",
+        "390px no horizontal overflow",
+        "combined snapshot retains four visual components and one payable",
+        "void requires reason and keeps original snapshot immutable",
+        "copy voided snapshot creates new unconfirmed draft from its allocations",
+        "expired version uses internal-only filename and CSV/slide labels",
+        "no JavaScript page errors"
+      ],
+      "limitations": [
+        "Chromium automation in isolated context, no real account or provider",
+        "PPTX not opened in native PowerPoint or WPS"
+      ]
+    }
+  ]
+}

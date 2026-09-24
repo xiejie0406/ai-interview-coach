@@ -1,0 +1,60 @@
+- complementary "主导航":
+  - link "Aden. 采购执行中心":
+    - /url: "#dashboard"
+  - text: 采 品牌采购团队
+  - navigation:
+    - text: 采购工作台
+    - link "工作台":
+      - /url: "#dashboard"
+    - link "采购任务 4":
+      - /url: "#tasks"
+    - link "商品候选池":
+      - /url: "#candidates/AD-260911-SKY5A"
+    - link "供应商会话":
+      - /url: "#conversations/AD-260911-SKY5A"
+    - link "报价对比":
+      - /url: "#quotes/AD-260911-SKY5A"
+    - link "供应商库":
+      - /url: "#suppliers"
+    - text: 管理与设置
+    - link "执行电脑与连接":
+      - /url: "#connections"
+    - link "采购规则":
+      - /url: "#rules"
+    - link "活动日志":
+      - /url: "#activity"
+  - strong: 演示执行环境
+  - text: 真实平台未接入 · 仅本地保存
+  - link "查看环境状态":
+    - /url: "#connections"
+  - text: LC
+  - strong: 林采 · 采购负责人
+  - text: 示例身份
+- banner:
+  - text: 采购工作空间
+  - strong: 商品候选池
+  - text: 已保存在本地 交互原型 · 示例数据
+- main:
+  - text: SOURCING WORKSPACE
+  - heading "商品候选池" [level=1]
+  - paragraph: 保留页面条件，找到值得进一步询价的供应商。
+  - button "手工补充候选"
+  - text: 当前采购任务
+  - combobox "当前采购任务":
+    - option "QA 工业垫片" [selected]
+    - option "秋季品牌活动 · 定制 T 恤采购"
+    - option "门店补货 · 牛皮纸包装袋"
+    - option "客户礼赠 · 定制保温杯"
+  - text: 10,000 件 · 其他品类 · 待筛选
+  - textbox "搜索商品候选":
+    - /placeholder: 搜索供应商或规格
+  - combobox "筛选商品候选":
+    - option "全部候选" [selected]
+    - option "已选择"
+    - option "对端为 AI 客服"
+  - text: 0 款商品 · 页面价仅供参考
+  - heading "暂时没有商品候选" [level=3]
+  - paragraph: 该品类没有匹配的示例商品。您可以补充真实已知资料作为本地演示候选。
+  - button "手工补充候选"
+  - paragraph: 页面价格未确认税费和运费，也不是供应商对本次需求的有效报价。商品图为本地示意图。
+- status: 采购计划已保存，等待复核

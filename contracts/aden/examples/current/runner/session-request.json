@@ -1,0 +1,6 @@
+{
+  "protocolVersion": 1,
+  "runnerVersion": "0.1.0",
+  "capacity": 2,
+  "capabilities": ["CORE"]
+}

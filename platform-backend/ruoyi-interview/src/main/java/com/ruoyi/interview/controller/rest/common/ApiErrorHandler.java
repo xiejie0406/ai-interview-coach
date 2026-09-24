@@ -28,9 +28,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /** Maps known failures to the stable ErrorEnvelope contract without leaking internals. */
-@RestControllerAdvice
+@org.springframework.core.annotation.Order(org.springframework.core.Ordered.HIGHEST_PRECEDENCE)
+@RestControllerAdvice(basePackages = "com.ruoyi.interview.controller.rest")
 public class ApiErrorHandler {
     private static final Logger LOG = LoggerFactory.getLogger(ApiErrorHandler.class);
+
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    ResponseEntity<AjaxResult> accessDenied(Exception exception, HttpServletRequest request) {
+        return response(HttpStatus.FORBIDDEN, "FORBIDDEN", "没有访问权限", false, Map.of(), request);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<AjaxResult> validation(MethodArgumentNotValidException exception, HttpServletRequest request) {

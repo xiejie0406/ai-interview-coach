@@ -1,0 +1,89 @@
+{
+  "at": "2026-09-10T17:06:57.822Z",
+  "results": [
+    {
+      "label": "任务详情锁定及撤销恢复",
+      "result": "Pass",
+      "detail": {
+        "lock": "none",
+        "start": 0
+      }
+    },
+    {
+      "label": "解除锁定与调整保持基线",
+      "result": "Pass"
+    },
+    {
+      "label": "多个标签页禁止覆盖最新本地计划",
+      "result": "Pass",
+      "detail": {
+        "protected": true
+      }
+    },
+    {
+      "label": "工作台最终布局 1440",
+      "result": "Pass",
+      "detail": {
+        "scroll": 1440,
+        "width": 1440,
+        "toolbar": [
+          {
+            "label": "前一天",
+            "within": true
+          },
+          {
+            "label": "后一天",
+            "within": true
+          },
+          {
+            "label": "起始日",
+            "within": true
+          },
+          {
+            "label": "1 天2 天5 天",
+            "within": true
+          }
+        ],
+        "icons": []
+      }
+    },
+    {
+      "label": "工作台最终布局 390",
+      "result": "Pass",
+      "detail": {
+        "scroll": 390,
+        "width": 390,
+        "toolbar": [
+          {
+            "label": "前一天",
+            "within": true
+          },
+          {
+            "label": "后一天",
+            "within": true
+          },
+          {
+            "label": "起始日",
+            "within": true
+          },
+          {
+            "label": "1 天2 天5 天",
+            "within": true
+          }
+        ],
+        "icons": []
+      }
+    },
+    {
+      "label": "窄屏抽屉与键盘关闭",
+      "result": "Pass"
+    },
+    {
+      "label": "新增逻辑运行异常",
+      "result": "Pass",
+      "detail": {
+        "errors": []
+      }
+    }
+  ]
+}

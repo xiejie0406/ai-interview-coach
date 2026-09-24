@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FEAT-INTERVIEW-002 工程验证报告</title>
+  <style>
+    body { font: 16px/1.6 system-ui, sans-serif; max-width: 1120px; margin: 32px auto; padding: 0 20px; color: #202124; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #d8dce3; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f5f6f8; }
+    .pass { color: #137333; font-weight: 700; }
+    .blocked { color: #b06000; font-weight: 700; }
+    .notrun { color: #5f6368; font-weight: 700; }
+    .summary { border-left: 4px solid #b06000; padding: 10px 14px; background: #fff8ee; }
+    code { background: #f1f3f4; padding: 1px 4px; }
+  </style>
+</head>
+<body>
+  <h1>FEAT-INTERVIEW-002 工程验证报告</h1>
+  <p>执行日期：2026-09-11；环境：Windows、本地 PostgreSQL 16.13、Playwright Chromium、本地 RuoYi / Portal。</p>
+  <p class="summary"><strong>结论：</strong>题库和文字面试闭环已验证；真实语音在 ASR 供应商鉴权处被 HTTP 403 阻断，TTS 未执行。正式用户验收待确认，不能声称上线就绪。</p>
+  <table>
+    <thead><tr><th>范围</th><th>实际结果</th><th>状态</th><th>限制</th></tr></thead>
+    <tbody>
+      <tr><td>后端与迁移</td><td>23 条测试通过；随机空库应用 Flyway V1–V14，JDBC 往返成功</td><td class="pass">Pass</td><td>Docker 不可用，改用授权的本地 PostgreSQL；临时库已清理</td></tr>
+      <tr><td>鉴权与资源配置</td><td>7 条单测验证两种鉴权头、配置拒绝规则及 Resource ID 映射/覆盖</td><td class="pass">Pass</td><td>不证明真实凭据有效或账号已开通资源</td></tr>
+      <tr><td>Portal / Admin 构建</td><td>类型检查及生产构建成功</td><td class="pass">Pass</td><td>保留既有大 chunk 警告</td></tr>
+      <tr><td>Portal 自动化</td><td>4 条 Chromium 流程通过，2 条真实供应商场景按开关跳过</td><td class="pass">Pass</td><td><a href="../../../../../../portal-web/playwright-report/index.html">Playwright HTML 报告</a>；默认流程使用路由 Mock</td></tr>
+      <tr><td>真实文字链路</td><td>计划、回答、模型追问、结束、DeepSeek 反馈完成</td><td class="pass">Pass</td><td>单次冒烟，不代表模型质量或容量达标</td></tr>
+      <tr><td>真实 ASR</td><td>测试麦克风、WS、WAV 分片、存储和外呼已发生；握手返回 <code>ASR_HANDSHAKE_HTTP_403</code></td><td class="blocked">Blocked</td><td>需确认控制台类型、凭据字段和已开通 Resource ID</td></tr>
+      <tr><td>真实 TTS / 语音反馈</td><td>因 ASR 前置失败停止链路</td><td class="notrun">NotRun</td><td>供应商明确失败后未盲目重试</td></tr>
+      <tr><td>正式 UAT</td><td>尚无用户或业务负责人验收结论</td><td class="notrun">Pending</td><td>验收记录保持 Draft</td></tr>
+    </tbody>
+  </table>
+  <p>详细事实、命令和首次失败记录见 <a href="../验证记录.md">验证记录.md</a>。</p>
+</body>
+</html>

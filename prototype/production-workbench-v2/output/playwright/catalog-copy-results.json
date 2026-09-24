@@ -1,0 +1,248 @@
+{
+  "at": "2026-09-10T17:21:01.263Z",
+  "results": [
+    {
+      "label": "已执行及返工源单复制隔离",
+      "result": "Pass",
+      "detail": {
+        "fixture": "测试预置已执行源单，Engine.dispose 生成返工及补产链；订单创建通过真实 UI",
+        "sourceNormalTasks": 6,
+        "sourceAllTasks": 10,
+        "newTaskCount": 6,
+        "excludedExecutionKeys": [
+          "activity",
+          "releases",
+          "lastActionAt",
+          "disposedBad",
+          "recoveredGood",
+          "dispositionCount",
+          "recoveryChainId",
+          "recoveryOf",
+          "sourceRejectedTask",
+          "recoveryReason",
+          "actualStart",
+          "actualEnd",
+          "actualRelease",
+          "lockAssignment",
+          "consumed"
+        ],
+        "sourceUnchanged": true,
+        "tasks": [
+          {
+            "id": "T-MTVSN772-RVY",
+            "orderId": "O-COPY-CLEAN",
+            "lineId": "L-MTVSN771-I4F",
+            "product": "A 精密壳体",
+            "qty": 80,
+            "op": "精密加工",
+            "workshop": "机加工车间",
+            "wc": "加工一中心",
+            "mode": "machine",
+            "skill": "精密加工",
+            "minLevel": 3,
+            "machines": [
+              "M1"
+            ],
+            "rate": 25,
+            "setup": 0,
+            "run": 192,
+            "unload": 0,
+            "deps": [],
+            "compatible": "",
+            "interruptible": false,
+            "batchId": null,
+            "status": "ready",
+            "good": 0,
+            "bad": 0,
+            "reported": 0,
+            "lock": "none"
+          },
+          {
+            "id": "T-MTVSN772-GB6",
+            "orderId": "O-COPY-CLEAN",
+            "lineId": "L-MTVSN771-I4F",
+            "product": "A 精密壳体",
+            "qty": 80,
+            "op": "同炉热处理",
+            "workshop": "热处理车间",
+            "wc": "热处理中心",
+            "mode": "batch",
+            "skill": "炉装卸",
+            "minLevel": 3,
+            "machines": [
+              "F1"
+            ],
+            "rate": 50,
+            "setup": 30,
+            "run": 120,
+            "unload": 30,
+            "deps": [
+              {
+                "taskId": "T-MTVSN772-RVY",
+                "type": "finish",
+                "qty": 0,
+                "lag": 0
+              }
+            ],
+            "compatible": "HT-180/120",
+            "interruptible": false,
+            "batchId": null,
+            "status": "ready",
+            "good": 0,
+            "bad": 0,
+            "reported": 0,
+            "lock": "none"
+          },
+          {
+            "id": "T-MTVSN772-SYZ",
+            "orderId": "O-COPY-CLEAN",
+            "lineId": "L-MTVSN771-I4F",
+            "product": "A 精密壳体",
+            "qty": 80,
+            "op": "成品检验",
+            "workshop": "质量车间",
+            "wc": "检验中心",
+            "mode": "manual",
+            "skill": "成品检验",
+            "minLevel": 3,
+            "machines": [],
+            "rate": 100,
+            "setup": 0,
+            "run": 48,
+            "unload": 0,
+            "deps": [
+              {
+                "taskId": "T-MTVSN772-GB6",
+                "type": "finish",
+                "qty": 0,
+                "lag": 0
+              }
+            ],
+            "compatible": "",
+            "interruptible": false,
+            "batchId": null,
+            "status": "ready",
+            "good": 0,
+            "bad": 0,
+            "reported": 0,
+            "lock": "none"
+          },
+          {
+            "id": "T-MTVSN772-M5E",
+            "orderId": "O-COPY-CLEAN",
+            "lineId": "L-MTVSN771-LEZ",
+            "product": "B 配套轴套",
+            "qty": 60,
+            "op": "数控车削",
+            "workshop": "机加工车间",
+            "wc": "加工二中心",
+            "mode": "machine",
+            "skill": "数控车削",
+            "minLevel": 3,
+            "machines": [
+              "M2"
+            ],
+            "rate": 50,
+            "setup": 0,
+            "run": 72,
+            "unload": 0,
+            "deps": [
+              {
+                "taskId": "T-MTVSN772-RVY",
+                "type": "quantity",
+                "qty": 40,
+                "lag": 0
+              }
+            ],
+            "compatible": "",
+            "interruptible": false,
+            "batchId": null,
+            "status": "ready",
+            "good": 0,
+            "bad": 0,
+            "reported": 0,
+            "lock": "none"
+          },
+          {
+            "id": "T-MTVSN772-RS4",
+            "orderId": "O-COPY-CLEAN",
+            "lineId": "L-MTVSN771-LEZ",
+            "product": "B 配套轴套",
+            "qty": 60,
+            "op": "同炉热处理",
+            "workshop": "热处理车间",
+            "wc": "热处理中心",
+            "mode": "batch",
+            "skill": "炉装卸",
+            "minLevel": 3,
+            "machines": [
+              "F1"
+            ],
+            "rate": 50,
+            "setup": 30,
+            "run": 120,
+            "unload": 30,
+            "deps": [
+              {
+                "taskId": "T-MTVSN772-M5E",
+                "type": "finish",
+                "qty": 0,
+                "lag": 0
+              }
+            ],
+            "compatible": "HT-180/120",
+            "interruptible": false,
+            "batchId": null,
+            "status": "ready",
+            "good": 0,
+            "bad": 0,
+            "reported": 0,
+            "lock": "none"
+          },
+          {
+            "id": "T-MTVSN772-7DL",
+            "orderId": "O-COPY-CLEAN",
+            "lineId": "L-MTVSN771-LEZ",
+            "product": "B 配套轴套",
+            "qty": 60,
+            "op": "成品检验",
+            "workshop": "质量车间",
+            "wc": "检验中心",
+            "mode": "manual",
+            "skill": "成品检验",
+            "minLevel": 3,
+            "machines": [],
+            "rate": 100,
+            "setup": 0,
+            "run": 36,
+            "unload": 0,
+            "deps": [
+              {
+                "taskId": "T-MTVSN772-RS4",
+                "type": "finish",
+                "qty": 0,
+                "lag": 0
+              }
+            ],
+            "compatible": "",
+            "interruptible": false,
+            "batchId": null,
+            "status": "ready",
+            "good": 0,
+            "bad": 0,
+            "reported": 0,
+            "lock": "none"
+          }
+        ]
+      }
+    },
+    {
+      "label": "主数据流程浏览器异常",
+      "result": "Pass",
+      "detail": {
+        "errors": []
+      }
+    }
+  ],
+  "errors": []
+}

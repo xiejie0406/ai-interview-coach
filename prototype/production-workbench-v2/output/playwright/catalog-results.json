@@ -1,0 +1,548 @@
+{
+  "at": "2026-09-10T17:06:57.223Z",
+  "results": [
+    {
+      "label": "新增多产品订单与独立工艺实例",
+      "result": "Pass",
+      "detail": {
+        "order": {
+          "id": "O-CAT-01",
+          "customer": "工艺验收客户",
+          "due": 3420,
+          "priority": 60,
+          "lines": [
+            {
+              "id": "L-MTVS4HNM-L51",
+              "product": "A 精密壳体",
+              "qty": 80,
+              "unit": "件",
+              "route": "RT-A V1"
+            },
+            {
+              "id": "L-MTVS4HNM-C6L",
+              "product": "B 配套轴套",
+              "qty": 60,
+              "unit": "件",
+              "route": "RT-B V1"
+            }
+          ]
+        },
+        "tasks": [
+          {
+            "id": "T-MTVS4HNM-MHU",
+            "orderId": "O-CAT-01",
+            "lineId": "L-MTVS4HNM-L51",
+            "product": "A 精密壳体",
+            "op": "精密加工",
+            "qty": 80,
+            "workshop": "机加工车间",
+            "wc": "加工一中心",
+            "mode": "machine",
+            "skill": "精密加工",
+            "minLevel": 3,
+            "machines": [
+              "M1"
+            ],
+            "rate": 25,
+            "setup": 0,
+            "run": 192,
+            "unload": 0,
+            "deps": [],
+            "batchId": null,
+            "lock": "none",
+            "status": "ready",
+            "good": 0,
+            "bad": 0,
+            "reported": 0,
+            "compatible": "",
+            "interruptible": false
+          },
+          {
+            "id": "T-MTVS4HNN-UUS",
+            "orderId": "O-CAT-01",
+            "lineId": "L-MTVS4HNM-L51",
+            "product": "A 精密壳体",
+            "op": "同炉热处理",
+            "qty": 80,
+            "workshop": "热处理车间",
+            "wc": "热处理中心",
+            "mode": "batch",
+            "skill": "炉装卸",
+            "minLevel": 3,
+            "machines": [
+              "F1"
+            ],
+            "rate": 50,
+            "setup": 30,
+            "run": 120,
+            "unload": 30,
+            "deps": [
+              {
+                "taskId": "T-MTVS4HNM-MHU",
+                "type": "finish",
+                "qty": 0,
+                "lag": 0
+              }
+            ],
+            "batchId": null,
+            "lock": "none",
+            "status": "ready",
+            "good": 0,
+            "bad": 0,
+            "reported": 0,
+            "compatible": "HT-180/120",
+            "interruptible": false
+          },
+          {
+            "id": "T-MTVS4HNN-MCA",
+            "orderId": "O-CAT-01",
+            "lineId": "L-MTVS4HNM-L51",
+            "product": "A 精密壳体",
+            "op": "成品检验",
+            "qty": 80,
+            "workshop": "质量车间",
+            "wc": "检验中心",
+            "mode": "manual",
+            "skill": "成品检验",
+            "minLevel": 3,
+            "machines": [],
+            "rate": 100,
+            "setup": 0,
+            "run": 48,
+            "unload": 0,
+            "deps": [
+              {
+                "taskId": "T-MTVS4HNN-UUS",
+                "type": "finish",
+                "qty": 0,
+                "lag": 0
+              }
+            ],
+            "batchId": null,
+            "lock": "none",
+            "status": "ready",
+            "good": 0,
+            "bad": 0,
+            "reported": 0,
+            "compatible": "",
+            "interruptible": false
+          },
+          {
+            "id": "T-MTVS4HNN-7K2",
+            "orderId": "O-CAT-01",
+            "lineId": "L-MTVS4HNM-C6L",
+            "product": "B 配套轴套",
+            "op": "数控车削",
+            "qty": 60,
+            "workshop": "机加工车间",
+            "wc": "加工二中心",
+            "mode": "machine",
+            "skill": "数控车削",
+            "minLevel": 3,
+            "machines": [
+              "M2"
+            ],
+            "rate": 50,
+            "setup": 0,
+            "run": 72,
+            "unload": 0,
+            "deps": [
+              {
+                "taskId": "T-MTVS4HNM-MHU",
+                "type": "quantity",
+                "qty": 40,
+                "lag": 0
+              }
+            ],
+            "batchId": null,
+            "lock": "none",
+            "status": "ready",
+            "good": 0,
+            "bad": 0,
+            "reported": 0,
+            "compatible": "",
+            "interruptible": false
+          },
+          {
+            "id": "T-MTVS4HNN-6N4",
+            "orderId": "O-CAT-01",
+            "lineId": "L-MTVS4HNM-C6L",
+            "product": "B 配套轴套",
+            "op": "同炉热处理",
+            "qty": 60,
+            "workshop": "热处理车间",
+            "wc": "热处理中心",
+            "mode": "batch",
+            "skill": "炉装卸",
+            "minLevel": 3,
+            "machines": [
+              "F1"
+            ],
+            "rate": 50,
+            "setup": 30,
+            "run": 120,
+            "unload": 30,
+            "deps": [
+              {
+                "taskId": "T-MTVS4HNN-7K2",
+                "type": "finish",
+                "qty": 0,
+                "lag": 0
+              }
+            ],
+            "batchId": null,
+            "lock": "none",
+            "status": "ready",
+            "good": 0,
+            "bad": 0,
+            "reported": 0,
+            "compatible": "HT-180/120",
+            "interruptible": false
+          },
+          {
+            "id": "T-MTVS4HNN-010",
+            "orderId": "O-CAT-01",
+            "lineId": "L-MTVS4HNM-C6L",
+            "product": "B 配套轴套",
+            "op": "成品检验",
+            "qty": 60,
+            "workshop": "质量车间",
+            "wc": "检验中心",
+            "mode": "manual",
+            "skill": "成品检验",
+            "minLevel": 3,
+            "machines": [],
+            "rate": 100,
+            "setup": 0,
+            "run": 36,
+            "unload": 0,
+            "deps": [
+              {
+                "taskId": "T-MTVS4HNN-6N4",
+                "type": "finish",
+                "qty": 0,
+                "lag": 0
+              }
+            ],
+            "batchId": null,
+            "lock": "none",
+            "status": "ready",
+            "good": 0,
+            "bad": 0,
+            "reported": 0,
+            "compatible": "",
+            "interruptible": false
+          }
+        ],
+        "revision": 1
+      }
+    },
+    {
+      "label": "工艺参数修改保留有效工时并参与排程",
+      "result": "Pass",
+      "detail": {
+        "run": 120,
+        "end": 135
+      }
+    },
+    {
+      "label": "循环关系拒绝且原依赖不变",
+      "result": "Pass",
+      "detail": {
+        "message": "该关系会形成工艺循环，无法保存"
+      }
+    },
+    {
+      "label": "数量门槛编辑与共同批次网络层级",
+      "result": "Pass",
+      "detail": {
+        "dep": {
+          "taskId": "A10",
+          "type": "quantity",
+          "qty": 40,
+          "lag": 10
+        },
+        "layout": {
+          "A20": 534,
+          "B20": 534,
+          "A30": 792
+        }
+      }
+    },
+    {
+      "label": "逐批转序编辑与逐时供给守恒",
+      "result": "Pass",
+      "detail": {
+        "dep": {
+          "taskId": "T10",
+          "type": "quantity",
+          "qty": 10,
+          "lag": 0,
+          "consume": true,
+          "ratio": 1,
+          "transferQty": 10
+        },
+        "segments": [
+          {
+            "start": 30,
+            "end": 45,
+            "kind": "run",
+            "machineId": null,
+            "personId": "P9",
+            "qty": 10
+          },
+          {
+            "start": 60,
+            "end": 75,
+            "kind": "run",
+            "machineId": null,
+            "personId": "P9",
+            "qty": 10
+          },
+          {
+            "start": 90,
+            "end": 105,
+            "kind": "run",
+            "machineId": null,
+            "personId": "P9",
+            "qty": 10
+          },
+          {
+            "start": 120,
+            "end": 135,
+            "kind": "run",
+            "machineId": null,
+            "personId": "P9",
+            "qty": 10
+          },
+          {
+            "start": 150,
+            "end": 165,
+            "kind": "run",
+            "machineId": null,
+            "personId": "P9",
+            "qty": 10
+          },
+          {
+            "start": 180,
+            "end": 195,
+            "kind": "run",
+            "machineId": null,
+            "personId": "P9",
+            "qty": 10
+          }
+        ]
+      }
+    },
+    {
+      "label": "人员技能编辑导致不合格人员无法分配",
+      "result": "Pass",
+      "detail": {
+        "issues": [
+          {
+            "code": "NO_CANDIDATE",
+            "message": "A10 在五日内没有满足技能、日历、锁定和资源占用的候选；不代表全局已证明无解",
+            "taskId": "A10",
+            "severity": "error"
+          },
+          {
+            "code": "NO_CANDIDATE",
+            "message": "D10 在五日内没有满足技能、日历、锁定和资源占用的候选；不代表全局已证明无解",
+            "taskId": "D10",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "A10",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "B10",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "A20",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "B20",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "A30",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "B30",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "D10",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "D20",
+            "severity": "error"
+          }
+        ],
+        "revision": 1
+      }
+    },
+    {
+      "label": "人员请假日历阻断原计划并影响重排",
+      "result": "Pass",
+      "detail": {
+        "unavailable": [
+          [
+            0,
+            6300
+          ]
+        ],
+        "issueCount": 3
+      }
+    },
+    {
+      "label": "设备资料空能力可保存及维修窗口阻断",
+      "result": "Pass",
+      "detail": {
+        "issues": [
+          {
+            "code": "NO_CANDIDATE",
+            "message": "A10 在五日内没有满足技能、日历、锁定和资源占用的候选；不代表全局已证明无解",
+            "taskId": "A10",
+            "severity": "error"
+          },
+          {
+            "code": "NO_CANDIDATE",
+            "message": "D10 在五日内没有满足技能、日历、锁定和资源占用的候选；不代表全局已证明无解",
+            "taskId": "D10",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "A10",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "B10",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "A20",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "B20",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "A30",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "B30",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "D10",
+            "severity": "error"
+          },
+          {
+            "code": "UNPLANNED",
+            "message": "工序未排入五日计划，订单交期无法可靠估算",
+            "taskId": "D20",
+            "severity": "error"
+          }
+        ]
+      }
+    },
+    {
+      "label": "合法拆批再合批与共享占用去重",
+      "result": "Pass",
+      "detail": {
+        "batch": {
+          "id": "H-CAT",
+          "taskIds": [
+            "A20",
+            "B20"
+          ],
+          "machineId": "F1",
+          "capacity": 200,
+          "compatibility": "HT-180/120",
+          "run": 120,
+          "setup": 30,
+          "unload": 30
+        },
+        "start": 300,
+        "end": 480
+      }
+    },
+    {
+      "label": "合批超容量拒绝且成员保持独立",
+      "result": "Pass",
+      "detail": {
+        "message": "成员总量超过设备批容量 200 件"
+      }
+    },
+    {
+      "label": "不兼容工艺禁止合批",
+      "result": "Pass",
+      "detail": {
+        "message": "所有成员必须是相同兼容组的固定周期批处理"
+      }
+    },
+    {
+      "label": "窄屏多产品表单及日历表单无整体溢出",
+      "result": "Pass",
+      "detail": {
+        "order": {
+          "width": 390,
+          "scroll": 390,
+          "dialog": 366
+        },
+        "calendar": {
+          "width": 390,
+          "scroll": 390,
+          "bodyScroll": 366,
+          "bodyWidth": 366
+        }
+      }
+    },
+    {
+      "label": "主数据流程浏览器异常",
+      "result": "Pass",
+      "detail": {
+        "errors": []
+      }
+    }
+  ],
+  "errors": []
+}

@@ -73,6 +73,7 @@ const activeDifficulty = computed<Difficulty | ''>(() => {
   return value === 'JUNIOR' || value === 'MID' || value === 'SENIOR' ? value : ''
 })
 const activeModule = computed(() => modules.find(([key]) => key === activeCategory.value))
+const visibleQuestionCount = computed(() => page.value?.items.length ?? 0)
 
 function stringQuery(key: string) {
   const value = route.query[key]
@@ -230,13 +231,13 @@ watch(selectedQuestionId, () => void loadDetail(), { immediate: true })
       >
         <b>{{ abbreviation }}</b>
         <span>{{ label }}</span>
-        <small>50 题</small>
+        <small>进入题库</small>
       </button>
     </aside>
 
     <section class="qbank-questions" aria-label="模块题目">
       <div class="qbank-column-header">
-        <span>{{ activeModule ? `${activeModule[1]} · 50 题` : '请选择一个模块' }}</span>
+        <span>{{ activeModule ? `${activeModule[1]} · 当前 ${visibleQuestionCount} 题` : '请选择一个模块' }}</span>
       </div>
       <form v-if="activeModule" class="qbank-search" @submit.prevent="applyFilters">
         <label class="sr-only" for="qbank-search-input">搜索当前模块题目</label>
@@ -251,7 +252,7 @@ watch(selectedQuestionId, () => void loadDetail(), { immediate: true })
         <button class="sr-only" type="submit">应用筛选</button>
       </form>
 
-      <p v-if="!activeModule" class="qbank-empty">从左侧选择一个模块，开始浏览 50 道深入题目。</p>
+      <p v-if="!activeModule" class="qbank-empty">从左侧选择一个模块，开始浏览已发布的深入题目。</p>
       <p v-else-if="listLoading" class="qbank-state" aria-live="polite">正在加载题目…</p>
       <div v-else-if="listError" class="qbank-error" role="alert">
         {{ listError }} <button type="button" @click="loadQuestions">重试</button>

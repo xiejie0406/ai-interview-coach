@@ -11,6 +11,7 @@ const router = createRouter({
     { path: '/questions/:questionId', component: () => import('@/features/catalog/QuestionDetailPage.vue') },
     { path: '/interviews/new', component: () => import('@/features/interview/InterviewSetupPage.vue'), meta: { requiresSession: true } },
     { path: '/interviews/:interviewId', component: () => import('@/features/interview/InterviewRoomPage.vue'), meta: { requiresSession: true } },
+    { path: '/interviews/:interviewId/feedback', component: () => import('@/features/interview/InterviewFeedbackPage.vue'), meta: { requiresSession: true } },
     { path: '/account', component: () => import('@/views/AccountPage.vue'), meta: { requiresSession: true } },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],

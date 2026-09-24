@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "1.0",
+  "contractType": "SOLVER_INPUT",
+  "requestId": "40000000-0000-4000-8000-000000000001",
+  "planVersionId": "40000000-0000-4000-8000-000000000002",
+  "capturedAt": "2026-09-15T00:00:00.000Z",
+  "definitionRevision": 9,
+  "executionRevision": 4,
+  "inputHash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "hashAlgorithm": "SHA-256",
+  "canonicalization": "JCS-RFC8785",
+  "modelVersion": "aps-cpsat-v1",
+  "scope": {
+    "siteCode": "SITE_01",
+    "workshopIds": ["40000000-0000-4000-8000-000000000003"]
+  },
+  "horizon": {
+    "startAt": "2026-09-15T00:00:00.000Z",
+    "detailEndAt": "2026-09-16T00:00:00.000Z",
+    "endAt": "2026-09-17T00:00:00.000Z",
+    "planningAnchorAt": "2026-09-15T00:00:00.000Z",
+    "timeUnitSeconds": 60,
+    "displayTimeZone": "Asia/Shanghai"
+  },
+  "baseVersion": null,
+  "parameters": {
+    "direction": "FORWARD",
+    "maxSolveSeconds": 30,
+    "randomSeed": 1,
+    "solverSearchThreads": 1,
+    "absoluteGapLimit": 0,
+    "relativeGapLimit": 0
+  },
+  "resources": [
+    {
+      "resourceId": "40000000-0000-4000-8000-000000000010",
+      "resourceType": "PERSON",
+      "workCenterId": null,
+      "exclusive": true,
+      "capacity": "1",
+      "capacityUomCode": null,
+      "skills": [
+        {
+          "skillId": "40000000-0000-4000-8000-000000000011",
+          "skillCode": "ASSEMBLY",
+          "validFrom": null,
+          "validTo": null,
+          "status": "ACTIVE"
+        }
+      ]
+    }
+  ],
+  "availabilityWindows": [],
+  "tasks": [],
+  "dependencies": [
+    {
+      "dependencyId": "40000000-0000-4000-8000-000000000020",
+      "predecessorTaskId": "40000000-0000-4000-8000-000000000021",
+      "successorTaskId": "40000000-0000-4000-8000-000000000022",
+      "relationType": "QUANTITY",
+      "lagSeconds": 0,
+      "lagBasis": "ELAPSED",
+      "thresholdQty": "10",
+      "thresholdRatio": "0.5",
+      "transferBatchQty": null,
+      "uomCode": "PCS",
+      "consumesOutput": true
+    }
+  ],
+  "materialSupplies": [
+    {
+      "supplyId": "40000000-0000-4000-8000-000000000030",
+      "itemId": "40000000-0000-4000-8000-000000000031",
+      "supplyType": "TASK_OUTPUT",
+      "sourceTaskId": null,
+      "availableAt": null,
+      "quantity": "10",
+      "uomCode": "PCS",
+      "qualityState": "PLANNED_QUALIFIED"
+    }
+  ],
+  "materialDemands": [],
+  "sharedBatchCandidates": [
+    {
+      "candidateId": "40000000-0000-4000-8000-000000000040",
+      "sourceType": "RULE_GENERATED",
+      "operationSpecId": "40000000-0000-4000-8000-000000000041",
+      "workCenterId": "40000000-0000-4000-8000-000000000042",
+      "compatibilityKey": "ONLY_ONE_MEMBER",
+      "capacity": "100",
+      "capacityUomCode": "PCS",
+      "cycleDurationSeconds": 3600,
+      "members": [
+        {
+          "taskId": "40000000-0000-4000-8000-000000000043",
+          "quantity": "10",
+          "uomCode": "PCS"
+        }
+      ]
+    }
+  ],
+  "locks": [],
+  "actualOccupancies": []
+}

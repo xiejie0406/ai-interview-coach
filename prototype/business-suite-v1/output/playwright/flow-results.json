@@ -1,0 +1,84 @@
+{
+  "date": "2026-09-10T15:57:15.536Z",
+  "browser": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+  "results": [
+    {
+      "label": "排程 / 有冲突时禁止发布",
+      "result": "Pass"
+    },
+    {
+      "label": "排程 / 生成可行草稿并保留锁定任务",
+      "result": "Pass",
+      "detail": {
+        "tasks": 9,
+        "lockedTask": {
+          "id": "OP-001",
+          "order": "MO-260910-001",
+          "resource": "CNC-01",
+          "start": 0,
+          "hours": 4,
+          "locked": true
+        }
+      }
+    },
+    {
+      "label": "排程 / 发布确认与现场开暂停完工",
+      "result": "Pass"
+    },
+    {
+      "label": "排程 / 新订单校验、筛选与下载",
+      "result": "Pass",
+      "detail": "生产排程-当前草稿.csv"
+    },
+    {
+      "label": "排程 / 手机抽屉可见与键盘关闭",
+      "result": "Pass"
+    },
+    {
+      "label": "Aden / 创建任务与暂停、恢复、接管",
+      "result": "Pass"
+    },
+    {
+      "label": "Aden / 审批拒绝、修改重提、同意与归档",
+      "result": "Pass"
+    },
+    {
+      "label": "Aden / 离线机器阻止任务恢复",
+      "result": "Pass"
+    },
+    {
+      "label": "Aden / 客服客户事实与审批后消息一致",
+      "result": "Pass",
+      "detail": "Aden-供应商比价.csv"
+    },
+    {
+      "label": "服装 / 报价金额、折扣、运费和税联动",
+      "result": "Pass",
+      "detail": {
+        "base": 24120,
+        "net": 22914,
+        "freight": 300,
+        "tax": 3017.82,
+        "total": 26231.82
+      }
+    },
+    {
+      "label": "服装 / 库存阻断与报价快照独立",
+      "result": "Pass",
+      "detail": "织选报价-BQ-260910-V01.csv"
+    },
+    {
+      "label": "服装 / 锁定重搭、商品搜索和空态",
+      "result": "Pass"
+    },
+    {
+      "label": "运行时异常",
+      "result": "Pass",
+      "detail": {
+        "errors": []
+      }
+    }
+  ],
+  "failures": [],
+  "errors": []
+}

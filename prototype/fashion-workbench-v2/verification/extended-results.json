@@ -1,0 +1,423 @@
+{
+  "startedAt": "2026-09-11T02:47:54.513Z",
+  "finishedAt": "2026-09-11T02:48:13.862Z",
+  "command": "node prototype/fashion-workbench-v2/extended-browser-check.cjs",
+  "environment": "Windows / bundled Playwright CJS / independent headless Chrome / temporary 127.0.0.1 HTTP server",
+  "scope": "本地原型合成数据，真实表单、按钮、下载、上传及多标签操作；不证明服务端鉴权或真实 ERP/AI 服务",
+  "sourceHashes": {
+    "core.js": "b9eef4fe429ab1a1d23691d27d18491f1a206f2404f1fa1fbdd92f08e195e24f",
+    "app.js": "e4db96d3a3fc7054858d0f7e3ff517d771c86b766af159172bfb9a1dc8318bd0",
+    "advanced.js": "69bee6b308bdb26b382e2593567ad6c9cc6d56b78fb17b9bdda922d4be6fde5c",
+    "catalog.js": "4dffada5aae0d55b233ef2e5d74f5575892c55913090d02561b6883a145a1fed",
+    "delivery.js": "8c3bec98eb944f8d6a749521eac3a9111fd245344af62b8d280c2a03fd015ac9",
+    "file-io.js": "ff9b0f40c7a89a2df93c6102d5a6626dcb0fb6deb900a3fa2b769e40216bb04f"
+  },
+  "sourceHashesAfter": {
+    "core.js": "b9eef4fe429ab1a1d23691d27d18491f1a206f2404f1fa1fbdd92f08e195e24f",
+    "app.js": "e4db96d3a3fc7054858d0f7e3ff517d771c86b766af159172bfb9a1dc8318bd0",
+    "advanced.js": "69bee6b308bdb26b382e2593567ad6c9cc6d56b78fb17b9bdda922d4be6fde5c",
+    "catalog.js": "4dffada5aae0d55b233ef2e5d74f5575892c55913090d02561b6883a145a1fed",
+    "delivery.js": "8c3bec98eb944f8d6a749521eac3a9111fd245344af62b8d280c2a03fd015ac9",
+    "file-io.js": "ff9b0f40c7a89a2df93c6102d5a6626dcb0fb6deb900a3fa2b769e40216bb04f"
+  },
+  "checks": [
+    {
+      "id": "EXT-01",
+      "name": "自然语言解析可修改、草稿不自动确认、空预算与零预算",
+      "result": "Pass",
+      "durationMs": 1225
+    },
+    {
+      "id": "EXT-02",
+      "name": "锁定阻止替换、解锁同类替换、保持锁定重搭、候选排序",
+      "result": "Pass",
+      "durationMs": 1315
+    },
+    {
+      "id": "EXT-03",
+      "name": "客户创建和编辑、指定价表缺价阻断、切回批发价恢复",
+      "result": "Pass",
+      "durationMs": 1642
+    },
+    {
+      "id": "EXT-04",
+      "name": "新建、复制、切换和关闭恢复方案保留各自需求候选",
+      "result": "Pass",
+      "durationMs": 1382
+    },
+    {
+      "id": "EXT-05",
+      "name": "完整备份实际下载、修改后恢复、坏备份拒绝且数据保持",
+      "result": "Pass",
+      "durationMs": 2450
+    },
+    {
+      "id": "EXT-06",
+      "name": "同源多标签并发编辑拒绝陈旧提交且保留本页草稿",
+      "result": "Pass",
+      "durationMs": 2475
+    },
+    {
+      "id": "EXT-07",
+      "name": "未应用报价条件阻断、尺码确认后生效快照金额准确",
+      "result": "Pass",
+      "durationMs": 1358
+    },
+    {
+      "id": "EXT-08",
+      "name": "销售只读商品、运营维护但不报价、负责人审批超限优惠",
+      "result": "Pass",
+      "durationMs": 2124
+    },
+    {
+      "id": "EXT-09",
+      "name": "管理员模板配置、重复品类拒绝、当前需求及新方案版本固化",
+      "result": "Pass",
+      "durationMs": 1500
+    },
+    {
+      "id": "EXT-10",
+      "name": "递进同步预览保留手动锁定冲突并只同步可选档位",
+      "result": "Pass",
+      "durationMs": 1272
+    }
+  ],
+  "errors": [],
+  "passed": 10,
+  "failed": 0,
+  "previousRuns": [
+    {
+      "startedAt": "2026-09-11T01:45:39.696Z",
+      "finishedAt": "2026-09-11T01:46:03.288Z",
+      "sourceHashes": {
+        "core.js": "b500a2fc3104e3f35210de980a117f03617a4d89a8a00cdc9845abe2b5254095",
+        "app.js": "90c60d98aa566a0cb08fd7fce24c3b0bdabe2273a019119188a701a4adc47ea6",
+        "catalog.js": "4dffada5aae0d55b233ef2e5d74f5575892c55913090d02561b6883a145a1fed",
+        "delivery.js": "8c3bec98eb944f8d6a749521eac3a9111fd245344af62b8d280c2a03fd015ac9",
+        "file-io.js": "ff9b0f40c7a89a2df93c6102d5a6626dcb0fb6deb900a3fa2b769e40216bb04f"
+      },
+      "checks": [
+        {
+          "id": "EXT-01",
+          "name": "自然语言解析可修改、草稿不自动确认、空预算与零预算",
+          "result": "Fail",
+          "durationMs": 1498,
+          "error": "AssertionError [ERR_ASSERTION]: 业务流程无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at run (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:20:590)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:24:2",
+          "screenshot": "extended-EXT-01-failure.png",
+          "notifications": "需求草稿已保存；请确认后继续选品\n预算须为正数；不设上限请留空",
+          "state": {
+            "route": "brief",
+            "role": "sales",
+            "revision": 3,
+            "projectId": "project-1",
+            "looks": 0,
+            "snapshots": 0
+          }
+        },
+        {
+          "id": "EXT-02",
+          "name": "锁定阻止替换、解锁同类替换、保持锁定重搭、候选排序",
+          "result": "Fail",
+          "durationMs": 1428,
+          "error": "AssertionError [ERR_ASSERTION]: 业务流程无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at run (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:20:590)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:33:2",
+          "screenshot": "extended-EXT-02-failure.png",
+          "notifications": "搭配已保存\n已保持锁定商品重新搭配；请核对尺码与图片",
+          "state": {
+            "route": "looks",
+            "role": "sales",
+            "revision": 5,
+            "projectId": "project-1",
+            "looks": 8,
+            "snapshots": 0
+          }
+        },
+        {
+          "id": "EXT-03",
+          "name": "客户创建和编辑、指定价表缺价阻断、切回批发价恢复",
+          "result": "Fail",
+          "durationMs": 1805,
+          "error": "AssertionError [ERR_ASSERTION]: 业务流程无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at run (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:20:590)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:43:2",
+          "screenshot": "extended-EXT-03-failure.png",
+          "notifications": "请先处理报价检查中的问题\n报价快照已确认：quote-mtwaoao3-ew27h",
+          "state": {
+            "route": "delivery",
+            "role": "sales",
+            "revision": 8,
+            "projectId": "project-1",
+            "looks": 8,
+            "snapshots": 1
+          }
+        },
+        {
+          "id": "EXT-04",
+          "name": "新建、复制、切换和关闭恢复方案保留各自需求候选",
+          "result": "Fail",
+          "durationMs": 1442,
+          "error": "AssertionError [ERR_ASSERTION]: 业务流程无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at run (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:20:590)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:49:2",
+          "screenshot": "extended-EXT-04-failure.png",
+          "notifications": "",
+          "state": {
+            "route": "projects",
+            "role": "sales",
+            "revision": 15,
+            "projectId": "project-1",
+            "looks": 8,
+            "snapshots": 0
+          }
+        },
+        {
+          "id": "EXT-05",
+          "name": "完整备份实际下载、修改后恢复、坏备份拒绝且数据保持",
+          "result": "Fail",
+          "durationMs": 2521,
+          "error": "AssertionError [ERR_ASSERTION]: 业务流程无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)',\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at run (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:20:590)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:56:2",
+          "screenshot": "extended-EXT-05-failure.png",
+          "notifications": "",
+          "state": {
+            "route": "settings",
+            "role": "sales",
+            "revision": 4,
+            "projectId": "project-1",
+            "looks": 8,
+            "snapshots": 1
+          }
+        },
+        {
+          "id": "EXT-06",
+          "name": "同源多标签并发编辑拒绝陈旧提交且保留本页草稿",
+          "result": "Fail",
+          "durationMs": 4556,
+          "error": "AssertionError [ERR_ASSERTION]: 业务流程无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)',\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)',\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at run (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:20:590)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:64:2",
+          "screenshot": "extended-EXT-06-failure.png",
+          "notifications": "",
+          "state": {
+            "route": "brief",
+            "role": "sales",
+            "revision": 2,
+            "projectId": "project-1",
+            "looks": 0,
+            "snapshots": 0
+          }
+        },
+        {
+          "id": "EXT-07",
+          "name": "未应用报价条件阻断、尺码确认后生效快照金额准确",
+          "result": "Fail",
+          "durationMs": 1568,
+          "error": "AssertionError [ERR_ASSERTION]: 业务流程无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at run (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:20:590)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:68:2",
+          "screenshot": "extended-EXT-07-failure.png",
+          "notifications": "报价条件已编辑，请先应用报价条件后再确认\n报价已重新核算\n报价快照已确认：quote-mtwaoj3p-poozj",
+          "state": {
+            "route": "delivery",
+            "role": "sales",
+            "revision": 5,
+            "projectId": "project-1",
+            "looks": 8,
+            "snapshots": 1
+          }
+        },
+        {
+          "id": "EXT-08",
+          "name": "销售只读商品、运营维护但不报价、负责人审批超限优惠",
+          "result": "Fail",
+          "durationMs": 6443,
+          "error": "page.waitForFunction: Timeout 5000ms exceeded.\n    at toast (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:15:47)\n    at D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:77:134\n    at async run (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:20:560)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\extended-browser-check.cjs:74:2",
+          "screenshot": "extended-EXT-08-failure.png",
+          "notifications": "设置已保存\n商品资料已保存",
+          "state": {
+            "route": "looks",
+            "role": "operator",
+            "revision": 4,
+            "projectId": "project-1",
+            "looks": 8,
+            "snapshots": 0
+          }
+        }
+      ],
+      "errors": [
+        {
+          "id": "EXT-01",
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "id": "EXT-02",
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "id": "EXT-03",
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "id": "EXT-04",
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "id": "EXT-05",
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "id": "EXT-05",
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "id": "EXT-06",
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "id": "EXT-06",
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "id": "EXT-06",
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "id": "EXT-07",
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "id": "EXT-08",
+          "message": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        }
+      ]
+    },
+    {
+      "startedAt": "2026-09-11T02:35:26.921Z",
+      "finishedAt": "2026-09-11T02:35:43.170Z",
+      "sourceHashes": {
+        "core.js": "b9eef4fe429ab1a1d23691d27d18491f1a206f2404f1fa1fbdd92f08e195e24f",
+        "app.js": "14aae90a2c0aa6cc6e0f5af19d5f67a7a8179ed00d9a95c2b97e3250ceaeb5c9",
+        "advanced.js": "69bee6b308bdb26b382e2593567ad6c9cc6d56b78fb17b9bdda922d4be6fde5c",
+        "catalog.js": "4dffada5aae0d55b233ef2e5d74f5575892c55913090d02561b6883a145a1fed",
+        "delivery.js": "8c3bec98eb944f8d6a749521eac3a9111fd245344af62b8d280c2a03fd015ac9",
+        "file-io.js": "ff9b0f40c7a89a2df93c6102d5a6626dcb0fb6deb900a3fa2b769e40216bb04f"
+      },
+      "checks": [
+        {
+          "id": "EXT-01",
+          "name": "自然语言解析可修改、草稿不自动确认、空预算与零预算",
+          "result": "Pass",
+          "durationMs": 1194
+        },
+        {
+          "id": "EXT-02",
+          "name": "锁定阻止替换、解锁同类替换、保持锁定重搭、候选排序",
+          "result": "Pass",
+          "durationMs": 1320
+        },
+        {
+          "id": "EXT-03",
+          "name": "客户创建和编辑、指定价表缺价阻断、切回批发价恢复",
+          "result": "Pass",
+          "durationMs": 1650
+        },
+        {
+          "id": "EXT-04",
+          "name": "新建、复制、切换和关闭恢复方案保留各自需求候选",
+          "result": "Pass",
+          "durationMs": 1376
+        },
+        {
+          "id": "EXT-05",
+          "name": "完整备份实际下载、修改后恢复、坏备份拒绝且数据保持",
+          "result": "Pass",
+          "durationMs": 2448
+        },
+        {
+          "id": "EXT-06",
+          "name": "同源多标签并发编辑拒绝陈旧提交且保留本页草稿",
+          "result": "Pass",
+          "durationMs": 2447
+        },
+        {
+          "id": "EXT-07",
+          "name": "未应用报价条件阻断、尺码确认后生效快照金额准确",
+          "result": "Pass",
+          "durationMs": 1411
+        },
+        {
+          "id": "EXT-08",
+          "name": "销售只读商品、运营维护但不报价、负责人审批超限优惠",
+          "result": "Pass",
+          "durationMs": 2096
+        }
+      ],
+      "errors": []
+    },
+    {
+      "startedAt": "2026-09-11T02:41:59.342Z",
+      "finishedAt": "2026-09-11T02:42:18.695Z",
+      "sourceHashes": {
+        "core.js": "b9eef4fe429ab1a1d23691d27d18491f1a206f2404f1fa1fbdd92f08e195e24f",
+        "app.js": "14aae90a2c0aa6cc6e0f5af19d5f67a7a8179ed00d9a95c2b97e3250ceaeb5c9",
+        "advanced.js": "69bee6b308bdb26b382e2593567ad6c9cc6d56b78fb17b9bdda922d4be6fde5c",
+        "catalog.js": "4dffada5aae0d55b233ef2e5d74f5575892c55913090d02561b6883a145a1fed",
+        "delivery.js": "8c3bec98eb944f8d6a749521eac3a9111fd245344af62b8d280c2a03fd015ac9",
+        "file-io.js": "ff9b0f40c7a89a2df93c6102d5a6626dcb0fb6deb900a3fa2b769e40216bb04f"
+      },
+      "checks": [
+        {
+          "id": "EXT-01",
+          "name": "自然语言解析可修改、草稿不自动确认、空预算与零预算",
+          "result": "Pass",
+          "durationMs": 1249
+        },
+        {
+          "id": "EXT-02",
+          "name": "锁定阻止替换、解锁同类替换、保持锁定重搭、候选排序",
+          "result": "Pass",
+          "durationMs": 1360
+        },
+        {
+          "id": "EXT-03",
+          "name": "客户创建和编辑、指定价表缺价阻断、切回批发价恢复",
+          "result": "Pass",
+          "durationMs": 1617
+        },
+        {
+          "id": "EXT-04",
+          "name": "新建、复制、切换和关闭恢复方案保留各自需求候选",
+          "result": "Pass",
+          "durationMs": 1371
+        },
+        {
+          "id": "EXT-05",
+          "name": "完整备份实际下载、修改后恢复、坏备份拒绝且数据保持",
+          "result": "Pass",
+          "durationMs": 2511
+        },
+        {
+          "id": "EXT-06",
+          "name": "同源多标签并发编辑拒绝陈旧提交且保留本页草稿",
+          "result": "Pass",
+          "durationMs": 2455
+        },
+        {
+          "id": "EXT-07",
+          "name": "未应用报价条件阻断、尺码确认后生效快照金额准确",
+          "result": "Pass",
+          "durationMs": 1365
+        },
+        {
+          "id": "EXT-08",
+          "name": "销售只读商品、运营维护但不报价、负责人审批超限优惠",
+          "result": "Pass",
+          "durationMs": 2102
+        },
+        {
+          "id": "EXT-09",
+          "name": "管理员模板配置、重复品类拒绝、当前需求及新方案版本固化",
+          "result": "Pass",
+          "durationMs": 1391
+        },
+        {
+          "id": "EXT-10",
+          "name": "递进同步预览保留手动锁定冲突并只同步可选档位",
+          "result": "Pass",
+          "durationMs": 1274
+        }
+      ],
+      "errors": []
+    }
+  ]
+}

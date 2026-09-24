@@ -1,0 +1,18 @@
+{
+  "date": "2026-09-10T16:01:27.203Z",
+  "results": [
+    {
+      "label": "报价 / 过期有效期阻断保存",
+      "result": "Pass"
+    },
+    {
+      "label": "报价 / 无效草稿无法绕过交付限制",
+      "result": "Pass"
+    },
+    {
+      "label": "报价 / 有效版本打印布局",
+      "result": "Pass"
+    }
+  ],
+  "failures": []
+}

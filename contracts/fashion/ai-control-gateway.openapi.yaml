@@ -1,0 +1,624 @@
+openapi: 3.1.0
+info:
+  title: Fashion AI Control Gateway Internal API
+  version: 1.0.0
+  description: >-
+    fashion-ai-runtime 调用 ruoyi-fashion 的内部控制与白名单 Tool 契约。
+    Java/MySQL 仍是 Run、Step、权限、预算和业务事实的唯一权威；本 API 不对浏览器开放。
+    IMP-01 只冻结协议，不表示 Run/Step 持久化或业务 Tool 已在后续阶段实现。
+tags:
+  - name: run-control
+  - name: tools
+paths:
+  /internal/v1/ai-run-steps:grant:
+    post:
+      tags: [run-control]
+      operationId: grantStepExecution
+      summary: 在真实 Tool、模型或 Provider 尝试前申请持久化执行权
+      description: >-
+        相同 idempotency_key 与相同 request_digest 返回原结果；相同键不同摘要返回 409。
+        Java 必须先持久化 Step，再返回 grant。IMP-01 仅冻结此语义，持久化在 IMP-05 实现。
+      security:
+        - FashionHmac: []
+      parameters:
+        - $ref: '#/components/parameters/ServiceId'
+        - $ref: '#/components/parameters/KeyId'
+        - $ref: '#/components/parameters/Timestamp'
+        - $ref: '#/components/parameters/Nonce'
+        - $ref: '#/components/parameters/Audience'
+        - $ref: '#/components/parameters/ContentSha256'
+        - $ref: '#/components/parameters/Signature'
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/CorrelationId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StepExecutionGrantRequest'
+      responses:
+        '200':
+          description: 已存在的同摘要 grant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StepExecutionGrantResponse'
+        '201':
+          description: 新 grant 已创建
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StepExecutionGrantResponse'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '408': { $ref: '#/components/responses/DeadlineExceeded' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '410': { $ref: '#/components/responses/Gone' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateOrBudgetExceeded' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+        '504': { $ref: '#/components/responses/UpstreamTimeout' }
+  /internal/v1/ai-tools/{tool_name}:invoke:
+    post:
+      tags: [tools]
+      operationId: invokeAllowedTool
+      summary: 调用 Java 白名单业务 Tool
+      description: >-
+        Java 联合校验服务身份、delegated_actor_token、allowedTools、deadline、run_attempt、
+        execution_lease_id、fencing_token 和业务版本。模型输出永远不能直接成为 Tool 名、URL、SQL 或权限。
+      security:
+        - FashionHmac: []
+      parameters:
+        - name: tool_name
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 80
+            pattern: '^[a-z][a-z0-9_]*$'
+        - $ref: '#/components/parameters/ServiceId'
+        - $ref: '#/components/parameters/KeyId'
+        - $ref: '#/components/parameters/Timestamp'
+        - $ref: '#/components/parameters/Nonce'
+        - $ref: '#/components/parameters/Audience'
+        - $ref: '#/components/parameters/ContentSha256'
+        - $ref: '#/components/parameters/Signature'
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/CorrelationId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ToolInvocationRequest'
+      responses:
+        '200':
+          description: Java 已确定 Tool 结果状态；业务拒绝也使用稳定 result_status 表达
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolInvocationResponse'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '408': { $ref: '#/components/responses/DeadlineExceeded' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '410': { $ref: '#/components/responses/Gone' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateOrBudgetExceeded' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+        '504': { $ref: '#/components/responses/UpstreamTimeout' }
+  /internal/v1/ai-run-events:append:
+    post:
+      tags: [run-control]
+      operationId: appendRunEvent
+      summary: 提交会改变 Step 权威状态的脱敏事件
+      description: >-
+        client_event_id 与 event_version 在当前 attempt 内幂等。Java 只接受当前租约和 fencing token，
+        再在同一事务分配单个 Run 内单调 event_seq；中间 token 流不要求逐条持久化。
+      security:
+        - FashionHmac: []
+      parameters:
+        - $ref: '#/components/parameters/ServiceId'
+        - $ref: '#/components/parameters/KeyId'
+        - $ref: '#/components/parameters/Timestamp'
+        - $ref: '#/components/parameters/Nonce'
+        - $ref: '#/components/parameters/Audience'
+        - $ref: '#/components/parameters/ContentSha256'
+        - $ref: '#/components/parameters/Signature'
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/CorrelationId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunEventAppendRequest'
+      responses:
+        '200':
+          description: 事件已接受，或同一事件的幂等重放已识别
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunEventAppendResponse'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '408': { $ref: '#/components/responses/DeadlineExceeded' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '410': { $ref: '#/components/responses/Gone' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateOrBudgetExceeded' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+        '504': { $ref: '#/components/responses/UpstreamTimeout' }
+  /internal/v1/ai-runs/{run_id}/control:read:
+    post:
+      tags: [run-control]
+      operationId: readRunControl
+      summary: 读取当前取消、期限和执行权状态
+      description: >-
+        Python 在安全检查点读取 Java 权威状态。CANCEL_REQUESTED 只表示停止新动作，
+        不能伪造成 Provider 已取消、已退款或 Run 已进入 CANCELLED。
+      security:
+        - FashionHmac: []
+      parameters:
+        - name: run_id
+          in: path
+          required: true
+          schema:
+            $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId'
+        - $ref: '#/components/parameters/ServiceId'
+        - $ref: '#/components/parameters/KeyId'
+        - $ref: '#/components/parameters/Timestamp'
+        - $ref: '#/components/parameters/Nonce'
+        - $ref: '#/components/parameters/Audience'
+        - $ref: '#/components/parameters/ContentSha256'
+        - $ref: '#/components/parameters/Signature'
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/CorrelationId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunControlReadRequest'
+      responses:
+        '200':
+          description: 当前 Java 权威控制状态
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunControlReadResponse'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '408': { $ref: '#/components/responses/DeadlineExceeded' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '410': { $ref: '#/components/responses/Gone' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateOrBudgetExceeded' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+        '504': { $ref: '#/components/responses/UpstreamTimeout' }
+components:
+  securitySchemes:
+    FashionHmac:
+      type: apiKey
+      in: header
+      name: X-Fashion-Signature
+      description: 完整签名规则见 service-authentication-v1.md；单独一个 header 不构成有效认证。
+  parameters:
+    ServiceId:
+      name: X-Fashion-Service-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        const: fashion-ai-runtime
+    KeyId:
+      name: X-Fashion-Key-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 64
+        pattern: '^[A-Za-z0-9][A-Za-z0-9._:-]*$'
+    Timestamp:
+      name: X-Fashion-Timestamp
+      in: header
+      required: true
+      schema:
+        type: string
+        pattern: '^[0-9]{10,12}$'
+    Nonce:
+      name: X-Fashion-Nonce
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 16
+        maxLength: 128
+        pattern: '^[A-Za-z0-9][A-Za-z0-9._:-]*$'
+    Audience:
+      name: X-Fashion-Audience
+      in: header
+      required: true
+      schema:
+        type: string
+        const: ruoyi-fashion
+    ContentSha256:
+      name: X-Fashion-Content-SHA256
+      in: header
+      required: true
+      schema:
+        $ref: './schemas/v1/internal-common.schema.json#/$defs/sha256'
+    Signature:
+      name: X-Fashion-Signature
+      in: header
+      required: true
+      schema:
+        type: string
+        pattern: '^v1=[A-Za-z0-9_-]{43}$'
+    RequestId:
+      name: X-Request-Id
+      in: header
+      required: true
+      schema:
+        $ref: './schemas/v1/internal-common.schema.json#/$defs/uuid'
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: true
+      schema:
+        $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId'
+    Traceparent:
+      name: traceparent
+      in: header
+      required: true
+      schema:
+        type: string
+        pattern: '^00-[0-9a-f]{32}-[0-9a-f]{16}-0[01]$'
+    Tracestate:
+      name: tracestate
+      in: header
+      required: false
+      schema:
+        type: string
+        maxLength: 512
+  responses:
+    Unauthorized:
+      description: 401 SERVICE_AUTHENTICATION_FAILED；缺失、过期、未知 key、摘要/签名错误或 nonce 重放
+      content:
+        application/json:
+          schema: { $ref: './schemas/v1/internal-common.schema.json#/$defs/errorEnvelope' }
+    Forbidden:
+      description: 403 SERVICE_NOT_AUTHORIZED；服务或 delegated actor 不允许当前动作/对象
+      content:
+        application/json:
+          schema: { $ref: './schemas/v1/internal-common.schema.json#/$defs/errorEnvelope' }
+    DeadlineExceeded:
+      description: 408 DEADLINE_EXCEEDED；接收请求时业务 deadline 已过
+      content:
+        application/json:
+          schema: { $ref: './schemas/v1/internal-common.schema.json#/$defs/errorEnvelope' }
+    Conflict:
+      description: 409；幂等摘要、版本或 fencing token 冲突，不得覆盖新状态
+      content:
+        application/json:
+          schema: { $ref: './schemas/v1/internal-common.schema.json#/$defs/errorEnvelope' }
+    Gone:
+      description: 410；租约/委托已过期或 Run 已终态，调用方不得直接重放旧请求
+      content:
+        application/json:
+          schema: { $ref: './schemas/v1/internal-common.schema.json#/$defs/errorEnvelope' }
+    PayloadTooLarge:
+      description: 413 PAYLOAD_TOO_LARGE；在 JSON 解析前按实际字节拒绝
+      content:
+        application/json:
+          schema: { $ref: './schemas/v1/internal-common.schema.json#/$defs/errorEnvelope' }
+    ValidationFailed:
+      description: 422 REQUEST_VALIDATION_FAILED；结构或字段不合法且不回显正文
+      content:
+        application/json:
+          schema: { $ref: './schemas/v1/internal-common.schema.json#/$defs/errorEnvelope' }
+    RateOrBudgetExceeded:
+      description: 429 RATE_LIMITED 或 BUDGET_EXCEEDED；仅在安全条件下按 retry_after_seconds 重试
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 0
+      content:
+        application/json:
+          schema: { $ref: './schemas/v1/internal-common.schema.json#/$defs/errorEnvelope' }
+    Unavailable:
+      description: 503 DEPENDENCY_UNAVAILABLE；能力关闭或依赖暂不可用
+      content:
+        application/json:
+          schema: { $ref: './schemas/v1/internal-common.schema.json#/$defs/errorEnvelope' }
+    UpstreamTimeout:
+      description: 504 UPSTREAM_TIMEOUT；上游超时，结果可能未知时不得盲目重试
+      content:
+        application/json:
+          schema: { $ref: './schemas/v1/internal-common.schema.json#/$defs/errorEnvelope' }
+  schemas:
+    StepExecutionGrantRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - contract_version
+        - request_id
+        - correlation_id
+        - run_id
+        - run_attempt
+        - call_key
+        - attempt_no
+        - step_type
+        - idempotency_key
+        - request_digest
+        - deadline_at
+        - execution_lease_id
+        - fencing_token
+      properties:
+        contract_version: { $ref: './schemas/v1/internal-common.schema.json#/$defs/contractVersion' }
+        request_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/uuid' }
+        correlation_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        run_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        run_attempt: { $ref: './schemas/v1/internal-common.schema.json#/$defs/runAttempt' }
+        call_key: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        attempt_no: { $ref: './schemas/v1/internal-common.schema.json#/$defs/attemptNo' }
+        step_type: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stepType' }
+        idempotency_key: { $ref: './schemas/v1/internal-common.schema.json#/$defs/idempotencyKey' }
+        request_digest: { $ref: './schemas/v1/internal-common.schema.json#/$defs/sha256' }
+        deadline_at: { $ref: './schemas/v1/internal-common.schema.json#/$defs/dateTimeWithOffset' }
+        execution_lease_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        fencing_token: { $ref: './schemas/v1/internal-common.schema.json#/$defs/fencingToken' }
+        external_request_key:
+          anyOf:
+            - { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+            - { type: 'null' }
+    StepExecutionGrantResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - contract_version
+        - request_id
+        - correlation_id
+        - run_id
+        - run_attempt
+        - step_id
+        - step_no
+        - call_key
+        - attempt_no
+        - execution_lease_id
+        - fencing_token
+        - lease_expires_at
+        - external_request_key
+      properties:
+        contract_version: { $ref: './schemas/v1/internal-common.schema.json#/$defs/contractVersion' }
+        request_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/uuid' }
+        correlation_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        run_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        run_attempt: { $ref: './schemas/v1/internal-common.schema.json#/$defs/runAttempt' }
+        step_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        step_no: { type: integer, minimum: 1 }
+        call_key: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        attempt_no: { $ref: './schemas/v1/internal-common.schema.json#/$defs/attemptNo' }
+        execution_lease_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        fencing_token: { $ref: './schemas/v1/internal-common.schema.json#/$defs/fencingToken' }
+        lease_expires_at: { $ref: './schemas/v1/internal-common.schema.json#/$defs/dateTimeWithOffset' }
+        external_request_key: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+    ToolInvocationRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - contract_version
+        - request_id
+        - correlation_id
+        - run_id
+        - run_attempt
+        - step_id
+        - call_key
+        - attempt_no
+        - tool_call_id
+        - idempotency_key
+        - deadline_at
+        - delegated_actor_token
+        - execution_lease_id
+        - fencing_token
+        - business_versions
+        - arguments
+      properties:
+        contract_version: { $ref: './schemas/v1/internal-common.schema.json#/$defs/contractVersion' }
+        request_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/uuid' }
+        correlation_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        run_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        run_attempt: { $ref: './schemas/v1/internal-common.schema.json#/$defs/runAttempt' }
+        step_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        call_key: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        attempt_no: { $ref: './schemas/v1/internal-common.schema.json#/$defs/attemptNo' }
+        tool_call_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        idempotency_key: { $ref: './schemas/v1/internal-common.schema.json#/$defs/idempotencyKey' }
+        deadline_at: { $ref: './schemas/v1/internal-common.schema.json#/$defs/dateTimeWithOffset' }
+        delegated_actor_token:
+          type: string
+          minLength: 32
+          maxLength: 4096
+          writeOnly: true
+        execution_lease_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        fencing_token: { $ref: './schemas/v1/internal-common.schema.json#/$defs/fencingToken' }
+        business_versions:
+          type: object
+          additionalProperties: false
+          properties:
+            quote_row_version: { type: [integer, 'null'], minimum: 0 }
+            combo_visual_hash:
+              anyOf:
+                - { $ref: './schemas/v1/internal-common.schema.json#/$defs/sha256' }
+                - { type: 'null' }
+        arguments:
+          type: object
+          maxProperties: 100
+    ToolInvocationResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - contract_version
+        - request_id
+        - correlation_id
+        - run_id
+        - step_id
+        - result_status
+        - result
+        - business_versions
+        - retryable
+        - error_code
+        - usage
+      properties:
+        contract_version: { $ref: './schemas/v1/internal-common.schema.json#/$defs/contractVersion' }
+        request_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/uuid' }
+        correlation_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        run_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        step_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        result_status:
+          type: string
+          enum: [SUCCEEDED, REJECTED, CONFLICT, WAITING, UNKNOWN, FAILED]
+        result:
+          type: [object, 'null']
+        business_versions:
+          type: object
+          additionalProperties: false
+          properties:
+            quote_row_version: { type: [integer, 'null'], minimum: 0 }
+            combo_visual_hash:
+              anyOf:
+                - { $ref: './schemas/v1/internal-common.schema.json#/$defs/sha256' }
+                - { type: 'null' }
+        retryable: { type: boolean }
+        error_code:
+          anyOf:
+            - { $ref: './schemas/v1/internal-common.schema.json#/$defs/errorCode' }
+            - { type: 'null' }
+        usage:
+          type: object
+          additionalProperties: false
+          properties:
+            tool_calls: { type: integer, minimum: 0 }
+            reserved_cost_minor: { type: integer, minimum: 0 }
+            actual_cost_minor: { type: [integer, 'null'], minimum: 0 }
+            currency: { type: string, const: CNY }
+    RunEventAppendRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - contract_version
+        - request_id
+        - correlation_id
+        - client_event_id
+        - event_version
+        - run_id
+        - run_attempt
+        - step_id
+        - step_no
+        - call_key
+        - attempt_no
+        - execution_lease_id
+        - fencing_token
+        - event_type
+        - occurred_at
+        - status
+        - payload_schema_version
+        - redacted_payload
+        - usage
+        - error_code
+        - trace_id
+      properties:
+        contract_version: { $ref: './schemas/v1/internal-common.schema.json#/$defs/contractVersion' }
+        request_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/uuid' }
+        correlation_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        client_event_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        event_version: { type: integer, minimum: 1 }
+        run_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        run_attempt: { $ref: './schemas/v1/internal-common.schema.json#/$defs/runAttempt' }
+        step_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        step_no: { type: integer, minimum: 1 }
+        call_key: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        attempt_no: { $ref: './schemas/v1/internal-common.schema.json#/$defs/attemptNo' }
+        execution_lease_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        fencing_token: { $ref: './schemas/v1/internal-common.schema.json#/$defs/fencingToken' }
+        event_type:
+          type: string
+          enum: [STEP_STARTED, EXTERNAL_ACCEPTED, STEP_WAITING, STEP_SUCCEEDED, STEP_FAILED, STEP_UNKNOWN, RUN_CANCEL_OBSERVED]
+        occurred_at: { $ref: './schemas/v1/internal-common.schema.json#/$defs/dateTimeWithOffset' }
+        status: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stepState' }
+        payload_schema_version: { type: string, minLength: 1, maxLength: 32 }
+        redacted_payload: { type: object, maxProperties: 100 }
+        usage: { type: object, maxProperties: 30 }
+        error_code:
+          anyOf:
+            - { $ref: './schemas/v1/internal-common.schema.json#/$defs/errorCode' }
+            - { type: 'null' }
+        trace_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/traceId' }
+    RunEventAppendResponse:
+      type: object
+      additionalProperties: false
+      required: [contract_version, request_id, correlation_id, run_id, client_event_id, event_version, event_seq, accepted, duplicate]
+      properties:
+        contract_version: { $ref: './schemas/v1/internal-common.schema.json#/$defs/contractVersion' }
+        request_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/uuid' }
+        correlation_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        run_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        client_event_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        event_version: { type: integer, minimum: 1 }
+        event_seq: { type: integer, minimum: 1 }
+        accepted: { type: boolean }
+        duplicate: { type: boolean }
+    RunControlReadRequest:
+      type: object
+      additionalProperties: false
+      required: [contract_version, request_id, correlation_id, run_id, run_attempt, execution_lease_id, fencing_token]
+      properties:
+        contract_version: { $ref: './schemas/v1/internal-common.schema.json#/$defs/contractVersion' }
+        request_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/uuid' }
+        correlation_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        run_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        run_attempt: { $ref: './schemas/v1/internal-common.schema.json#/$defs/runAttempt' }
+        execution_lease_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        fencing_token: { $ref: './schemas/v1/internal-common.schema.json#/$defs/fencingToken' }
+    RunControlReadResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - contract_version
+        - request_id
+        - correlation_id
+        - run_id
+        - run_attempt
+        - execution_lease_id
+        - fencing_token
+        - state
+        - cancellation_requested
+        - deadline_at
+        - lease_expires_at
+      properties:
+        contract_version: { $ref: './schemas/v1/internal-common.schema.json#/$defs/contractVersion' }
+        request_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/uuid' }
+        correlation_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        run_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        run_attempt: { $ref: './schemas/v1/internal-common.schema.json#/$defs/runAttempt' }
+        execution_lease_id: { $ref: './schemas/v1/internal-common.schema.json#/$defs/stableId' }
+        fencing_token: { $ref: './schemas/v1/internal-common.schema.json#/$defs/fencingToken' }
+        state: { $ref: './schemas/v1/internal-common.schema.json#/$defs/runState' }
+        cancellation_requested: { type: boolean }
+        deadline_at: { $ref: './schemas/v1/internal-common.schema.json#/$defs/dateTimeWithOffset' }
+        lease_expires_at: { $ref: './schemas/v1/internal-common.schema.json#/$defs/dateTimeWithOffset' }

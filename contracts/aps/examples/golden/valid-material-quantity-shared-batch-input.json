@@ -1,0 +1,216 @@
+{
+  "schemaVersion": "1.0",
+  "contractType": "SOLVER_INPUT",
+  "requestId": "30000000-0000-4000-8000-000000000001",
+  "planVersionId": "30000000-0000-4000-8000-000000000002",
+  "capturedAt": "2026-09-15T00:00:00.000Z",
+  "definitionRevision": 9,
+  "executionRevision": 4,
+  "inputHash": "90d3456e2d557c05882101b156ec4e9e69e571fcebd9d9f79f489c57f09edade",
+  "hashAlgorithm": "SHA-256",
+  "canonicalization": "JCS-RFC8785",
+  "modelVersion": "aps-cpsat-v1",
+  "scope": {
+    "siteCode": "SITE_01",
+    "workshopIds": ["30000000-0000-4000-8000-000000000003"]
+  },
+  "horizon": {
+    "startAt": "2026-09-15T00:00:00.000Z",
+    "detailEndAt": "2026-09-16T00:00:00.000Z",
+    "endAt": "2026-09-17T00:00:00.000Z",
+    "planningAnchorAt": "2026-09-15T00:00:00.000Z",
+    "timeUnitSeconds": 60,
+    "displayTimeZone": "Asia/Shanghai"
+  },
+  "baseVersion": null,
+  "parameters": {
+    "direction": "FORWARD",
+    "maxSolveSeconds": 30,
+    "randomSeed": 1,
+    "solverSearchThreads": 1,
+    "absoluteGapLimit": 0,
+    "relativeGapLimit": 0
+  },
+  "resources": [
+    {
+      "resourceId": "30000000-0000-4000-8000-000000000090",
+      "resourceType": "MACHINE",
+      "workCenterId": "30000000-0000-4000-8000-000000000040",
+      "exclusive": true,
+      "capacity": "1",
+      "capacityUomCode": null,
+      "skills": []
+    }
+  ],
+  "availabilityWindows": [],
+  "tasks": [
+    {
+      "taskId": "30000000-0000-4000-8000-000000000010",
+      "orderLineId": "30000000-0000-4000-8000-000000000020",
+      "operationSpecId": "30000000-0000-4000-8000-000000000030",
+      "workCenterId": "30000000-0000-4000-8000-000000000040",
+      "planningClass": "MANDATORY_DETAIL",
+      "quantity": "100",
+      "uomCode": "PCS",
+      "earliestStartAt": "2026-09-15T01:00:00.000Z",
+      "promisedAt": null,
+      "phases": [
+        {
+          "phaseId": "30000000-0000-4000-8000-000000000050",
+          "phaseType": "WAIT",
+          "sequenceNo": 1,
+          "fixedSeconds": 60,
+          "secondsPerUnit": "0",
+          "interruptible": false,
+          "maxSegments": 1,
+          "minSegmentSeconds": 0,
+          "resumeSetupSeconds": 0,
+          "segmentResourcePolicy": "SAME_RESOURCES",
+          "requirements": []
+        }
+      ]
+    },
+    {
+      "taskId": "30000000-0000-4000-8000-000000000011",
+      "orderLineId": "30000000-0000-4000-8000-000000000021",
+      "operationSpecId": "30000000-0000-4000-8000-000000000031",
+      "workCenterId": "30000000-0000-4000-8000-000000000041",
+      "planningClass": "MANDATORY_DETAIL",
+      "quantity": "100",
+      "uomCode": "PCS",
+      "earliestStartAt": "2026-09-15T01:00:00.000Z",
+      "promisedAt": null,
+      "phases": [
+        {
+          "phaseId": "30000000-0000-4000-8000-000000000051",
+          "phaseType": "WAIT",
+          "sequenceNo": 1,
+          "fixedSeconds": 60,
+          "secondsPerUnit": "0",
+          "interruptible": false,
+          "maxSegments": 1,
+          "minSegmentSeconds": 0,
+          "resumeSetupSeconds": 0,
+          "segmentResourcePolicy": "SAME_RESOURCES",
+          "requirements": []
+        }
+      ]
+    },
+    {
+      "taskId": "30000000-0000-4000-8000-000000000012",
+      "orderLineId": "30000000-0000-4000-8000-000000000022",
+      "operationSpecId": "30000000-0000-4000-8000-000000000031",
+      "workCenterId": "30000000-0000-4000-8000-000000000041",
+      "planningClass": "MANDATORY_DETAIL",
+      "quantity": "100",
+      "uomCode": "PCS",
+      "earliestStartAt": "2026-09-15T01:00:00.000Z",
+      "promisedAt": null,
+      "phases": [
+        {
+          "phaseId": "30000000-0000-4000-8000-000000000051",
+          "phaseType": "WAIT",
+          "sequenceNo": 1,
+          "fixedSeconds": 60,
+          "secondsPerUnit": "0",
+          "interruptible": false,
+          "maxSegments": 1,
+          "minSegmentSeconds": 0,
+          "resumeSetupSeconds": 0,
+          "segmentResourcePolicy": "SAME_RESOURCES",
+          "requirements": []
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "dependencyId": "30000000-0000-4000-8000-000000000060",
+      "predecessorTaskId": "30000000-0000-4000-8000-000000000010",
+      "successorTaskId": "30000000-0000-4000-8000-000000000011",
+      "relationType": "QUANTITY",
+      "lagSeconds": 0,
+      "lagBasis": "ELAPSED",
+      "thresholdQty": null,
+      "thresholdRatio": "0.5",
+      "transferBatchQty": "20",
+      "uomCode": "PCS",
+      "consumesOutput": true
+    }
+  ],
+  "materialSupplies": [
+    {
+      "supplyId": "30000000-0000-4000-8000-000000000070",
+      "itemId": "30000000-0000-4000-8000-000000000071",
+      "supplyType": "TASK_OUTPUT",
+      "sourceTaskId": "30000000-0000-4000-8000-000000000010",
+      "availableAt": null,
+      "quantity": "100",
+      "uomCode": "PCS",
+      "qualityState": "PLANNED_QUALIFIED"
+    }
+  ],
+  "materialDemands": [
+    {
+      "demandId": "30000000-0000-4000-8000-000000000072",
+      "targetTaskId": "30000000-0000-4000-8000-000000000011",
+      "itemId": "30000000-0000-4000-8000-000000000071",
+      "sourceTaskId": "30000000-0000-4000-8000-000000000010",
+      "demandType": "TRANSFER",
+      "requiredQuantity": "100",
+      "uomCode": "PCS",
+      "transferBatchQuantity": "20",
+      "materialStatus": "UNAVAILABLE",
+      "readyAt": null
+    }
+  ],
+  "sharedBatchCandidates": [
+    {
+      "candidateId": "30000000-0000-4000-8000-000000000080",
+      "sourceType": "RULE_GENERATED",
+      "operationSpecId": "30000000-0000-4000-8000-000000000031",
+      "workCenterId": "30000000-0000-4000-8000-000000000041",
+      "compatibilityKey": "FURNACE_RECIPE_A",
+      "capacity": "200",
+      "capacityUomCode": "PCS",
+      "cycleDurationSeconds": 3600,
+      "members": [
+        {
+          "taskId": "30000000-0000-4000-8000-000000000011",
+          "quantity": "100",
+          "uomCode": "PCS"
+        },
+        {
+          "taskId": "30000000-0000-4000-8000-000000000012",
+          "quantity": "100",
+          "uomCode": "PCS"
+        }
+      ]
+    }
+  ],
+  "locks": [],
+  "actualOccupancies": [
+    {
+      "occupancyId": "30000000-0000-4000-8000-000000000091",
+      "planJobId": "30000000-0000-4000-8000-000000000092",
+      "executionRunId": "30000000-0000-4000-8000-000000000093",
+      "sourcePlanSegmentId": null,
+      "resourceId": "30000000-0000-4000-8000-000000000090",
+      "occupiedResourceRole": "MACHINE",
+      "taskId": "30000000-0000-4000-8000-000000000010",
+      "activityType": "WAIT_HOLD",
+      "startAt": "2026-09-14T23:30:00.000Z",
+      "endAt": null,
+      "currentPhase": {
+        "operationSpecId": "30000000-0000-4000-8000-000000000030",
+        "phaseId": "30000000-0000-4000-8000-000000000050",
+        "phaseType": "WAIT"
+      },
+      "remainingDurationSeconds": null,
+      "remainingQuantity": null,
+      "remainingQuantityUomCode": null,
+      "releaseAt": null,
+      "releaseConfidence": "UNKNOWN"
+    }
+  ]
+}

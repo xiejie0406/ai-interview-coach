@@ -25,6 +25,7 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
+import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 
 import java.util.Map;
 import java.util.List;
@@ -36,6 +37,7 @@ import java.util.List;
 @Configuration
 @EnableWebSocket
 public class VoiceWebSocketConfiguration implements WebSocketConfigurer {
+    private static final int MAX_TEXT_MESSAGE_BYTES = 2 * 1024 * 1024;
 
     @Autowired
     private ObjectProvider<HandshakeInterceptor> voiceHandshakeInterceptor;
@@ -58,6 +60,14 @@ public class VoiceWebSocketConfiguration implements WebSocketConfigurer {
     public HandshakeInterceptor ruoyiVoiceHandshakeInterceptor(TokenService tokenService,
                                                                BusinessTenantResolver tenants) {
         return new RuoyiVoiceHandshakeInterceptor(tokenService, tenants);
+    }
+
+    @Bean
+    public ServletServerContainerFactoryBean voiceWebSocketContainer() {
+        var container = new ServletServerContainerFactoryBean();
+        // 音频使用 JSON + Base64 文本帧，容器上限必须与 handler 的 2 MiB 协议上限一致。
+        container.setMaxTextMessageBufferSize(MAX_TEXT_MESSAGE_BYTES);
+        return container;
     }
 
     @Override

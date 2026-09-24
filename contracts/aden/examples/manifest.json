@@ -1,0 +1,301 @@
+{
+  "schemaVersion": 1,
+  "description": "Each current body example is validated against its canonical JSON Schema and, when bound, the exact OpenAPI operation body Schema.",
+  "cases": [
+    {
+      "id": "operator-create-task-request",
+      "scenarioClass": "positive",
+      "file": "current/operator/create-task-request.json",
+      "schemaRef": "../schemas/current/operator.schema.json#/$defs/CreateTaskRequest",
+      "expectedValid": true,
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "createTask", "location": "requestBody", "mediaType": "application/json"}
+    },
+    {
+      "id": "operator-task-draft-response",
+      "scenarioClass": "positive",
+      "file": "current/operator/task-draft-response.json",
+      "schemaRef": "../schemas/current/operator.schema.json#/$defs/TaskSnapshot",
+      "expectedValid": true,
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "createTask", "location": "responseBody", "status": "201", "mediaType": "application/json"}
+    },
+    {
+      "id": "operator-submit-command-request",
+      "scenarioClass": "positive",
+      "file": "current/operator/submit-command-request.json",
+      "schemaRef": "../schemas/current/operator.schema.json#/$defs/OperatorTaskCommandRequest",
+      "expectedValid": true,
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "commandTask", "location": "requestBody", "mediaType": "application/json"}
+    },
+    {
+      "id": "operator-cancel-command-request",
+      "scenarioClass": "positive",
+      "file": "current/operator/cancel-command-request.json",
+      "schemaRef": "../schemas/current/operator.schema.json#/$defs/OperatorTaskCommandRequest",
+      "expectedValid": true,
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "commandTask", "location": "requestBody", "mediaType": "application/json"}
+    },
+    {
+      "id": "operator-validation-failed-is-http-200",
+      "scenarioClass": "positive-business-failure",
+      "file": "current/operator/task-validation-failed-http-200.json",
+      "schemaRef": "../schemas/current/operator.schema.json#/$defs/TaskSnapshot",
+      "expectedValid": true,
+      "expectedStatus": 200,
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "commandTask", "location": "responseBody", "status": "200", "mediaType": "application/json"}
+    },
+    {
+      "id": "operator-capability-projections",
+      "scenarioClass": "positive",
+      "file": "current/operator/capabilities-response.json",
+      "schemaRef": "../schemas/current/operator.schema.json#/$defs/CapabilityListResponse",
+      "expectedValid": true,
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "listCapabilities", "location": "responseBody", "status": "200", "mediaType": "application/json"}
+    },
+    {
+      "id": "operator-bootstrap-long-max-watermark",
+      "scenarioClass": "positive-boundary",
+      "file": "current/operator/bootstrap-long-max-watermark.json",
+      "schemaRef": "../schemas/current/operator.schema.json#/$defs/WorkspaceBootstrapSnapshot",
+      "expectedValid": true,
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "getWorkspaceBootstrap", "location": "responseBody", "status": "200", "mediaType": "application/json"}
+    },
+    {
+      "id": "operator-event-two-power-53",
+      "scenarioClass": "positive-boundary",
+      "file": "current/operator/event-2pow53.json",
+      "schemaRef": "../schemas/current/operator.schema.json#/$defs/EventEnvelope",
+      "expectedValid": true,
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "subscribeWorkspaceEvents", "location": "responseBody", "status": "200", "mediaType": "text/event-stream"}
+    },
+    {
+      "id": "operator-permission-denied",
+      "scenarioClass": "expected-error",
+      "file": "current/operator/error-permission-denied.json",
+      "schemaRef": "../schemas/current/common.schema.json#/$defs/ErrorEnvelope",
+      "expectedValid": true,
+      "expectedStatus": 403,
+      "expectedErrorCode": "ADEN_PERMISSION_DENIED",
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "getWorkspaceBootstrap", "location": "responseBody", "status": "403", "mediaType": "application/json"}
+    },
+    {
+      "id": "operator-version-conflict",
+      "scenarioClass": "expected-error",
+      "file": "current/operator/error-version-conflict.json",
+      "schemaRef": "../schemas/current/common.schema.json#/$defs/ErrorEnvelope",
+      "expectedValid": true,
+      "expectedStatus": 412,
+      "expectedErrorCode": "ADEN_VERSION_CONFLICT",
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "commandTask", "location": "responseBody", "status": "412", "mediaType": "application/json"}
+    },
+    {
+      "id": "operator-idempotency-conflict",
+      "scenarioClass": "expected-error",
+      "file": "current/operator/error-idempotency-conflict.json",
+      "schemaRef": "../schemas/current/common.schema.json#/$defs/ErrorEnvelope",
+      "expectedValid": true,
+      "expectedStatus": 409,
+      "expectedErrorCode": "ADEN_IDEMPOTENCY_KEY_REUSED",
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "commandTask", "location": "responseBody", "status": "409", "mediaType": "application/json"}
+    },
+    {
+      "id": "operator-invalid-cursor",
+      "scenarioClass": "expected-error",
+      "file": "current/operator/error-cursor-invalid.json",
+      "schemaRef": "../schemas/current/common.schema.json#/$defs/ErrorEnvelope",
+      "expectedValid": true,
+      "expectedStatus": 400,
+      "expectedErrorCode": "ADEN_STREAM_CURSOR_INVALID",
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "subscribeWorkspaceEvents", "location": "responseBody", "status": "400", "mediaType": "application/json"}
+    },
+    {
+      "id": "operator-expired-cursor",
+      "scenarioClass": "expected-error",
+      "file": "current/operator/error-cursor-expired.json",
+      "schemaRef": "../schemas/current/common.schema.json#/$defs/ErrorEnvelope",
+      "expectedValid": true,
+      "expectedStatus": 410,
+      "expectedErrorCode": "ADEN_STREAM_CURSOR_EXPIRED",
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "subscribeWorkspaceEvents", "location": "responseBody", "status": "410", "mediaType": "application/json"}
+    },
+    {
+      "id": "operator-validation-precondition-422-no-mutation",
+      "scenarioClass": "expected-error",
+      "file": "current/operator/error-validation-precondition-422.json",
+      "schemaRef": "../schemas/current/common.schema.json#/$defs/ErrorEnvelope",
+      "expectedValid": true,
+      "expectedStatus": 422,
+      "expectedErrorCode": "ADEN_TASK_VALIDATION_FAILED",
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "commandTask", "location": "responseBody", "status": "422", "mediaType": "application/json"}
+    },
+    {
+      "id": "runner-session-request",
+      "scenarioClass": "positive",
+      "file": "current/runner/session-request.json",
+      "schemaRef": "../schemas/current/runner.schema.json#/$defs/CreateRunnerSessionRequest",
+      "expectedValid": true,
+      "openapi": {"document": "../openapi/runner-v1.openapi.json", "operationId": "createRunnerSession", "location": "requestBody", "mediaType": "application/json"}
+    },
+    {
+      "id": "runner-session-response-two-power-53",
+      "scenarioClass": "positive-boundary",
+      "file": "current/runner/session-response.json",
+      "schemaRef": "../schemas/current/runner.schema.json#/$defs/RunnerSession",
+      "expectedValid": true,
+      "openapi": {"document": "../openapi/runner-v1.openapi.json", "operationId": "createRunnerSession", "location": "responseBody", "status": "201", "mediaType": "application/json"}
+    },
+    {
+      "id": "runner-claim-request",
+      "scenarioClass": "positive",
+      "file": "current/runner/claim-request.json",
+      "schemaRef": "../schemas/current/runner.schema.json#/$defs/ClaimDeliveriesRequest",
+      "expectedValid": true,
+      "openapi": {"document": "../openapi/runner-v1.openapi.json", "operationId": "claimRunnerDeliveries", "location": "requestBody", "mediaType": "application/json"}
+    },
+    {
+      "id": "runner-claim-response-long-max-fence",
+      "scenarioClass": "positive-boundary",
+      "file": "current/runner/claim-response-long-max-fence.json",
+      "schemaRef": "../schemas/current/runner.schema.json#/$defs/ClaimDeliveriesResponse",
+      "expectedValid": true,
+      "openapi": {"document": "../openapi/runner-v1.openapi.json", "operationId": "claimRunnerDeliveries", "location": "responseBody", "status": "200", "mediaType": "application/json"}
+    },
+    {
+      "id": "runner-delivery-heartbeat-cancel",
+      "scenarioClass": "positive-cancel-signal",
+      "file": "current/runner/delivery-heartbeat-cancel-response.json",
+      "schemaRef": "../schemas/current/runner.schema.json#/$defs/DeliveryHeartbeatResponse",
+      "expectedValid": true,
+      "openapi": {"document": "../openapi/runner-v1.openapi.json", "operationId": "heartbeatRunnerDelivery", "location": "responseBody", "status": "200", "mediaType": "application/json"}
+    },
+    {
+      "id": "runner-receipt-started",
+      "scenarioClass": "positive",
+      "file": "current/runner/receipt-started-request.json",
+      "schemaRef": "../schemas/current/runner.schema.json#/$defs/ReceiptRequest",
+      "expectedValid": true,
+      "openapi": {"document": "../openapi/runner-v1.openapi.json", "operationId": "submitRunnerReceipt", "location": "requestBody", "mediaType": "application/json"}
+    },
+    {
+      "id": "runner-receipt-succeeded",
+      "scenarioClass": "positive",
+      "file": "current/runner/receipt-succeeded-request.json",
+      "schemaRef": "../schemas/current/runner.schema.json#/$defs/ReceiptRequest",
+      "expectedValid": true,
+      "openapi": {"document": "../openapi/runner-v1.openapi.json", "operationId": "submitRunnerReceipt", "location": "requestBody", "mediaType": "application/json"}
+    },
+    {
+      "id": "runner-receipt-response",
+      "scenarioClass": "positive",
+      "file": "current/runner/receipt-response.json",
+      "schemaRef": "../schemas/current/runner.schema.json#/$defs/ReceiptResponse",
+      "expectedValid": true,
+      "openapi": {"document": "../openapi/runner-v1.openapi.json", "operationId": "submitRunnerReceipt", "location": "responseBody", "status": "200", "mediaType": "application/json"}
+    },
+    {
+      "id": "runner-old-fence-error",
+      "scenarioClass": "expected-error",
+      "file": "current/runner/error-old-fence.json",
+      "schemaRef": "../schemas/current/common.schema.json#/$defs/ErrorEnvelope",
+      "expectedValid": true,
+      "expectedStatus": 409,
+      "expectedErrorCode": "ADEN_RECEIPT_STALE",
+      "openapi": {"document": "../openapi/runner-v1.openapi.json", "operationId": "submitRunnerReceipt", "location": "responseBody", "status": "409", "mediaType": "application/json"}
+    },
+    {
+      "id": "runner-post-auth-epoch-stale-error",
+      "scenarioClass": "expected-error",
+      "file": "current/runner/error-session-epoch-stale.json",
+      "schemaRef": "../schemas/current/common.schema.json#/$defs/ErrorEnvelope",
+      "expectedValid": true,
+      "expectedStatus": 409,
+      "expectedErrorCode": "ADEN_SESSION_EPOCH_STALE",
+      "openapi": {"document": "../openapi/runner-v1.openapi.json", "operationId": "claimRunnerDeliveries", "location": "responseBody", "status": "409", "mediaType": "application/json"}
+    },
+    {
+      "id": "experimental-agent-job-provider-disabled",
+      "scenarioClass": "experimental-positive",
+      "file": "experimental/agent-job-provider-disabled.json",
+      "schemaRef": "../schemas/experimental/agent-provider-disabled.schema.json#/$defs/AgentJob",
+      "expectedValid": true
+    },
+    {
+      "id": "experimental-candidate-no-action",
+      "scenarioClass": "experimental-positive",
+      "file": "experimental/candidate-no-action.json",
+      "schemaRef": "../schemas/experimental/agent-provider-disabled.schema.json#/$defs/Candidate",
+      "expectedValid": true
+    },
+    {
+      "id": "reject-operator-internal-command",
+      "scenarioClass": "schema-negative",
+      "file": "invalid/operator-internal-command.json",
+      "schemaRef": "../schemas/current/operator.schema.json#/$defs/OperatorTaskCommandRequest",
+      "expectedValid": false,
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "commandTask", "location": "requestBody", "mediaType": "application/json"}
+    },
+    {
+      "id": "reject-int64-json-number",
+      "scenarioClass": "schema-negative",
+      "file": "invalid/event-int64-as-number.json",
+      "schemaRef": "../schemas/current/operator.schema.json#/$defs/EventEnvelope",
+      "expectedValid": false,
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "subscribeWorkspaceEvents", "location": "responseBody", "status": "200", "mediaType": "text/event-stream"}
+    },
+    {
+      "id": "reject-int64-leading-zero",
+      "scenarioClass": "schema-negative",
+      "file": "invalid/event-int64-leading-zero.json",
+      "schemaRef": "../schemas/current/operator.schema.json#/$defs/EventEnvelope",
+      "expectedValid": false,
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "subscribeWorkspaceEvents", "location": "responseBody", "status": "200", "mediaType": "text/event-stream"}
+    },
+    {
+      "id": "reject-int64-overflow",
+      "scenarioClass": "schema-negative",
+      "file": "invalid/event-int64-overflow.json",
+      "schemaRef": "../schemas/current/operator.schema.json#/$defs/EventEnvelope",
+      "expectedValid": false,
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "subscribeWorkspaceEvents", "location": "responseBody", "status": "200", "mediaType": "text/event-stream"}
+    },
+    {
+      "id": "reject-unknown-event-schema-version",
+      "scenarioClass": "schema-negative",
+      "file": "invalid/event-unknown-schema-version.json",
+      "schemaRef": "../schemas/current/operator.schema.json#/$defs/EventEnvelope",
+      "expectedValid": false,
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "subscribeWorkspaceEvents", "location": "responseBody", "status": "200", "mediaType": "text/event-stream"}
+    },
+    {
+      "id": "reject-unknown-event-state",
+      "scenarioClass": "schema-negative",
+      "file": "invalid/event-unknown-state.json",
+      "schemaRef": "../schemas/current/operator.schema.json#/$defs/EventEnvelope",
+      "expectedValid": false,
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "subscribeWorkspaceEvents", "location": "responseBody", "status": "200", "mediaType": "text/event-stream"}
+    },
+    {
+      "id": "reject-bootstrap-duplicate-capability",
+      "scenarioClass": "schema-negative",
+      "file": "invalid/bootstrap-duplicate-capability.json",
+      "schemaRef": "../schemas/current/operator.schema.json#/$defs/WorkspaceBootstrapSnapshot",
+      "expectedValid": false,
+      "openapi": {"document": "../openapi/operator-v1.openapi.json", "operationId": "getWorkspaceBootstrap", "location": "responseBody", "status": "200", "mediaType": "application/json"}
+    },
+    {
+      "id": "reject-task-package-external-action",
+      "scenarioClass": "schema-negative",
+      "file": "invalid/task-package-external-action-enabled.json",
+      "schemaRef": "../schemas/current/runner.schema.json#/$defs/TaskPackage",
+      "expectedValid": false,
+      "openapi": {"document": "../openapi/runner-v1.openapi.json", "location": "componentSchema", "component": "TaskPackage"}
+    },
+    {
+      "id": "reject-receipt-unknown-field",
+      "scenarioClass": "schema-negative",
+      "file": "invalid/receipt-unknown-field.json",
+      "schemaRef": "../schemas/current/runner.schema.json#/$defs/ReceiptRequest",
+      "expectedValid": false,
+      "openapi": {"document": "../openapi/runner-v1.openapi.json", "operationId": "submitRunnerReceipt", "location": "requestBody", "mediaType": "application/json"}
+    }
+  ]
+}

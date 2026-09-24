@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.aden.infrastructure.persistence.mapper.AdenRunnerMapper">
+  <resultMap id="runner" type="com.ruoyi.aden.infrastructure.persistence.mapper.AdenRunnerRow">
+    <id property="runnerId" column="runner_id"/><result property="workspaceId" column="workspace_id"/>
+    <result property="runnerName" column="runner_name"/><result property="runnerPresence" column="runner_presence"/>
+    <result property="capabilitiesJson" column="capabilities_json"/><result property="currentSessionEpoch" column="current_session_epoch"/>
+    <result property="currentCredentialEpoch" column="current_credential_epoch"/><result property="version" column="version"/>
+    <result property="createdByRuoYiUserId" column="created_by_ruoyi_user_id"/><result property="createdAt" column="created_at"/><result property="updatedAt" column="updated_at"/>
+  </resultMap>
+  <resultMap id="credential" type="com.ruoyi.aden.infrastructure.persistence.mapper.AdenRunnerCredentialRow">
+    <id property="credentialId" column="credential_id"/><result property="workspaceId" column="workspace_id"/><result property="runnerId" column="runner_id"/>
+    <result property="credentialEpoch" column="credential_epoch"/><result property="credentialKeyedDigest" column="credential_keyed_digest"/>
+    <result property="pepperKeyId" column="pepper_key_id"/><result property="credentialStatus" column="credential_status"/>
+    <result property="issuedAt" column="issued_at"/><result property="expiresAt" column="expires_at"/>
+  </resultMap>
+  <resultMap id="session" type="com.ruoyi.aden.infrastructure.persistence.mapper.AdenRunnerSessionRow">
+    <id property="sessionId" column="session_id"/><result property="workspaceId" column="workspace_id"/><result property="runnerId" column="runner_id"/><result property="credentialId" column="credential_id"/>
+    <result property="sessionStatus" column="session_status"/><result property="sessionEpoch" column="session_epoch"/><result property="sessionKeyedDigest" column="session_keyed_digest"/><result property="pepperKeyId" column="pepper_key_id"/>
+    <result property="capacity" column="capacity"/><result property="inFlight" column="in_flight"/><result property="heartbeatSequence" column="heartbeat_sequence"/><result property="heartbeatAt" column="heartbeat_at"/><result property="expiresAt" column="expires_at"/><result property="runnerCurrentSessionEpoch" column="runner_current_session_epoch"/>
+  </resultMap>
+  <select id="lockWorkspace" resultType="java.lang.Long">select last_event_seq from aden_workspace where workspace_id=#{workspaceId} and workspace_status='ACTIVE' for update</select>
+  <insert id="insertRunner">insert into aden_runner(workspace_id,runner_id,runner_name,runner_presence,capabilities_json,current_session_epoch,current_credential_epoch,version,created_by_ruoyi_user_id,created_at,updated_at) values(#{workspaceId},#{runnerId},#{name},'OFFLINE',#{capabilitiesJson},0,#{credentialEpoch},1,#{userId},#{now},#{now})</insert>
+  <insert id="insertCredential">insert into aden_runner_credential(workspace_id,credential_id,runner_id,credential_epoch,credential_keyed_digest,pepper_key_id,credential_status,version,issued_at,expires_at,created_at,updated_at) values(#{workspaceId},#{credentialId},#{runnerId},#{epoch},#{digest},#{pepperKeyId},'ACTIVE',0,#{issuedAt},#{expiresAt},#{issuedAt},#{issuedAt})</insert>
+  <select id="selectRunnerForUpdate" resultMap="runner">select workspace_id,runner_id,runner_name,runner_presence,capabilities_json,current_session_epoch,current_credential_epoch,version,created_by_ruoyi_user_id,created_at,updated_at from aden_runner where workspace_id=#{workspaceId} and runner_id=#{runnerId} for update</select>
+  <select id="selectCredentialForUpdate" resultMap="credential">select workspace_id,credential_id,runner_id,credential_epoch,credential_keyed_digest,pepper_key_id,credential_status,issued_at,expires_at from aden_runner_credential where workspace_id=#{workspaceId} and credential_id=#{credentialId} for update</select>
+  <select id="selectCredentialByPublicId" resultMap="credential">select workspace_id,credential_id,runner_id,credential_epoch,credential_keyed_digest,pepper_key_id,credential_status,issued_at,expires_at from aden_runner_credential where credential_id=#{credentialId} limit 2</select>
+  <select id="selectSessionByPublicId" resultMap="session">select s.workspace_id,s.session_id,s.runner_id,s.credential_id,s.session_status,s.session_epoch,s.session_keyed_digest,s.pepper_key_id,s.capacity,s.in_flight,s.heartbeat_sequence,s.heartbeat_at,s.expires_at,r.current_session_epoch runner_current_session_epoch from aden_runner_session s join aden_runner r on r.workspace_id=s.workspace_id and r.runner_id=s.runner_id where s.session_id=#{sessionId} limit 2</select>
+  <update id="advanceRunnerSession">update aden_runner set current_session_epoch=#{nextEpoch},runner_presence='ONLINE',last_seen_at=#{now},version=version+1,updated_at=#{now} where workspace_id=#{workspaceId} and runner_id=#{runnerId} and current_session_epoch=#{expectedEpoch} and version=#{expectedVersion} and runner_presence&lt;&gt;'QUARANTINED'</update>
+  <update id="supersedeSessions">update aden_runner_session set session_status='SUPERSEDED',version=version+1,updated_at=#{now} where workspace_id=#{workspaceId} and runner_id=#{runnerId} and session_status='ACTIVE'</update>
+  <insert id="insertSession">insert into aden_runner_session(workspace_id,session_id,runner_id,credential_id,session_status,session_epoch,session_keyed_digest,pepper_key_id,capacity,in_flight,heartbeat_sequence,metadata_json,version,heartbeat_at,expires_at,created_at,updated_at) values(#{workspaceId},#{sessionId},#{runnerId},#{credentialId},'ACTIVE',#{epoch},#{digest},#{pepperKeyId},#{capacity},0,0,#{metadataJson},0,#{heartbeatAt},#{expiresAt},#{heartbeatAt},#{heartbeatAt})</insert>
+  <update id="revokeRunner">update aden_runner set runner_presence='QUARANTINED',version=version+1,updated_at=#{now} where workspace_id=#{workspaceId} and runner_id=#{runnerId} and version=#{expectedVersion}</update>
+  <update id="revokeCredentials">update aden_runner_credential set credential_status='REVOKED',revoked_at=#{now},version=version+1,updated_at=#{now} where workspace_id=#{workspaceId} and runner_id=#{runnerId} and credential_status='ACTIVE'</update>
+  <update id="revokeSessions">update aden_runner_session set session_status='REVOKED',version=version+1,updated_at=#{now} where workspace_id=#{workspaceId} and runner_id=#{runnerId} and session_status='ACTIVE'</update>
+  <update id="advanceWorkspace">update aden_workspace set last_event_seq=#{next},version=version+1,updated_at=#{now} where workspace_id=#{workspaceId} and last_event_seq=#{expected} and workspace_status='ACTIVE'</update>
+  <insert id="insertEvent">insert into aden_event(workspace_id,event_id,event_seq,aggregate_type,aggregate_id,aggregate_version,event_type,payload_json,correlation_id,actor_type,actor_id,occurred_at,created_at) values(#{workspaceId},#{eventId},#{sequence},'RUNNER',#{runnerId},#{version},#{eventType},#{payload},#{correlationId},#{actorType},#{actorId},#{now},#{now})</insert>
+  <insert id="insertOutbox">insert into aden_outbox(workspace_id,outbox_id,event_id,consumer,outbox_state,attempts,available_at,created_at,updated_at) values(#{workspaceId},#{outboxId},#{eventId},'OPERATOR_SSE','PENDING',0,#{now},#{now},#{now})</insert>
+  <insert id="insertAudit">insert into aden_audit_event(workspace_id,audit_event_id,scope_type,action_code,resource_type,resource_id,actor_type,actor_id,correlation_id,outcome,details_json,occurred_at,created_at) values(#{workspaceId},#{auditId},'WORKSPACE',#{actionCode},'RUNNER',#{runnerId},#{actorType},#{actorId},#{correlationId},'SUCCEEDED',#{details},#{now},#{now})</insert>
+</mapper>

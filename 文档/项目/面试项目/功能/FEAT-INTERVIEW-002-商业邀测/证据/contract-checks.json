@@ -1,0 +1,211 @@
+{
+  "type": "DOCUMENT_CONTRACT_STATIC_CHECK",
+  "generatedAt": "2026-09-09T13:26:44.304214+00:00",
+  "feature": "FEAT-INTERVIEW-002",
+  "contractVersion": "0.2.0",
+  "tools": {
+    "python": "3.12.4",
+    "jsonschema": "4.26.0"
+  },
+  "inputSha256": {
+    "asyncapi.json": "b08bd5d13e7307f95de3c99fb2ef6062f2004f5c422c03f4f8f4e8559f3ae33d",
+    "openapi.json": "945a4900ff87198ecfce0fe5537b59d95961095cb2823b89c6e5d04e77b642fb",
+    "schemas.json": "f0d131172144ab7409e5e15720661e0040dbf0717fad0612ad45258e10d4084e"
+  },
+  "counts": {
+    "files": 3,
+    "definitions": 51,
+    "paths": 24,
+    "operations": 26,
+    "references": 407,
+    "asyncMessagesChecked": 21,
+    "voiceVariants": 20,
+    "schemaExamples": 23
+  },
+  "checks": [
+    "JSON UTF-8 parsing",
+    "JSON Schema 2020-12 meta-schema",
+    "local $ref pointers",
+    "required properties",
+    "unique operationIds",
+    "path parameter declarations",
+    "REST security inheritance",
+    "AsyncAPI message mapping and direction",
+    "selected positive and negative schema examples"
+  ],
+  "examples": [
+    {
+      "name": "supported_combined_plan",
+      "definition": "PlanInput",
+      "expectedValid": true,
+      "actualValid": true,
+      "result": "Pass"
+    },
+    {
+      "name": "reject_targetLevel",
+      "definition": "PlanInput",
+      "expectedValid": false,
+      "actualValid": false,
+      "result": "Pass"
+    },
+    {
+      "name": "reject_practiceMode",
+      "definition": "PlanInput",
+      "expectedValid": false,
+      "actualValid": false,
+      "result": "Pass"
+    },
+    {
+      "name": "reject_answerEndPolicy",
+      "definition": "PlanInput",
+      "expectedValid": false,
+      "actualValid": false,
+      "result": "Pass"
+    },
+    {
+      "name": "reject_rounds",
+      "definition": "PlanInput",
+      "expectedValid": false,
+      "actualValid": false,
+      "result": "Pass"
+    },
+    {
+      "name": "reject_durationMinutes",
+      "definition": "PlanInput",
+      "expectedValid": false,
+      "actualValid": false,
+      "result": "Pass"
+    },
+    {
+      "name": "reject_short_combined_plan",
+      "definition": "PlanInput",
+      "expectedValid": false,
+      "actualValid": false,
+      "result": "Pass"
+    },
+    {
+      "name": "allow_short_single_round",
+      "definition": "PlanInput",
+      "expectedValid": true,
+      "actualValid": true,
+      "result": "Pass"
+    },
+    {
+      "name": "explicit_confirmation",
+      "definition": "ConfirmTranscript",
+      "expectedValid": true,
+      "actualValid": true,
+      "result": "Pass"
+    },
+    {
+      "name": "reject_implicit_confirmation",
+      "definition": "ConfirmTranscript",
+      "expectedValid": false,
+      "actualValid": false,
+      "result": "Pass"
+    },
+    {
+      "name": "explicit_complete",
+      "definition": "CompleteInput",
+      "expectedValid": true,
+      "actualValid": true,
+      "result": "Pass"
+    },
+    {
+      "name": "reject_client_budget_reason",
+      "definition": "CompleteInput",
+      "expectedValid": false,
+      "actualValid": false,
+      "result": "Pass"
+    },
+    {
+      "name": "reject_implicit_disposition",
+      "definition": "CompleteInput",
+      "expectedValid": false,
+      "actualValid": false,
+      "result": "Pass"
+    },
+    {
+      "name": "levels_only_report",
+      "definition": "RoundReport",
+      "expectedValid": true,
+      "actualValid": true,
+      "result": "Pass"
+    },
+    {
+      "name": "reject_numeric_overall_score",
+      "definition": "RoundReport",
+      "expectedValid": false,
+      "actualValid": false,
+      "result": "Pass"
+    },
+    {
+      "name": "unscored_dispute",
+      "definition": "DimensionJudgement",
+      "expectedValid": true,
+      "actualValid": true,
+      "result": "Pass"
+    },
+    {
+      "name": "reject_scored_dispute",
+      "definition": "DimensionJudgement",
+      "expectedValid": false,
+      "actualValid": false,
+      "result": "Pass"
+    },
+    {
+      "name": "reject_score_without_evidence",
+      "definition": "DimensionJudgement",
+      "expectedValid": false,
+      "actualValid": false,
+      "result": "Pass"
+    },
+    {
+      "name": "scored_with_evidence_shape",
+      "definition": "DimensionJudgement",
+      "expectedValid": true,
+      "actualValid": true,
+      "result": "Pass"
+    },
+    {
+      "name": "question_length_limit",
+      "definition": "InterviewerActionV2",
+      "expectedValid": true,
+      "actualValid": true,
+      "result": "Pass"
+    },
+    {
+      "name": "reject_overlong_question",
+      "definition": "InterviewerActionV2",
+      "expectedValid": false,
+      "actualValid": false,
+      "result": "Pass"
+    },
+    {
+      "name": "playback_ack_shape",
+      "definition": "VoiceFrameV2",
+      "expectedValid": true,
+      "actualValid": true,
+      "result": "Pass"
+    },
+    {
+      "name": "reject_answer_in_playback_ack",
+      "definition": "VoiceFrameV2",
+      "expectedValid": false,
+      "actualValid": false,
+      "result": "Pass"
+    }
+  ],
+  "errors": [
+    {
+      "operation": "listCommercialPrices",
+      "error": "missing security"
+    }
+  ],
+  "result": "Fail",
+  "limits": [
+    "No OpenAPI or AsyncAPI dedicated standards lint",
+    "No application execution or code tests",
+    "No server state, ownership, concurrency, audio, provider or scoring-quality validation"
+  ]
+}

@@ -11,6 +11,7 @@ target/
 # Node
 node_modules/
 dist/
+/aden-desktop/out/
 .vite/
 coverage/
 .cache/
@@ -27,6 +28,8 @@ Thumbs.db
 .runtime/
 /.playwright-cli/
 /output/
+/portal-web/playwright-report/
+/portal-web/test-results/
 .git.disabled/
 logs/
 tmp/

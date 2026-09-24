@@ -89,7 +89,8 @@ public class VoiceUseCaseConfiguration {
         return (tenantId, userId) -> {
             Optional<String> reason = unavailableReason(storage, speechToText, cipher);
             return new VoiceCapabilityPort.Capability(reason.isEmpty(),
-                    List.of("audio/webm;codecs=opus", "audio/ogg;codecs=opus", "audio/wav"),
+                    // 火山 ASR 不接受 WebM 容器；Portal 会在上传前统一封装为 PCM WAV。
+                    List.of("audio/ogg;codecs=opus", "audio/wav"),
                     120, 12L * 1024 * 1024, 8, 512L * 1024, 4_000, reason);
         };
     }

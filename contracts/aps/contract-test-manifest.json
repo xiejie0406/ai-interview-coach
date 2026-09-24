@@ -1,0 +1,180 @@
+{
+  "manifestVersion": "1.0",
+  "toolchain": {
+    "python": "3.12.4",
+    "node": "24.15.0"
+  },
+  "schemas": {
+    "SolverInput": "schemas/solver-input-v1.schema.json",
+    "SolverResult": "schemas/solver-result-v1.schema.json",
+    "ValidationResult": "schemas/validation-result-v1.schema.json",
+    "Problem": "schemas/problem-v1.schema.json"
+  },
+  "openapi": "openapi/aps-api-v1.yaml",
+  "cases": [
+    {
+      "schema": "SolverInput",
+      "instance": "examples/golden/valid-minimal-solver-input.json",
+      "expectedValid": true
+    },
+    {
+      "schema": "SolverInput",
+      "instance": "examples/golden/valid-same-start-input.json",
+      "expectedValid": true
+    },
+    {
+      "schema": "SolverInput",
+      "instance": "examples/golden/valid-material-quantity-shared-batch-input.json",
+      "expectedValid": true
+    },
+    {
+      "schema": "SolverInput",
+      "instance": "examples/golden/valid-baseline-replan-input.json",
+      "expectedValid": true
+    },
+    {
+      "schema": "SolverInput",
+      "instance": "examples/golden/invalid-missing-revisions-solver-input.json",
+      "expectedValid": false,
+      "expectedErrorPointers": [""]
+    },
+    {
+      "schema": "SolverInput",
+      "instance": "examples/golden/invalid-trusted-carry-null-release-solver-input.json",
+      "expectedValid": false,
+      "expectedErrorPointers": ["/actualOccupancies/0/releaseAt"]
+    },
+    {
+      "schema": "SolverInput",
+      "instance": "examples/golden/invalid-capability-and-flow-solver-input.json",
+      "expectedValid": false,
+      "expectedErrorPointers": [
+        "/resources/0/skills/0",
+        "/dependencies/0",
+        "/materialSupplies/0/sourceTaskId",
+        "/sharedBatchCandidates/0/members"
+      ]
+    },
+    {
+      "schema": "SolverResult",
+      "instance": "examples/golden/valid-minimal-solver-result.json",
+      "expectedValid": true
+    },
+    {
+      "schema": "SolverResult",
+      "instance": "examples/golden/invalid-draft-optimal-solver-result.json",
+      "expectedValid": false,
+      "expectedErrorPointers": ["/solverStatus"]
+    },
+    {
+      "schema": "SolverResult",
+      "instance": "examples/golden/invalid-solving-terminal-solver-result.json",
+      "expectedValid": false,
+      "expectedErrorPointers": ["/solverStatus", "/resultKind"]
+    },
+    {
+      "schema": "SolverResult",
+      "instance": "examples/golden/invalid-conflict-empty-problems-solver-result.json",
+      "expectedValid": false,
+      "expectedErrorPointers": ["/problems"]
+    },
+    {
+      "schema": "SolverResult",
+      "instance": "examples/golden/invalid-feasible-error-problem-solver-result.json",
+      "expectedValid": false,
+      "expectedErrorPointers": ["/problems"]
+    },
+    {
+      "schema": "ValidationResult",
+      "instance": "examples/golden/valid-input-pass-validation-result.json",
+      "expectedValid": true
+    },
+    {
+      "schema": "ValidationResult",
+      "instance": "examples/golden/valid-publish-precheck-pass-validation-result.json",
+      "expectedValid": true
+    },
+    {
+      "schema": "ValidationResult",
+      "instance": "examples/golden/valid-same-start-validation-result.json",
+      "expectedValid": true
+    },
+    {
+      "schema": "ValidationResult",
+      "instance": "examples/golden/invalid-input-pass-publishable-validation-result.json",
+      "expectedValid": false,
+      "expectedErrorPointers": ["/publishable"]
+    }
+  ],
+  "hashCases": [
+    {
+      "instance": "examples/golden/valid-minimal-solver-input.json",
+      "mode": "OMIT_TOP_LEVEL_FIELD",
+      "hashField": "inputHash"
+    },
+    {
+      "instance": "examples/golden/valid-same-start-input.json",
+      "mode": "OMIT_TOP_LEVEL_FIELD",
+      "hashField": "inputHash"
+    },
+    {
+      "instance": "examples/golden/valid-material-quantity-shared-batch-input.json",
+      "mode": "OMIT_TOP_LEVEL_FIELD",
+      "hashField": "inputHash"
+    },
+    {
+      "instance": "examples/golden/valid-baseline-replan-input.json",
+      "mode": "OMIT_TOP_LEVEL_FIELD",
+      "hashField": "inputHash"
+    },
+    {
+      "instance": "examples/golden/valid-minimal-solver-result.json",
+      "mode": "SELECT_PROPERTY",
+      "property": "candidate",
+      "hashField": "candidateHash"
+    }
+  ],
+  "jcsVectors": [
+    {
+      "name": "rfc8785-numeric-sample",
+      "input": {
+        "numbers": [333333333.33333329, 1e+30, 4.50, 2e-3, 1e-27],
+        "literals": [null, true, false]
+      },
+      "canonical": "{\"literals\":[null,true,false],\"numbers\":[333333333.3333333,1e+30,4.5,0.002,1e-27]}",
+      "sha256": "f9ef8430c38ca3edd7fb96a698d14fdf39c74c63299627162d38b59af2af5abb"
+    },
+    {
+      "name": "unicode-exponent-unordered",
+      "input": {
+        "😀": "emoji",
+        "z": 1e+30,
+        "a": 0.000001,
+        "é": "雪"
+      },
+      "canonical": "{\"a\":0.000001,\"z\":1e+30,\"é\":\"雪\",\"😀\":\"emoji\"}",
+      "sha256": "df2774f41f6c6812af4615bd02a0c7716217c381d440c0f5118efb5e7e1077e5"
+    },
+    {
+      "name": "negative-zero-exponent-boundaries",
+      "input": {
+        "small": 1e-7,
+        "negativeZero": -0,
+        "large": 1e+21
+      },
+      "canonical": "{\"large\":1e+21,\"negativeZero\":0,\"small\":1e-7}",
+      "sha256": "6606a335519b1c6c815454ba545fd693ca40a01d3e010c896ee743f6a1b7ad6f"
+    },
+    {
+      "name": "utf16-key-order",
+      "input": {
+        "😀": 4,
+        "€": 3,
+        "a": 1,
+        "é": 2
+      },
+      "canonical": "{\"a\":1,\"é\":2,\"€\":3,\"😀\":4}",
+      "sha256": "94f0e74ec171339e440550814b266526c0503a73827dd6d9b77f812ae3a1b26b"
+    }
+  ]
+}

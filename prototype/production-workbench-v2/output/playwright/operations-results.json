@@ -1,0 +1,173 @@
+{
+  "at": "2026-09-10T17:32:26.934Z",
+  "results": [
+    {
+      "label": "前置未放行开工失败，时间与任务状态不变",
+      "result": "Pass",
+      "detail": {
+        "message": "前置 A10 合格数量未达到 50 件",
+        "now": 0
+      }
+    },
+    {
+      "label": "A10开工、暂停与恢复有连续审计记录",
+      "result": "Pass",
+      "detail": {
+        "activity": [
+          {
+            "start": 0,
+            "end": 30
+          },
+          {
+            "start": 30,
+            "end": null
+          }
+        ]
+      }
+    },
+    {
+      "label": "A10合格50件释放跨产品B10，时间经过不代替报工",
+      "result": "Pass",
+      "detail": {
+        "aGood": 50,
+        "bStatus": "running"
+      }
+    },
+    {
+      "label": "两产品加工完成后同炉成员同步开工",
+      "result": "Pass",
+      "detail": {
+        "now": 300,
+        "a": "running",
+        "b": "running"
+      }
+    },
+    {
+      "label": "自动批次卸料前报工失败且数量不变",
+      "result": "Pass",
+      "detail": {
+        "message": "实际开停、班次与上游放行尚不足以形成该数量；自动加工须完成卸载"
+      }
+    },
+    {
+      "label": "同炉卸料后分别回记成员，3机时和1人时去重",
+      "result": "Pass",
+      "detail": {
+        "personMinutes": 60,
+        "machineMinutes": 180
+      }
+    },
+    {
+      "label": "末端不良阻止订单合格齐套，B次日完成",
+      "result": "Pass",
+      "detail": {
+        "id": "O-100",
+        "end": null,
+        "late": 0,
+        "good": 198,
+        "qty": 200,
+        "reason": "不良产出尚未形成完整处置方案"
+      }
+    },
+    {
+      "label": "不良处置创建返工任务并追溯原任务",
+      "result": "Pass",
+      "detail": {
+        "source": "A30",
+        "recovery": "A30-R1-1"
+      }
+    },
+    {
+      "label": "返工重新排程发布为正式任务",
+      "result": "Pass",
+      "detail": {
+        "version": "V02",
+        "plan": {
+          "taskId": "A30-R1-1",
+          "start": 1500,
+          "end": 1502,
+          "machineId": null,
+          "personId": "P4",
+          "segments": [
+            {
+              "start": 1500,
+              "end": 1502,
+              "kind": "run",
+              "machineId": null,
+              "personId": "P4",
+              "qty": 2
+            }
+          ],
+          "batchId": null
+        }
+      }
+    },
+    {
+      "label": "返工实际开工报合格后原订单200件齐套，不重复计数",
+      "result": "Pass",
+      "detail": {
+        "sourceGood": 98,
+        "recovered": 2,
+        "orderGood": 200,
+        "records": 17
+      }
+    },
+    {
+      "label": "日报数量跨日归属，人工与设备占用关联执行",
+      "result": "Pass",
+      "detail": {
+        "first": {
+          "finalGood": 98,
+          "person": 480,
+          "machine": 540
+        },
+        "next": {
+          "finalGood": 102,
+          "recoveryRows": 1
+        }
+      }
+    },
+    {
+      "label": "多技能人力按员工去重，半日累积守恒",
+      "result": "Pass",
+      "detail": {
+        "people": 9,
+        "available": 21600,
+        "sum": 21600,
+        "slots": 10,
+        "booked": 1592
+      }
+    },
+    {
+      "label": "恢复旧版只形成新草稿，正式版本与实际不变",
+      "result": "Pass",
+      "detail": {
+        "current": "V02",
+        "restoredDraft": "V01"
+      }
+    },
+    {
+      "label": "审计筛选和实际CSV下载",
+      "result": "Pass",
+      "detail": {
+        "file": "operations-audit.csv"
+      }
+    },
+    {
+      "label": "刷新后生产与回收数量持久化",
+      "result": "Pass",
+      "detail": {
+        "good": 98,
+        "recovered": 2
+      }
+    },
+    {
+      "label": "浏览器运行无异常",
+      "result": "Pass",
+      "detail": {
+        "errors": []
+      }
+    }
+  ],
+  "errors": []
+}

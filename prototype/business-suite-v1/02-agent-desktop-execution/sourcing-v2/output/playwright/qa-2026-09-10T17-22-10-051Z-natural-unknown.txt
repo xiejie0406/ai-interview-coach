@@ -1,0 +1,123 @@
+- complementary "主导航":
+  - link "Aden. 采购执行中心":
+    - /url: "#dashboard"
+  - text: 采 品牌采购团队
+  - navigation:
+    - text: 采购工作台
+    - link "工作台":
+      - /url: "#dashboard"
+    - link "采购任务 3":
+      - /url: "#tasks"
+    - link "商品候选池":
+      - /url: "#candidates/AD-260911-001"
+    - link "供应商会话":
+      - /url: "#conversations/AD-260911-001"
+    - link "报价对比":
+      - /url: "#quotes/AD-260911-001"
+    - link "供应商库":
+      - /url: "#suppliers"
+    - text: 管理与设置
+    - link "执行电脑与连接":
+      - /url: "#connections"
+    - link "采购规则":
+      - /url: "#rules"
+    - link "活动日志":
+      - /url: "#activity"
+  - strong: 演示执行环境
+  - text: 真实平台未接入 · 仅本地保存
+  - link "查看环境状态":
+    - /url: "#connections"
+  - text: LC
+  - strong: 林采 · 采购负责人
+  - text: 示例身份
+- banner:
+  - text: 采购工作空间
+  - strong: 新建采购任务
+  - text: 已保存在本地 交互原型 · 示例数据
+- main:
+  - text: NEW SOURCING REQUEST
+  - heading "新建采购任务" [level=1]
+  - paragraph: 先说清楚需要什么，Aden 会整理计划供您复核。
+  - link "返回任务":
+    - /url: "#tasks"
+  - heading "采购需求" [level=2]
+  - text: 草稿自动保存在本地
+  - heading "先描述这次采购" [level=2]
+  - text: 本地规则演示 采购需求原文
+  - textbox "采购需求原文":
+    - /placeholder: 例如：商品：定制 T 恤，数量 300 件，规格：白色纯棉 220g，含税到货单件上限 30 元，收货城市杭州……
+    - text: 帮我找些实验器材，总预算200元，差不多下周交付。
+  - alert
+  - paragraph: 仅按明确字段做本地规则提取，不调用模型。不明确的规格、每件预算与日期会留空，您仍需逐项确认。
+  - button "提取并填入下方表单"
+  - button "载入示例需求"
+  - text: 已提取：暂无。待您填写确认：商品、数量、规格、每件到货上限、收货城市、询价截止、最晚交货。
+  - alert:
+    - text: 请先修正以下内容：
+    - link "请输入 1–80 字的商品或任务名，不能只有标点。":
+      - /url: "#title"
+    - link "数量须为 1–100,000 的正整数。":
+      - /url: "#quantity"
+    - link "请填写用于共同询价的核心规格。":
+      - /url: "#spec"
+    - link "请输入大于 0、最多六位小数的每件含税到货成本上限。":
+      - /url: "#budget"
+    - link "请填写收货城市。":
+      - /url: "#destination"
+    - link "最晚交货日期不能早于今天。":
+      - /url: "#deadline"
+    - link "询价截止日期不能早于今天。":
+      - /url: "#enquiryDeadline"
+  - button "定制 T 恤"
+  - button "包装袋"
+  - button "保温杯"
+  - text: 任务名称 *
+  - textbox "任务名称 *" [invalid]
+  - text: 例如：秋季活动定制 T 恤采购 请输入 1–80 字的商品或任务名，不能只有标点。 商品品类
+  - combobox "商品品类":
+    - option "根据名称与规格识别"
+    - option "定制 T 恤"
+    - option "包装袋"
+    - option "保温杯"
+    - option "其他品类" [selected]
+  - text: 示例支持 T 恤、包装袋、保温杯；其他品类可手工补充。 采购数量 *
+  - spinbutton "采购数量 *" [invalid]
+  - text: 正整数，最多 100,000 数量须为 1–100,000 的正整数。 核心规格 *
+  - textbox "核心规格 *" [invalid]:
+    - /placeholder: 材质、尺寸、颜色、工艺与包装要求
+  - text: 作为询价和报价比较的共同条件，外发前需要确认。 请填写用于共同询价的核心规格。 含税到货单件上限 *（人民币）
+  - spinbutton "含税到货单件上限 *（人民币）" [invalid]
+  - text: 包含加工、包装、运费与固定費分摊；仅用于内部，不向供应商透露。 请输入大于 0、最多六位小数的每件含税到货成本上限。 收货城市 *
+  - textbox "收货城市 *" [invalid]
+  - text: 只需要城市，不收集完整地址和电话。 请填写收货城市。 询价截止日期 *
+  - textbox "询价截止日期 *" [invalid]
+  - text: 此日期后停止自动询价与补问。 询价截止日期不能早于今天。 最晚交货日期 *
+  - textbox "最晚交货日期 *" [invalid]
+  - text: 与询价截止分开核验。 最晚交货日期不能早于今天。 候选供应商上限 *
+  - spinbutton "候选供应商上限 *": "5"
+  - text: 默认 5 家，每项任务最多 10 家。 目标有效报价数 *
+  - spinbutton "目标有效报价数 *": "3"
+  - text: 未达目标时只能明确保存为部分结果。 计量单位
+  - combobox "计量单位":
+    - option "件" [selected]
+    - option "个"
+    - option "米"
+    - option "套"
+  - text: 同一任务按相同单位比较。 采集来源（演示）*
+  - checkbox "1688" [checked]
+  - text: "1688"
+  - checkbox "供应商网站" [checked]
+  - text: 供应商网站 平台真实未接入，此处选择只改变演示候选范围。
+  - checkbox "授权 Agent 补问已列明的缺失字段 每位供应商最多 3 轮，不更改数量、规格，不承诺订金或下单。" [checked]
+  - text: 授权 Agent 补问已列明的缺失字段 每位供应商最多 3 轮，不更改数量、规格，不承诺订金或下单。 离开页面后可继续本地草稿
+  - button "保存草稿"
+  - button "复核采购计划"
+  - complementary:
+    - heading "接下来会发生什么" [level=2]
+    - list:
+      - listitem: 1 复核任务范围 确认数量、预算和规格，再启动采集。
+      - listitem: 2 找到候选商品 保留商品页面条件和采集来源。
+      - listitem: 3 确认后联系供应商 逐一预览接收人和询价内容。
+      - listitem: 4 比较完整报价 核对税费、运费、交期与起订量。
+    - strong: 您始终掌握采购决定
+    - text: 供应商的回复只形成报价信息。Aden 不提供下单、付款或采购承诺动作。

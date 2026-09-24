@@ -85,7 +85,8 @@ public class InterviewInfrastructureConfiguration {
     }
 
     @Bean
-    public ClockPort interviewClockPort(Clock interviewClock) {
+    public ClockPort interviewClockPort(
+            @Qualifier("interviewClock") Clock interviewClock) {
         return new SystemClockAdapter(interviewClock);
     }
 

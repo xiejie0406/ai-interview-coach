@@ -1,0 +1,888 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aps.local/contracts/schemas/solver-input-v1.schema.json",
+  "title": "APS SolverInput v1",
+  "description": "单站点、不可变的 APS 求解输入快照。结构通过不等于业务可求解。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contractType",
+    "requestId",
+    "planVersionId",
+    "capturedAt",
+    "definitionRevision",
+    "executionRevision",
+    "inputHash",
+    "hashAlgorithm",
+    "canonicalization",
+    "modelVersion",
+    "scope",
+    "horizon",
+    "baseVersion",
+    "parameters",
+    "resources",
+    "availabilityWindows",
+    "tasks",
+    "dependencies",
+    "materialSupplies",
+    "materialDemands",
+    "sharedBatchCandidates",
+    "locks",
+    "actualOccupancies"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "contractType": { "const": "SOLVER_INPUT" },
+    "requestId": { "$ref": "#/$defs/uuid" },
+    "planVersionId": { "$ref": "#/$defs/uuid" },
+    "capturedAt": { "$ref": "#/$defs/utcInstant" },
+    "definitionRevision": { "$ref": "#/$defs/revision" },
+    "executionRevision": { "$ref": "#/$defs/revision" },
+    "inputHash": { "$ref": "#/$defs/sha256" },
+    "hashAlgorithm": { "const": "SHA-256" },
+    "canonicalization": { "const": "JCS-RFC8785" },
+    "modelVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "scope": { "$ref": "#/$defs/scope" },
+    "horizon": { "$ref": "#/$defs/horizon" },
+    "baseVersion": {
+      "oneOf": [
+        { "$ref": "#/$defs/baseVersion" },
+        { "type": "null" }
+      ]
+    },
+    "parameters": { "$ref": "#/$defs/parameters" },
+    "resources": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/resource" }
+    },
+    "availabilityWindows": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/availabilityWindow" }
+    },
+    "tasks": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/task" }
+    },
+    "dependencies": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/dependency" }
+    },
+    "materialSupplies": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/materialSupply" }
+    },
+    "materialDemands": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/materialDemand" }
+    },
+    "sharedBatchCandidates": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/sharedBatchCandidate" }
+    },
+    "locks": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/lock" }
+    },
+    "actualOccupancies": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/actualOccupancy" }
+    }
+  },
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    },
+    "utcInstant": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    },
+    "revision": { "type": "integer", "minimum": 0 },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "positiveDecimal": {
+      "type": "string",
+      "description": "DECIMAL(18,6) 的正数定点文本；最多 12 位整数和 6 位小数。",
+      "pattern": "^(?:0\\.(?=[0-9]{1,6}$)(?=[0-9]*[1-9])[0-9]+|[1-9][0-9]{0,11}(?:\\.[0-9]{1,6})?)$"
+    },
+    "nonNegativeDecimal": {
+      "type": "string",
+      "description": "DECIMAL(18,6) 的非负定点文本；最多 12 位整数和 6 位小数。",
+      "pattern": "^(?:0(?:\\.[0-9]{1,6})?|[1-9][0-9]{0,11}(?:\\.[0-9]{1,6})?)$"
+    },
+    "nullableUuid": {
+      "oneOf": [
+        { "$ref": "#/$defs/uuid" },
+        { "type": "null" }
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["siteCode", "workshopIds"],
+      "properties": {
+        "siteCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "workshopIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        }
+      }
+    },
+    "horizon": {
+      "type": "object",
+      "description": "所有时间边界均为 UTC；时间窗采用半开区间 [startAt,endAt)。",
+      "additionalProperties": false,
+      "required": [
+        "startAt",
+        "detailEndAt",
+        "endAt",
+        "planningAnchorAt",
+        "timeUnitSeconds",
+        "displayTimeZone"
+      ],
+      "properties": {
+        "startAt": { "$ref": "#/$defs/utcInstant" },
+        "detailEndAt": { "$ref": "#/$defs/utcInstant" },
+        "endAt": { "$ref": "#/$defs/utcInstant" },
+        "planningAnchorAt": { "$ref": "#/$defs/utcInstant" },
+        "timeUnitSeconds": { "enum": [1, 60] },
+        "displayTimeZone": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^(?:UTC|[A-Za-z_+-]+(?:/[A-Za-z0-9_+-]+)+)$"
+        }
+      }
+    },
+    "baseVersion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["planVersionId", "inputHash", "freezeEndAt", "jobs"],
+      "properties": {
+        "planVersionId": { "$ref": "#/$defs/uuid" },
+        "inputHash": { "$ref": "#/$defs/sha256" },
+        "freezeEndAt": { "$ref": "#/$defs/utcInstant" },
+        "jobs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/baselineJob" }
+        }
+      }
+    },
+    "baselineJob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baselineJobId", "memberTaskIds", "startAt", "endAt", "resourceIds"],
+      "properties": {
+        "baselineJobId": { "$ref": "#/$defs/uuid" },
+        "memberTaskIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        },
+        "startAt": { "$ref": "#/$defs/utcInstant" },
+        "endAt": { "$ref": "#/$defs/utcInstant" },
+        "resourceIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        }
+      }
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "direction",
+        "maxSolveSeconds",
+        "randomSeed",
+        "solverSearchThreads",
+        "absoluteGapLimit",
+        "relativeGapLimit"
+      ],
+      "properties": {
+        "direction": { "enum": ["FORWARD", "BACKWARD_HINT"] },
+        "maxSolveSeconds": { "type": "integer", "minimum": 1, "maximum": 3600 },
+        "randomSeed": { "type": "integer", "minimum": 0, "maximum": 2147483647 },
+        "solverSearchThreads": { "type": "integer", "minimum": 1, "maximum": 64 },
+        "absoluteGapLimit": { "type": "number", "minimum": 0 },
+        "relativeGapLimit": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resourceId",
+        "resourceType",
+        "workCenterId",
+        "exclusive",
+        "capacity",
+        "capacityUomCode",
+        "skills"
+      ],
+      "properties": {
+        "resourceId": { "$ref": "#/$defs/uuid" },
+        "resourceType": { "enum": ["PERSON", "MACHINE", "WORKSTATION", "TOOL"] },
+        "workCenterId": { "$ref": "#/$defs/nullableUuid" },
+        "exclusive": { "type": "boolean" },
+        "capacity": { "$ref": "#/$defs/positiveDecimal" },
+        "capacityUomCode": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 16,
+          "pattern": "^[A-Z0-9_]+$"
+        },
+        "skills": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/resourceSkill" }
+        }
+      }
+    },
+    "resourceSkill": {
+      "type": "object",
+      "description": "技能有效期采用半开区间 [validFrom,validTo)；null 边界表示开放端。",
+      "additionalProperties": false,
+      "required": ["skillId", "skillCode", "skillLevel", "validFrom", "validTo", "status"],
+      "properties": {
+        "skillId": { "$ref": "#/$defs/uuid" },
+        "skillCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "skillLevel": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "validFrom": {
+          "oneOf": [
+            { "$ref": "#/$defs/utcInstant" },
+            { "type": "null" }
+          ]
+        },
+        "validTo": {
+          "oneOf": [
+            { "$ref": "#/$defs/utcInstant" },
+            { "type": "null" }
+          ]
+        },
+        "status": { "enum": ["ACTIVE", "INACTIVE", "EXPIRED"] }
+      }
+    },
+    "availabilityWindow": {
+      "type": "object",
+      "description": "资源可用的半开区间 [startAt,endAt)。",
+      "additionalProperties": false,
+      "required": ["availabilityId", "resourceId", "startAt", "endAt", "capacity"],
+      "properties": {
+        "availabilityId": { "$ref": "#/$defs/uuid" },
+        "resourceId": { "$ref": "#/$defs/uuid" },
+        "startAt": { "$ref": "#/$defs/utcInstant" },
+        "endAt": { "$ref": "#/$defs/utcInstant" },
+        "capacity": { "$ref": "#/$defs/positiveDecimal" }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taskId",
+        "orderLineId",
+        "operationSpecId",
+        "workCenterId",
+        "planningClass",
+        "quantity",
+        "uomCode",
+        "earliestStartAt",
+        "promisedAt",
+        "phases"
+      ],
+      "properties": {
+        "taskId": { "$ref": "#/$defs/uuid" },
+        "orderLineId": { "$ref": "#/$defs/uuid" },
+        "operationSpecId": { "$ref": "#/$defs/uuid" },
+        "workCenterId": { "$ref": "#/$defs/uuid" },
+        "planningClass": { "enum": ["MANDATORY_DETAIL", "FUTURE_CARRY_FORWARD"] },
+        "quantity": { "$ref": "#/$defs/positiveDecimal" },
+        "uomCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16,
+          "pattern": "^[A-Z0-9_]+$"
+        },
+        "earliestStartAt": { "$ref": "#/$defs/utcInstant" },
+        "promisedAt": {
+          "oneOf": [
+            { "$ref": "#/$defs/utcInstant" },
+            { "type": "null" }
+          ]
+        },
+        "phases": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/phase" }
+        }
+      }
+    },
+    "phase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phaseId",
+        "phaseType",
+        "sequenceNo",
+        "fixedSeconds",
+        "secondsPerUnit",
+        "interruptible",
+        "maxSegments",
+        "minSegmentSeconds",
+        "resumeSetupSeconds",
+        "segmentResourcePolicy",
+        "requirements"
+      ],
+      "properties": {
+        "phaseId": { "$ref": "#/$defs/uuid" },
+        "phaseType": { "enum": ["SETUP", "RUN", "UNLOAD", "WAIT", "TRANSPORT"] },
+        "sequenceNo": { "type": "integer", "minimum": 1, "maximum": 32767 },
+        "fixedSeconds": { "type": "integer", "minimum": 0 },
+        "secondsPerUnit": { "$ref": "#/$defs/nonNegativeDecimal" },
+        "interruptible": { "type": "boolean" },
+        "maxSegments": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "minSegmentSeconds": { "type": "integer", "minimum": 0 },
+        "resumeSetupSeconds": { "type": "integer", "minimum": 0 },
+        "segmentResourcePolicy": { "enum": ["SAME_RESOURCES", "RESELECT_ALLOWED"] },
+        "requirements": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/resourceRequirement" }
+        }
+      }
+    },
+    "resourceRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirementId",
+        "resourceType",
+        "seatCount",
+        "capacityDemand",
+        "requiredSkillCode",
+        "minimumSkillLevel",
+        "holdOnPause",
+        "candidateResourceIds"
+      ],
+      "properties": {
+        "requirementId": { "$ref": "#/$defs/uuid" },
+        "resourceType": { "enum": ["PERSON", "MACHINE", "WORKSTATION", "TOOL"] },
+        "seatCount": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "capacityDemand": { "$ref": "#/$defs/positiveDecimal" },
+        "requiredSkillCode": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "minimumSkillLevel": { "type": ["integer", "null"], "minimum": 1, "maximum": 10 },
+        "holdOnPause": { "type": "boolean" },
+        "candidateResourceIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "description": "SAME_START 是可持久输入，但 v1 校验器必须返回 UNSUPPORTED_SYNC_RULE。",
+      "additionalProperties": false,
+      "required": [
+        "dependencyId",
+        "predecessorTaskId",
+        "successorTaskId",
+        "relationType",
+        "lagSeconds",
+        "lagBasis",
+        "thresholdQty",
+        "thresholdRatio",
+        "transferBatchQty",
+        "uomCode",
+        "consumesOutput"
+      ],
+      "properties": {
+        "dependencyId": { "$ref": "#/$defs/uuid" },
+        "predecessorTaskId": { "$ref": "#/$defs/uuid" },
+        "successorTaskId": { "$ref": "#/$defs/uuid" },
+        "relationType": {
+          "enum": ["FINISH_TO_START", "QUANTITY", "SAME_START"]
+        },
+        "lagSeconds": { "type": "integer", "minimum": 0 },
+        "lagBasis": { "enum": ["ELAPSED", "WORKING"] },
+        "thresholdQty": {
+          "oneOf": [
+            { "$ref": "#/$defs/positiveDecimal" },
+            { "type": "null" }
+          ]
+        },
+        "thresholdRatio": {
+          "oneOf": [
+            { "$ref": "#/$defs/positiveRatio" },
+            { "type": "null" }
+          ]
+        },
+        "transferBatchQty": {
+          "oneOf": [
+            { "$ref": "#/$defs/positiveDecimal" },
+            { "type": "null" }
+          ]
+        },
+        "uomCode": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 16,
+          "pattern": "^[A-Z0-9_]+$"
+        },
+        "consumesOutput": { "type": "boolean" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "relationType": { "const": "FINISH_TO_START" } } },
+          "then": {
+            "properties": {
+              "thresholdQty": { "type": "null" },
+              "thresholdRatio": { "type": "null" },
+              "transferBatchQty": { "type": "null" },
+              "uomCode": { "type": "null" },
+              "consumesOutput": { "const": false }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "relationType": { "const": "QUANTITY" } } },
+          "then": {
+            "oneOf": [
+              {
+                "properties": {
+                  "thresholdQty": { "$ref": "#/$defs/positiveDecimal" },
+                  "thresholdRatio": { "type": "null" },
+                  "uomCode": { "type": "string" }
+                }
+              },
+              {
+                "properties": {
+                  "thresholdQty": { "type": "null" },
+                  "thresholdRatio": { "$ref": "#/$defs/positiveRatio" }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": { "properties": { "relationType": { "const": "SAME_START" } } },
+          "then": {
+            "properties": {
+              "lagSeconds": { "const": 0 },
+              "lagBasis": { "const": "ELAPSED" },
+              "thresholdQty": { "type": "null" },
+              "thresholdRatio": { "type": "null" },
+              "transferBatchQty": { "type": "null" },
+              "uomCode": { "type": "null" },
+              "consumesOutput": { "const": false }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "transferBatchQty": { "type": "string" } } },
+          "then": { "properties": { "uomCode": { "type": "string" } } }
+        }
+      ]
+    },
+    "positiveRatio": {
+      "type": "string",
+      "description": "大于 0 且小于等于 1 的 DECIMAL(8,6) 定点文本。",
+      "pattern": "^(?:1(?:\\.0{1,6})?|0\\.(?=[0-9]{1,6}$)(?=[0-9]*[1-9])[0-9]+)$"
+    },
+    "materialSupply": {
+      "type": "object",
+      "description": "固定可用供给或由上游任务释放的有限供给；不得把一次释放当成无限供给。",
+      "additionalProperties": false,
+      "required": ["supplyId", "itemId", "supplyType", "sourceTaskId", "availableAt", "quantity", "uomCode", "qualityState"],
+      "properties": {
+        "supplyId": { "$ref": "#/$defs/uuid" },
+        "itemId": { "$ref": "#/$defs/uuid" },
+          "supplyType": { "enum": ["FIXED_AVAILABLE", "TASK_OUTPUT", "EXECUTION_RELEASED"] },
+        "sourceTaskId": { "$ref": "#/$defs/nullableUuid" },
+        "availableAt": {
+          "oneOf": [
+            { "$ref": "#/$defs/utcInstant" },
+            { "type": "null" }
+          ]
+        },
+        "quantity": { "$ref": "#/$defs/positiveDecimal" },
+        "uomCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16,
+          "pattern": "^[A-Z0-9_]+$"
+        },
+        "qualityState": { "enum": ["AVAILABLE", "PENDING_QUALITY", "PLANNED_QUALIFIED"] }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "supplyType": { "const": "FIXED_AVAILABLE" } } },
+          "then": { "properties": { "availableAt": { "$ref": "#/$defs/utcInstant" } } }
+        },
+        {
+          "if": { "properties": { "supplyType": { "const": "TASK_OUTPUT" } } },
+          "then": {
+            "properties": {
+              "sourceTaskId": { "$ref": "#/$defs/uuid" },
+              "availableAt": { "type": "null" },
+              "qualityState": { "const": "PLANNED_QUALIFIED" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "supplyType": { "const": "EXECUTION_RELEASED" } } },
+          "then": {
+            "properties": {
+              "sourceTaskId": { "$ref": "#/$defs/uuid" },
+              "availableAt": { "$ref": "#/$defs/utcInstant" },
+              "qualityState": { "const": "AVAILABLE" }
+            }
+          }
+        }
+      ]
+    },
+    "materialDemand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "demandId",
+        "targetTaskId",
+        "itemId",
+        "sourceTaskId",
+        "demandType",
+        "requiredQuantity",
+        "uomCode",
+        "transferBatchQuantity",
+        "materialStatus",
+        "readyAt"
+      ],
+      "properties": {
+        "demandId": { "$ref": "#/$defs/uuid" },
+        "targetTaskId": { "$ref": "#/$defs/uuid" },
+        "itemId": { "$ref": "#/$defs/uuid" },
+        "sourceTaskId": { "$ref": "#/$defs/nullableUuid" },
+        "demandType": { "enum": ["COMPONENT", "TRANSFER", "EXTERNAL"] },
+        "requiredQuantity": { "$ref": "#/$defs/positiveDecimal" },
+        "uomCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16,
+          "pattern": "^[A-Z0-9_]+$"
+        },
+        "transferBatchQuantity": {
+          "oneOf": [
+            { "$ref": "#/$defs/positiveDecimal" },
+            { "type": "null" }
+          ]
+        },
+        "materialStatus": { "enum": ["UNAVAILABLE", "PARTIAL", "AVAILABLE", "CONSUMED", "CANCELLED"] },
+        "readyAt": {
+          "oneOf": [
+            { "$ref": "#/$defs/utcInstant" },
+            { "type": "null" }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "demandType": { "const": "TRANSFER" } } },
+          "then": { "properties": { "sourceTaskId": { "$ref": "#/$defs/uuid" } } }
+        },
+        {
+          "if": { "properties": { "demandType": { "const": "EXTERNAL" } } },
+          "then": { "properties": { "sourceTaskId": { "type": "null" } } }
+        }
+      ]
+    },
+    "sharedBatchCandidate": {
+      "type": "object",
+      "description": "人工固定或确定性规则生成的有限共享批候选；成员量总和与容量由业务校验器复核。",
+      "additionalProperties": false,
+      "required": [
+        "candidateId",
+        "sourceType",
+        "operationSpecId",
+        "workCenterId",
+        "compatibilityKey",
+        "capacity",
+        "capacityUomCode",
+        "cycleDurationSeconds",
+        "members"
+      ],
+      "properties": {
+        "candidateId": { "$ref": "#/$defs/uuid" },
+        "sourceType": { "enum": ["MANUAL_FIXED", "RULE_GENERATED"] },
+        "operationSpecId": { "$ref": "#/$defs/uuid" },
+        "workCenterId": { "$ref": "#/$defs/uuid" },
+        "compatibilityKey": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "capacity": { "$ref": "#/$defs/positiveDecimal" },
+        "capacityUomCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16,
+          "pattern": "^[A-Z0-9_]+$"
+        },
+        "cycleDurationSeconds": { "type": "integer", "minimum": 1 },
+        "members": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/sharedBatchMember" }
+        }
+      }
+    },
+    "sharedBatchMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["taskId", "quantity", "uomCode"],
+      "properties": {
+        "taskId": { "$ref": "#/$defs/uuid" },
+        "quantity": { "$ref": "#/$defs/positiveDecimal" },
+        "uomCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16,
+          "pattern": "^[A-Z0-9_]+$"
+        }
+      }
+    },
+    "lock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lockId",
+        "targetType",
+        "targetId",
+        "lockType",
+        "lockedStartAt",
+        "lockedEndAt",
+        "lockedResourceIds",
+        "reason"
+      ],
+      "properties": {
+        "lockId": { "$ref": "#/$defs/uuid" },
+        "targetType": { "enum": ["JOB", "SEGMENT", "ALLOCATION"] },
+        "targetId": { "$ref": "#/$defs/uuid" },
+        "lockType": { "enum": ["TIME", "RESOURCE", "FULL"] },
+        "lockedStartAt": {
+          "oneOf": [
+            { "$ref": "#/$defs/utcInstant" },
+            { "type": "null" }
+          ]
+        },
+        "lockedEndAt": {
+          "oneOf": [
+            { "$ref": "#/$defs/utcInstant" },
+            { "type": "null" }
+          ]
+        },
+        "lockedResourceIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    },
+    "actualOccupancy": {
+      "type": "object",
+      "description": "endAt 为 null 表示在 capturedAt 仍开放占用。TRUSTED 表示可形成固定资源 carry；UNKNOWN 表示必须保守阻塞到 horizon.endAt。",
+      "additionalProperties": false,
+      "required": [
+        "occupancyId",
+        "planJobId",
+        "executionRunId",
+        "sourcePlanSegmentId",
+        "resourceId",
+        "occupiedResourceRole",
+        "taskId",
+        "activityType",
+        "startAt",
+        "endAt",
+        "currentPhase",
+        "remainingDurationSeconds",
+        "remainingQuantity",
+        "remainingQuantityUomCode",
+        "releaseAt",
+        "releaseConfidence"
+      ],
+      "properties": {
+        "occupancyId": { "$ref": "#/$defs/uuid" },
+        "planJobId": { "$ref": "#/$defs/uuid" },
+        "executionRunId": { "$ref": "#/$defs/uuid" },
+        "sourcePlanSegmentId": { "$ref": "#/$defs/nullableUuid" },
+        "resourceId": { "$ref": "#/$defs/uuid" },
+        "occupiedResourceRole": { "enum": ["PERSON", "MACHINE", "WORKSTATION", "TOOL"] },
+        "taskId": { "$ref": "#/$defs/nullableUuid" },
+        "activityType": { "enum": ["SETUP", "RUN", "UNLOAD", "WAIT_HOLD", "PAUSE_HOLD", "TRANSPORT"] },
+        "startAt": { "$ref": "#/$defs/utcInstant" },
+        "endAt": {
+          "oneOf": [
+            { "$ref": "#/$defs/utcInstant" },
+            { "type": "null" }
+          ]
+        },
+        "currentPhase": {
+          "oneOf": [
+            { "$ref": "#/$defs/currentPhase" },
+            { "type": "null" }
+          ]
+        },
+        "remainingDurationSeconds": { "type": ["integer", "null"], "minimum": 1 },
+        "remainingQuantity": {
+          "oneOf": [
+            { "$ref": "#/$defs/positiveDecimal" },
+            { "type": "null" }
+          ]
+        },
+        "remainingQuantityUomCode": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 16,
+          "pattern": "^[A-Z0-9_]+$"
+        },
+        "releaseAt": {
+          "oneOf": [
+            { "$ref": "#/$defs/utcInstant" },
+            { "type": "null" }
+          ]
+        },
+        "releaseConfidence": { "enum": ["TRUSTED", "UNKNOWN", "NOT_APPLICABLE"] },
+        "members": {
+          "type": "array",
+          "description": "同一物理占用关联的执行成员及各自剩余派工量；共享批不得复制物理占用。",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/actualOccupancyMember" }
+        },
+        "sourceRequirementId": { "$ref": "#/$defs/nullableUuid" },
+        "sourceSeatNo": { "type": ["integer", "null"], "minimum": 1, "maximum": 100 },
+        "capacityUsed": {
+          "oneOf": [
+            { "$ref": "#/$defs/positiveDecimal" },
+            { "type": "null" }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "releaseConfidence": { "const": "TRUSTED" } } },
+          "then": {
+            "properties": {
+              "endAt": { "type": "null" },
+              "currentPhase": { "$ref": "#/$defs/currentPhase" },
+              "releaseAt": { "$ref": "#/$defs/utcInstant" },
+              "sourceRequirementId": { "$ref": "#/$defs/uuid" },
+              "sourceSeatNo": { "type": "integer", "minimum": 1, "maximum": 100 },
+              "capacityUsed": { "$ref": "#/$defs/positiveDecimal" }
+            },
+            "allOf": [
+              {
+                "anyOf": [
+                  { "properties": { "taskId": { "$ref": "#/$defs/uuid" } } },
+                  { "properties": { "members": { "type": "array", "minItems": 1 } }, "required": ["members"] }
+                ]
+              },
+              {
+                "anyOf": [
+                  { "properties": { "remainingDurationSeconds": { "type": "integer", "minimum": 1 } } },
+                  { "properties": { "remainingQuantity": { "$ref": "#/$defs/positiveDecimal" } } }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "if": { "properties": { "releaseConfidence": { "const": "UNKNOWN" } } },
+          "then": {
+            "properties": {
+              "endAt": { "type": "null" },
+              "remainingDurationSeconds": { "type": "null" },
+              "remainingQuantity": { "type": "null" },
+              "remainingQuantityUomCode": { "type": "null" },
+              "releaseAt": { "type": "null" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "releaseConfidence": { "const": "NOT_APPLICABLE" } } },
+          "then": {
+            "properties": {
+              "endAt": { "$ref": "#/$defs/utcInstant" },
+              "currentPhase": { "type": "null" },
+              "remainingDurationSeconds": { "type": "null" },
+              "remainingQuantity": { "type": "null" },
+              "remainingQuantityUomCode": { "type": "null" },
+              "releaseAt": { "type": "null" }
+            }
+          }
+        }
+      ]
+    },
+    "actualOccupancyMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["taskId", "remainingQuantity", "uomCode"],
+      "properties": {
+        "taskId": { "$ref": "#/$defs/uuid" },
+        "remainingQuantity": { "$ref": "#/$defs/positiveDecimal" },
+        "uomCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16,
+          "pattern": "^[A-Z0-9_]+$"
+        }
+      }
+    },
+    "currentPhase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operationSpecId", "phaseId", "phaseType"],
+      "properties": {
+        "operationSpecId": { "$ref": "#/$defs/uuid" },
+        "phaseId": { "$ref": "#/$defs/uuid" },
+        "phaseType": { "enum": ["SETUP", "RUN", "UNLOAD", "WAIT", "TRANSPORT"] }
+      }
+    }
+  }
+}

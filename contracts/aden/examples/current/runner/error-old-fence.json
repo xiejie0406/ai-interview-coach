@@ -1,0 +1,9 @@
+{
+  "code": 409,
+  "msg": "回执 fencing token 已过期",
+  "data": null,
+  "errorCode": "ADEN_RECEIPT_STALE",
+  "retryable": false,
+  "correlationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "details": {"receivedFence": "1", "currentFence": "2"}
+}

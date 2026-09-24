@@ -1,0 +1,9 @@
+{
+  "code": 422,
+  "msg": "提交前置输入不完整，任务未发生变化",
+  "data": null,
+  "errorCode": "ADEN_TASK_VALIDATION_FAILED",
+  "retryable": false,
+  "correlationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "details": {"taskMutated": false}
+}

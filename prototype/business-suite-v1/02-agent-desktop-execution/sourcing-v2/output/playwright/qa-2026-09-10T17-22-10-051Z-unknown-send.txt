@@ -1,0 +1,70 @@
+- complementary "主导航":
+  - link "Aden. 采购执行中心":
+    - /url: "#dashboard"
+  - text: 采 品牌采购团队
+  - navigation:
+    - text: 采购工作台
+    - link "工作台":
+      - /url: "#dashboard"
+    - link "采购任务 3":
+      - /url: "#tasks"
+    - link "商品候选池":
+      - /url: "#candidates/AD-260911-002"
+    - link "供应商会话":
+      - /url: "#conversations/AD-260911-002"
+    - link "报价对比":
+      - /url: "#quotes/AD-260911-002"
+    - link "供应商库":
+      - /url: "#suppliers"
+    - text: 管理与设置
+    - link "执行电脑与连接":
+      - /url: "#connections"
+    - link "采购规则":
+      - /url: "#rules"
+    - link "活动日志":
+      - /url: "#activity"
+  - strong: 演示执行环境
+  - text: 真实平台未接入 · 仅本地保存
+  - link "查看环境状态":
+    - /url: "#connections"
+  - text: LC
+  - strong: 林采 · 采购负责人
+  - text: 示例身份
+- banner:
+  - text: 采购工作空间
+  - strong: 供应商会话
+  - text: 已保存在本地 交互原型 · 示例数据
+- main:
+  - text: SOURCING WORKSPACE
+  - heading "供应商会话" [level=1]
+  - paragraph: 让每次沟通都围绕商品条件，保留对方原话与报价证据。
+  - button "演示情景"
+  - button "人工接管"
+  - text: 当前采购任务
+  - combobox "当前采购任务":
+    - option "秋季品牌活动 · 定制 T 恤采购"
+    - option "门店补货 · 牛皮纸包装袋" [selected]
+    - option "客户礼赠 · 定制保温杯"
+  - text: 1,000 件 · 包装袋 · 待处理
+  - heading "执行等待处理" [level=3]
+  - paragraph: 存在发送结果未知，请先回查确认。
+  - button "回查发送记录"
+  - complementary:
+    - text: 供应商会话 1
+    - link "方寸包装 AI 客服 发送结果未知 发送结果未知":
+      - /url: "#conversations/AD-260911-002/AD-260911-002:conv:s-b1"
+      - heading "方寸包装" [level=3]
+      - text: AI 客服
+      - paragraph: 发送结果未知
+      - text: 发送结果未知
+  - heading "方寸包装" [level=2]
+  - paragraph: 方寸报价助手 · AI 客服 · 身份来自示例资料
+  - text: 发送结果未知 本次需求 · 1,000 件 · 杭州 发送回执未知 · 示例
+  - time: 09/11 01:22
+  - text: 您好，我们计划采购 1000 件包装袋，规格：原色牛皮纸 120g，26×12×32cm，单色 LOGO，扭绳手提，收货城市杭州，最晚交货要求 2026-10-02。请提供含税单价、加工费、包装费、运费、本批固定费用、起订量、交期起算条件（出货或到货）和报价有效期。请仅提供报价，本次咨询不构成采购承诺。 发送可能已经发生。先回查确认；不自动重发。
+  - button "回查发送记录"
+  - complementary:
+    - heading "报价信息" [level=3]
+    - paragraph: 等待供应商针对本次需求的回复
+    - text: 页面价格不会自动填作正式报价。
+- status: 演示情景已载入 发送结果未知，请先回查

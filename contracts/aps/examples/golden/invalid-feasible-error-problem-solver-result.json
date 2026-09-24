@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.0",
+  "contractType": "SOLVER_RESULT",
+  "requestId": "50000000-0000-4000-8000-000000000005",
+  "planVersionId": "50000000-0000-4000-8000-000000000006",
+  "generatedAt": "2026-09-15T00:00:00.000Z",
+  "definitionRevision": 7,
+  "executionRevision": 3,
+  "inputHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "modelVersion": "aps-cpsat-v1",
+  "solverVersion": "ortools-9.15",
+  "planStatus": "FEASIBLE",
+  "solverStatus": "FEASIBLE",
+  "resultKind": "FEASIBLE",
+  "solverSummary": {
+    "stopReason": "COMPLETED",
+    "wallTimeMillis": 100,
+    "firstSolutionMillis": 50,
+    "objectiveValue": 0,
+    "bestBound": 0,
+    "absoluteGap": 0,
+    "relativeGap": 0,
+    "variableCount": 10,
+    "constraintCount": 10,
+    "searchThreads": 1,
+    "randomSeed": 1,
+    "objectives": []
+  },
+  "candidateHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "candidate": {
+    "horizonStartAt": "2026-09-15T00:00:00.000Z",
+    "horizonEndAt": "2026-09-17T00:00:00.000Z",
+    "jobs": [],
+    "segments": [],
+    "allocations": [],
+    "futureCarryForwardTaskIds": [],
+    "unplannedTaskIds": []
+  },
+  "problems": [
+    {
+      "schemaVersion": "1.0",
+      "contractType": "APS_PROBLEM",
+      "problemId": "50000000-0000-4000-8000-000000000007",
+      "reasonCode": "RESOURCE_OVERLAP",
+      "constraintCode": "APS-BR-11",
+      "severity": "ERROR",
+      "title": "候选存在资源重叠",
+      "detail": "可审查候选不得携带 ERROR。",
+      "retryable": false,
+      "objectRefs": []
+    }
+  ]
+}

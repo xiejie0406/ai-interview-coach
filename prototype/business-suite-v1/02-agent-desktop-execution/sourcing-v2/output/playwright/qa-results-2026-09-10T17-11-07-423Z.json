@@ -1,0 +1,157 @@
+{
+  "runId": "2026-09-10T17-11-07-423Z",
+  "startedAt": "2026-09-10T17-11-07-423Z",
+  "command": "C:\\Users\\admin\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs flows",
+  "exitCode": 1,
+  "environment": {
+    "node": "v24.19.0",
+    "playwright": "1.62.1",
+    "executablePath": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    "base": "http://127.0.0.1:8789/02-agent-desktop-execution/sourcing-v2/",
+    "locale": "zh-CN",
+    "timezone": "Asia/Shanghai",
+    "mode": "独立无登录态 Chrome，仅本地原型 UI；不是真实平台或生产验收",
+    "chromium": "152.0.7977.83"
+  },
+  "summary": {
+    "passed": 8,
+    "failed": 2
+  },
+  "results": [
+    {
+      "label": "表单 / 必填、数量校验、草稿与刷新",
+      "status": "Pass",
+      "elapsedMs": 1592,
+      "detail": {
+        "draft": "QA 包装袋草稿",
+        "quantity": 1000,
+        "persistedAfterRefresh": true
+      }
+    },
+    {
+      "label": "闭环 / 保温杯采集、退回重审、AI缺项追问、报价选择与快照",
+      "status": "Pass",
+      "elapsedMs": 6875,
+      "detail": {
+        "task": "AD-260911-SAL47",
+        "candidates": 3,
+        "validQuotes": 2,
+        "savedTotal": 3760,
+        "csv": "qa-2026-09-10T17-11-07-423Z-selection.csv",
+        "quoteCsv": "qa-2026-09-10T17-11-07-423Z-quotes.csv",
+        "taskIsolation": true
+      }
+    },
+    {
+      "label": "品类 / 包装袋与部分结果确认",
+      "status": "Pass",
+      "elapsedMs": 3285,
+      "detail": {
+        "category": "包装袋",
+        "validQuotes": 1,
+        "targetQuotes": 3,
+        "total": 845,
+        "outcome": "部分结果"
+      }
+    },
+    {
+      "label": "未知品类 / 空状态、手工来源、安全文本与低单价精度",
+      "status": "Fail",
+      "elapsedMs": 3663,
+      "error": "AssertionError [ERR_ASSERTION]: 页面缺少：¥350.00\n    at contains (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs:20:42)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs:174:182\n    at async check (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs:40:24)\n    at async suite (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs:54:77)\n    at async flows (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs:167:3)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs:212:203",
+      "artifact": "qa-2026-09-10T17-11-07-423Z-failure-3"
+    },
+    {
+      "label": "控制 / 暂停、接管、交还、停止与任务隔离",
+      "status": "Fail",
+      "elapsedMs": 7014,
+      "error": "locator.click: Timeout 6500ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-action=\"start\"]')\u001b[22m\n\n    at D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs:179:160\n    at async check (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs:40:24)\n    at async suite (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs:54:77)\n    at async flows (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs:178:3)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs:212:203",
+      "artifact": "qa-2026-09-10T17-11-07-423Z-failure-4"
+    },
+    {
+      "label": "异常 / 发送未知、回查已发与未发、不盲重试",
+      "status": "Pass",
+      "elapsedMs": 2529,
+      "detail": {
+        "firstAttempt": "人工回查未发送",
+        "secondAttempt": "示例回查已发送",
+        "recordsAfterReload": 2
+      }
+    },
+    {
+      "label": "环境 / 离线与登录失效恢复、只读说明",
+      "status": "Pass",
+      "elapsedMs": 2719,
+      "detail": {
+        "offline": "恢复演示在线后核验任务",
+        "auth": "完成演示登录核验后恢复",
+        "readonly": "显式本地能力修复",
+        "realConnections": 0
+      }
+    },
+    {
+      "label": "人工 / AI模板循环、订金要求与询价截止",
+      "status": "Pass",
+      "elapsedMs": 1336,
+      "detail": {
+        "loop": "人工处理",
+        "deposit": "保留原话且未承诺",
+        "timeout": "保留既有报价"
+      }
+    },
+    {
+      "label": "检索 / 空状态、规则仅影响新任务、键盘弹窗",
+      "status": "Pass",
+      "elapsedMs": 1410,
+      "detail": {
+        "taskSearchEmpty": true,
+        "supplierSearchEmpty": true,
+        "newDefaultOnly": true,
+        "escapeClosed": true
+      }
+    },
+    {
+      "label": "运行时 / JavaScript 与外部请求",
+      "status": "Pass",
+      "elapsedMs": 0,
+      "detail": {
+        "pagesVisited": 50,
+        "runtimeErrors": [],
+        "blockedRequests": []
+      }
+    }
+  ],
+  "screenshots": [
+    {
+      "name": "chat-complete",
+      "file": "qa-2026-09-10T17-11-07-423Z-chat-complete.png"
+    },
+    {
+      "name": "quotes-ready",
+      "file": "qa-2026-09-10T17-11-07-423Z-quotes-ready.png"
+    },
+    {
+      "name": "unknown-empty",
+      "file": "qa-2026-09-10T17-11-07-423Z-unknown-empty.png"
+    },
+    {
+      "name": "failure-3",
+      "file": "qa-2026-09-10T17-11-07-423Z-failure-3.png"
+    },
+    {
+      "name": "failure-4",
+      "file": "qa-2026-09-10T17-11-07-423Z-failure-4.png"
+    },
+    {
+      "name": "unknown-send",
+      "file": "qa-2026-09-10T17-11-07-423Z-unknown-send.png"
+    }
+  ],
+  "runtimeErrors": [],
+  "blockedRequests": [],
+  "limitations": [
+    "只验证本地演示数据和状态迁移；不验证真实商品采集、客服发送或回复获取。",
+    "生产 AC-18 跨空间服务端权限、AC-19 外部提示注入防护、AC-20 删除与备份数据生命周期未验证。",
+    "未验证原生 Windows Runner、网络在途发送、模型准确率、平台许可、性能 SLA。"
+  ]
+}

@@ -122,6 +122,104 @@ export const constantRoutes = [
 // 动态路由，基于用户权限动态去加载
 export const dynamicRoutes = [
   {
+    path: '/aps/routes',
+    component: Layout,
+    hidden: true,
+    permissions: ['aps:routing:list'],
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/aps/routes/index.vue'),
+        name: 'ApsRoutes',
+        meta: { title: 'APS 产品与工艺路线', icon: 'tree' }
+      }
+    ]
+  },
+  {
+    path: '/aps/orders',
+    component: Layout,
+    hidden: true,
+    permissions: ['aps:order:list'],
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/aps/orders/index.vue'),
+        name: 'ApsOrders',
+        meta: { title: 'APS 订单与任务展开', icon: 'list' }
+      }
+    ]
+  },
+  {
+    path: '/aps/resources',
+    component: Layout,
+    hidden: true,
+    permissions: ['aps:resource:list'],
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/aps/resources/index.vue'),
+        name: 'ApsResources',
+        meta: { title: 'APS 资源与日历', icon: 'tree-table' }
+      }
+    ]
+  },
+  {
+    path: '/aps/readiness',
+    component: Layout,
+    hidden: true,
+    permissions: ['aps:readiness:view'],
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/aps/readiness/index.vue'),
+        name: 'ApsResourceReadiness',
+        meta: { title: 'APS 资源数据就绪', icon: 'validCode' }
+      }
+    ]
+  },
+  {
+    path: '/aps/workbench',
+    component: Layout,
+    hidden: true,
+    permissions: ['aps:planning:view'],
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/aps/workbench/index.vue'),
+        name: 'ApsProductionWorkbench',
+        meta: { title: 'APS 生产排程工作台', icon: 'chart' }
+      }
+    ]
+  },
+  {
+    path: '/aps/execution',
+    component: Layout,
+    hidden: true,
+    permissions: ['aps:execution:view'],
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/aps/execution/index.vue'),
+        name: 'ApsExecution',
+        meta: { title: 'APS 现场执行', icon: 'time' }
+      }
+    ]
+  },
+  {
+    path: '/aps/reports',
+    component: Layout,
+    hidden: true,
+    permissions: ['aps:report:view'],
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/aps/reports/index.vue'),
+        name: 'ApsReports',
+        meta: { title: 'APS 生产与交期报表', icon: 'chart' }
+      }
+    ]
+  },
+  {
     path: '/system/user-auth',
     component: Layout,
     hidden: true,

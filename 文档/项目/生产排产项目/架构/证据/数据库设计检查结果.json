@@ -1,0 +1,235 @@
+{
+  "generatedAt": "2026-09-12T23:44:20.135Z",
+  "kind": "aps-database-pilot-static-check",
+  "sources": {
+    "design": "文档/项目/生产排产项目/架构/数据库设计.md",
+    "designSha256": "858bc771f738aaeb64a37e648752035166b523e6df25dbc9adcf486d00818515",
+    "sql": "文档/项目/生产排产项目/架构/生产排程数据库基线草案.sql",
+    "sqlSha256": "651de7efb067434bea1d26c0a93089ade3007ebbfb8147974d8c8aa74c3c8c9d"
+  },
+  "runtime": "v24.15.0",
+  "summary": {
+    "status": "Pass",
+    "pass": 17,
+    "fail": 0,
+    "designTables": 29,
+    "sqlCreateStatements": 29,
+    "sqlUniqueTables": 29,
+    "sqlColumns": 477,
+    "sqlForeignKeys": 64,
+    "sqlNamedConstraints": 268
+  },
+  "checks": [
+    {
+      "name": "Design declares one unique M01-M29 table list",
+      "status": "Pass",
+      "detail": {
+        "rows": 29,
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "tables": [
+          "aps_workshop",
+          "aps_work_center",
+          "aps_resource",
+          "aps_resource_skill",
+          "aps_resource_availability",
+          "aps_item",
+          "aps_operation_spec",
+          "aps_operation_phase",
+          "aps_resource_requirement",
+          "aps_route_version",
+          "aps_route_node",
+          "aps_route_edge",
+          "aps_order",
+          "aps_order_line",
+          "aps_production_lot",
+          "aps_task",
+          "aps_task_dependency",
+          "aps_material_demand",
+          "aps_plan_version",
+          "aps_plan_job",
+          "aps_plan_job_member",
+          "aps_plan_segment",
+          "aps_plan_allocation",
+          "aps_plan_lock",
+          "aps_execution_run",
+          "aps_actual_occupancy",
+          "aps_production_report",
+          "aps_output_lot",
+          "aps_quantity_event"
+        ]
+      }
+    },
+    {
+      "name": "SQL CREATE TABLE set and order exactly match the 29-table candidate",
+      "status": "Pass",
+      "detail": {
+        "createStatements": 29,
+        "uniqueTables": 29,
+        "tables": [
+          "aps_workshop",
+          "aps_work_center",
+          "aps_resource",
+          "aps_resource_skill",
+          "aps_resource_availability",
+          "aps_item",
+          "aps_operation_spec",
+          "aps_operation_phase",
+          "aps_resource_requirement",
+          "aps_route_version",
+          "aps_route_node",
+          "aps_route_edge",
+          "aps_order",
+          "aps_order_line",
+          "aps_production_lot",
+          "aps_task",
+          "aps_task_dependency",
+          "aps_material_demand",
+          "aps_plan_version",
+          "aps_plan_job",
+          "aps_plan_job_member",
+          "aps_plan_segment",
+          "aps_plan_allocation",
+          "aps_plan_lock",
+          "aps_execution_run",
+          "aps_actual_occupancy",
+          "aps_production_report",
+          "aps_output_lot",
+          "aps_quantity_event"
+        ]
+      }
+    },
+    {
+      "name": "No deleted, merged, or deferred table is recreated",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "No current table contains factory_id",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "Exactly one physical skill table remains",
+      "status": "Pass",
+      "detail": [
+        "aps_resource_skill"
+      ]
+    },
+    {
+      "name": "SAME_START is preserved in M12/M17 but constrained as a non-executable P0 source rule",
+      "status": "Pass",
+      "detail": {
+        "design": true,
+        "routeEdge": true,
+        "taskDependency": true
+      }
+    },
+    {
+      "name": "Every CREATE TABLE is structurally closed and has unique columns",
+      "status": "Pass",
+      "detail": {
+        "malformed": [],
+        "duplicateColumns": []
+      }
+    },
+    {
+      "name": "Every table uses InnoDB and utf8mb4",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "Every table has an id primary/index key",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "Named constraints are globally unique and at most 64 characters",
+      "status": "Pass",
+      "detail": {
+        "count": 268,
+        "duplicates": [],
+        "overlong": []
+      }
+    },
+    {
+      "name": "All foreign keys target existing UUID columns and have child indexes",
+      "status": "Pass",
+      "detail": {
+        "foreignKeyCount": 64,
+        "errors": []
+      }
+    },
+    {
+      "name": "Plan version enforces at most one current published marker",
+      "status": "Pass",
+      "detail": "generated nullable marker with unique key"
+    },
+    {
+      "name": "Local production report has no mandatory Inbox dependency",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "DDL contains no destructive statement, seed, database creation, or FK bypass",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "Executable DDL contains no obvious PostgreSQL-only syntax",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "Design and SQL contain no NUL bytes or conflict markers",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "Design is explicitly Draft and SQL is Review-only / Not executed",
+      "status": "Pass",
+      "detail": {
+        "designDraft": true,
+        "sqlReviewOnly": true
+      }
+    }
+  ],
+  "notRun": [
+    "MySQL parser or empty-database DDL execution",
+    "CHECK and foreign-key rejection against live data",
+    "Dependency-cycle and cross-table quantity-conservation service rules",
+    "Concurrent solve, publish, report, and recovery transactions",
+    "Query-plan and performance verification",
+    "Backup, restore, migration, or rollback rehearsal",
+    "Application integration, external-system integration, or user acceptance"
+  ]
+}

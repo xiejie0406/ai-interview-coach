@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "contractVersion": "1.0.0",
+  "scope": "FEAT-ADEN-001 synthetic CORE",
+  "terms": {
+    "workspace": "Operator 授权、Task、Runner、Event 与 Audit 的资源隔离根",
+    "operator": "经 RuoYi JWT 认证并同时受 aden:* 权限与 Workspace membership 约束的人类主体",
+    "runner": "使用独立设备凭据与短期 Session 的低权限执行模拟器",
+    "agentWorker": "未来独立机器身份；current OpenAPI 不发布",
+    "streamCursor": "绑定 workspace、Schema、filter、after-sequence 与到期时间的 MAC 不透明游标",
+    "fencingToken": "每次 Delivery 重新领取单调递增、阻止旧 owner 回执的十进制字符串"
+  },
+  "identities": {
+    "external": ["OPERATOR", "RUNNER", "AGENT_WORKER"],
+    "internalActors": ["VALIDATOR", "COORDINATOR", "RUNNER_RECEIPT_ADAPTER"]
+  },
+  "taskStates": [
+    "DRAFT", "VALIDATING", "QUEUED", "RUNNING", "WAITING_USER",
+    "WAITING_EXTERNAL", "CANCEL_REQUESTED", "SUCCEEDED", "FAILED", "CANCELED"
+  ],
+  "publicOperatorCommands": {
+    "SUBMIT_FOR_VALIDATION": "aden:task:command",
+    "REQUEST_CANCEL": "aden:task:cancel"
+  },
+  "internalCommands": [
+    "VALIDATION_PASSED", "VALIDATION_FAILED", "START", "PROGRESS", "COMPLETE",
+    "FAIL", "WAIT_FOR_USER", "WAIT_FOR_EXTERNAL", "RESUME", "CONFIRM_CANCELED"
+  ],
+  "stateActorCommand": [
+    {"from": "DRAFT", "actor": "OPERATOR", "command": "SUBMIT_FOR_VALIDATION", "to": "VALIDATING"},
+    {"from": "VALIDATING", "actor": "VALIDATOR", "command": "VALIDATION_PASSED", "to": "QUEUED"},
+    {"from": "VALIDATING", "actor": "VALIDATOR", "command": "VALIDATION_FAILED", "to": "FAILED"},
+    {"from": "QUEUED", "actor": "RUNNER_RECEIPT_ADAPTER", "command": "START", "to": "RUNNING"},
+    {"from": "QUEUED", "actor": "OPERATOR", "command": "REQUEST_CANCEL", "to": "CANCEL_REQUESTED"},
+    {"from": "RUNNING", "actor": "RUNNER_RECEIPT_ADAPTER", "command": "PROGRESS", "to": "RUNNING"},
+    {"from": "RUNNING", "actor": "RUNNER_RECEIPT_ADAPTER", "command": "COMPLETE", "to": "SUCCEEDED"},
+    {"from": "RUNNING", "actor": "RUNNER_RECEIPT_ADAPTER", "command": "FAIL", "to": "FAILED"},
+    {"from": "RUNNING", "actor": "OPERATOR", "command": "REQUEST_CANCEL", "to": "CANCEL_REQUESTED"},
+    {"from": "WAITING_USER", "actor": "OPERATOR", "command": "REQUEST_CANCEL", "to": "CANCEL_REQUESTED"},
+    {"from": "WAITING_EXTERNAL", "actor": "OPERATOR", "command": "REQUEST_CANCEL", "to": "CANCEL_REQUESTED"},
+    {"from": "CANCEL_REQUESTED", "actor": "RUNNER_RECEIPT_ADAPTER", "command": "CONFIRM_CANCELED", "to": "CANCELED"},
+    {"from": "CANCEL_REQUESTED", "actor": "COORDINATOR", "command": "CONFIRM_CANCELED", "to": "CANCELED", "condition": "no-active-delivery"}
+  ],
+  "wireScalars": {
+    "int64DecimalString": {
+      "minimum": "0",
+      "maximum": "9223372036854775807",
+      "canonical": true,
+      "fields": [
+        "task/version", "event/aggregateVersion", "event/sequence", "runner/credentialEpoch",
+        "runner/sessionEpoch", "delivery/fencingToken", "receipt/receiptSequence", "publicRuoYiBigintId"
+      ]
+    },
+    "int32Bounded": ["attemptNo", "capacity", "batchLimit", "progressPercent"],
+    "opaque": ["ETag", "streamCursor", "pageCursor"]
+  },
+  "errors": [
+    {"http": 400, "errorCode": "ADEN_INVALID_ARGUMENT", "retryable": false},
+    {"http": 400, "errorCode": "ADEN_STREAM_CURSOR_INVALID", "retryable": false},
+    {"http": 401, "errorCode": "ADEN_AUTH_REQUIRED", "retryable": false},
+    {"http": 401, "errorCode": "ADEN_RUNNER_AUTH_INVALID", "retryable": false},
+    {"http": 403, "errorCode": "ADEN_PERMISSION_DENIED", "retryable": false},
+    {"http": 403, "errorCode": "ADEN_EXTERNAL_ACTION_DISABLED", "retryable": false},
+    {"http": 404, "errorCode": "ADEN_TASK_NOT_FOUND", "retryable": false},
+    {"http": 404, "errorCode": "ADEN_RUNNER_NOT_FOUND", "retryable": false},
+    {"http": 409, "errorCode": "ADEN_STATE_TRANSITION_DENIED", "retryable": false},
+    {"http": 409, "errorCode": "ADEN_IDEMPOTENCY_KEY_REUSED", "retryable": false},
+    {"http": 409, "errorCode": "ADEN_RUNNER_LEASE_LOST", "retryable": false},
+    {"http": 409, "errorCode": "ADEN_SESSION_EPOCH_STALE", "retryable": false},
+    {"http": 409, "errorCode": "ADEN_RECEIPT_STALE", "retryable": false},
+    {"http": 409, "errorCode": "ADEN_OUTCOME_UNKNOWN", "retryable": false},
+    {"http": 410, "errorCode": "ADEN_STREAM_CURSOR_EXPIRED", "retryable": false},
+    {"http": 412, "errorCode": "ADEN_VERSION_CONFLICT", "retryable": false},
+    {"http": 422, "errorCode": "ADEN_TASK_VALIDATION_FAILED", "retryable": false},
+    {"http": 428, "errorCode": "ADEN_PRECONDITION_REQUIRED", "retryable": false},
+    {"http": 429, "errorCode": "ADEN_RATE_LIMITED", "retryable": true},
+    {"http": 503, "errorCode": "ADEN_DEPENDENCY_UNAVAILABLE", "retryable": true},
+    {"http": 503, "errorCode": "ADEN_AUDIT_UNAVAILABLE", "retryable": true}
+  ],
+  "compatibility": {
+    "unknownField": "reject",
+    "unknownEnum": "reject",
+    "unknownSchemaVersion": "reject",
+    "currentBreakingChange": "major-version-and-reapproval",
+    "experimentalImportFromCurrent": "forbidden",
+    "secretInExampleOrEvent": "forbidden"
+  }
+}

@@ -1,0 +1,86 @@
+- link "跳到主要内容":
+  - /url: "#main"
+- complementary "主导航":
+  - link "Aden. 采购执行中心":
+    - /url: "#dashboard"
+  - text: 采 品牌采购团队
+  - navigation:
+    - text: 采购工作台
+    - link "工作台":
+      - /url: "#dashboard"
+    - link "采购任务 4":
+      - /url: "#tasks"
+    - link "商品候选池":
+      - /url: "#candidates/AD-260911-SE5C9"
+    - link "供应商会话":
+      - /url: "#conversations/AD-260911-SE5C9"
+    - link "报价对比":
+      - /url: "#quotes/AD-260911-SE5C9"
+    - link "供应商库":
+      - /url: "#suppliers"
+    - text: 管理与设置
+    - link "执行电脑与连接":
+      - /url: "#connections"
+    - link "采购规则":
+      - /url: "#rules"
+    - link "活动日志":
+      - /url: "#activity"
+  - strong: 演示执行环境
+  - text: 真实平台未接入 · 仅本地保存
+  - link "查看环境状态":
+    - /url: "#connections"
+  - text: LC
+  - strong: 林采 · 采购负责人
+  - text: 示例身份
+- banner:
+  - text: 采购工作空间
+  - strong: 供应商会话
+  - text: 已保存在本地 交互原型 · 示例数据
+- main:
+  - text: SOURCING WORKSPACE
+  - heading "供应商会话" [level=1]
+  - paragraph: 让每次沟通都围绕商品条件，保留对方原话与报价证据。
+  - button "演示情景"
+  - button "人工接管"
+  - text: 当前采购任务
+  - combobox "当前采购任务":
+    - option "QA 工业垫片" [selected]
+    - option "秋季品牌活动 · 定制 T 恤采购"
+    - option "门店补货 · 牛皮纸包装袋"
+    - option "客户礼赠 · 定制保温杯"
+  - text: 10,000 件 · 其他品类 · 待确认发送
+  - complementary:
+    - text: 供应商会话 1
+    - link "<img src=x onerror=alert(1)> 垫片厂 身份未知 待确认发送 待确认发送":
+      - /url: "#conversations/AD-260911-SE5C9/AD-260911-SE5C9:conv:manual-mtvse6x1"
+      - heading "<img src=x onerror=alert(1)> 垫片厂" [level=3]
+      - text: 身份未知
+      - paragraph: 待确认发送
+      - text: 待确认发送
+  - heading "<img src=x onerror=alert(1)> 垫片厂" [level=2]
+  - paragraph: =采购接待 · 身份未知 · 身份来自示例资料
+  - text: 待确认发送 本次需求 · 10,000 件 · 杭州
+  - heading "询价已准备好，等待您复核" [level=3]
+  - paragraph: 逐项确认接收人、规格与外发内容后，才会进入演示发送。
+  - text: 您好，我们计划采购 10000 件其他品类，规格：不锈钢 M8 垫片，平面无毛刺，收货城市杭州，最晚交货要求 2026-10-02。请提供含税单价、加工费、包装费、运费、本批固定费用、起订量、交期起算条件（出货或到货）和报价有效期。请仅提供报价，本次咨询不构成采购承诺。 版本 1 · 首次外发需逐项确认
+  - button "复核询价内容"
+  - complementary:
+    - heading "报价信息" [level=3]
+    - paragraph: 等待供应商针对本次需求的回复
+    - text: 页面价格不会自动填作正式报价。
+- status
+- dialog "逐项复核询价与接收人":
+  - banner:
+    - heading "逐项复核询价与接收人" [level=2]
+    - button "关闭"
+  - text: 仅向下方明确勾选的接收对象演示发送。预算上限不在询价中；没有真实消息发出。
+  - heading "<img src=x onerror=alert(1)> 垫片厂" [level=3]
+  - text: 接收人：=采购接待 · 身份未知 · AD-260911-SE5C9
+  - button "退回"
+  - text: 询价正文 · 版本 1
+  - textbox "询价正文 · 版本 1": 您好，我们计划采购 10000 件其他品类，规格：不锈钢 M8 垫片，平面无毛刺，收货城市杭州，最晚交货要求 2026-10-02。请提供含税单价、加工费、包装费、运费、本批固定费用、起订量、交期起算条件（出货或到货）和报价有效期。请仅提供报价，本次咨询不构成采购承诺。
+  - checkbox "我已核对该接收人和当前正文，确认演示发送 不勾选即不发送；修改正文后需重新勾选。"
+  - text: 我已核对该接收人和当前正文，确认演示发送 不勾选即不发送；修改正文后需重新勾选。 确认只对本次接收人和当前内容有效。以后补问受本任务授权范围限制。
+  - contentinfo:
+    - button "暂不发送"
+    - button "演示发送已确认项"

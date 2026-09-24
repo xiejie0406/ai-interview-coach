@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ruoyi</groupId>
+        <artifactId>ruoyi</artifactId>
+        <version>3.9.2</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>aps</artifactId>
+    <packaging>pom</packaging>
+    <name>RuoYi :: APS</name>
+    <description>生产排程模块聚合与工程边界</description>
+
+    <modules>
+        <module>aps-domain</module>
+        <module>aps-application</module>
+        <module>aps-infrastructure-mysql</module>
+        <module>aps-solver-contract</module>
+        <module>aps-constraint-validator</module>
+        <module>aps-solver-ortools</module>
+        <module>aps-api</module>
+        <module>aps-worker</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+        <ortools.version>9.15.6755</ortools.version>
+        <java-json-canonicalization.version>1.1</java-json-canonicalization.version>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.5.2</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>aps-build-baseline</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[3.9.0,4.0.0)</version>
+                                    <message>APS 构建要求 Maven 3.9.x。</message>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>[17,)</version>
+                                    <message>APS 构建要求 JDK 17 或更高版本，产物字节码仍固定为 Java 17。</message>
+                                </requireJavaVersion>
+                                <requireProperty>
+                                    <property>maven.compiler.release</property>
+                                    <regex>^17$</regex>
+                                    <message>APS 字节码目标必须保持为 Java 17。</message>
+                                </requireProperty>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>aps-sbom</id>
+            <activation>
+                <property>
+                    <name>aps.sbom</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.cyclonedx</groupId>
+                        <artifactId>cyclonedx-maven-plugin</artifactId>
+                        <version>2.9.1</version>
+                        <inherited>false</inherited>
+                        <executions>
+                            <execution>
+                                <id>aps-aggregate-sbom</id>
+                                <phase>package</phase>
+                                <goals><goal>makeAggregateBom</goal></goals>
+                                <configuration>
+                                    <outputName>aps-sbom</outputName>
+                                    <outputFormat>all</outputFormat>
+                                    <includeBomSerialNumber>true</includeBomSerialNumber>
+                                    <includeTestScope>false</includeTestScope>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

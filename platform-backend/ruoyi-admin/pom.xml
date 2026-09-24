@@ -17,6 +17,12 @@
 
     <dependencies>
 
+        <!-- 生产健康与 JVM/HTTP 指标；默认只暴露 Spring Boot 的 health 端点 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <!-- spring-boot-devtools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -46,6 +52,28 @@
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-interview</artifactId>
+        </dependency>
+
+        <!-- 服装智能选品与报价业务模块；认证与安全继续由 RuoYi 提供 -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-fashion</artifactId>
+        </dependency>
+
+        <!-- Aden 桌面智能执行平台；身份与安全继续由 RuoYi 提供 -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-aden</artifactId>
+        </dependency>
+
+        <!-- APS HTTP 适配层与 MySQL 持久化适配层；功能默认关闭 -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>aps-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>aps-infrastructure-mysql</artifactId>
         </dependency>
 
         <!-- 定时任务-->

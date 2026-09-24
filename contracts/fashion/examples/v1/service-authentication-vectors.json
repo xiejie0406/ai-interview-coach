@@ -1,0 +1,52 @@
+{
+  "contract": "fashion-service-authentication-v1",
+  "encoding": "UTF-8",
+  "notes": "测试密钥只用于跨语言确定性向量，不得用于任何部署环境。canonical_utf8 末尾没有换行。",
+  "vectors": [
+    {
+      "name": "java-agent-runs-execute",
+      "secret_base64": "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
+      "method": "POST",
+      "raw_path": "/internal/v1/agent-runs:execute",
+      "service_id": "ruoyi-fashion",
+      "key_id": "current",
+      "audience": "fashion-ai-runtime",
+      "timestamp": "1799721000",
+      "nonce": "00000000-0000-4000-8000-000000000001",
+      "body_utf8": "{\"runId\":\"run-001\"}",
+      "content_sha256": "f08729f55ce4df7e5125c728c0112224acfbcc6ecaac181ddb3fabeed3a8bd3b",
+      "canonical_utf8": "FASHION-HMAC-SHA256\nPOST\n/internal/v1/agent-runs:execute\nruoyi-fashion\nfashion-ai-runtime\n1799721000\n00000000-0000-4000-8000-000000000001\nf08729f55ce4df7e5125c728c0112224acfbcc6ecaac181ddb3fabeed3a8bd3b",
+      "signature": "v1=AA_3Re8jy5kY7izB-J7GQH6Y69STfjVbvrGy4nkc9Ho"
+    },
+    {
+      "name": "python-requirement-analysis",
+      "secret_base64": "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
+      "method": "POST",
+      "raw_path": "/internal/v1/requirement-analysis",
+      "service_id": "ruoyi-fashion",
+      "key_id": "current",
+      "audience": "fashion-ai-runtime",
+      "timestamp": "1799721000",
+      "nonce": "00000000-0000-4000-8000-000000000001",
+      "body_utf8": "{\"runId\":\"run-001\"}",
+      "content_sha256": "f08729f55ce4df7e5125c728c0112224acfbcc6ecaac181ddb3fabeed3a8bd3b",
+      "canonical_utf8": "FASHION-HMAC-SHA256\nPOST\n/internal/v1/requirement-analysis\nruoyi-fashion\nfashion-ai-runtime\n1799721000\n00000000-0000-4000-8000-000000000001\nf08729f55ce4df7e5125c728c0112224acfbcc6ecaac181ddb3fabeed3a8bd3b",
+      "signature": "v1=_1YV--qhKNOuReDkszJj2G4X2Qdr6yndo4zRuaYVxrE"
+    },
+    {
+      "name": "python-to-java-agent-runs-execute",
+      "secret_base64": "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
+      "method": "POST",
+      "raw_path": "/internal/v1/agent-runs:execute",
+      "service_id": "fashion-ai-runtime",
+      "key_id": "current",
+      "audience": "ruoyi-fashion",
+      "timestamp": "1799721000",
+      "nonce": "00000000-0000-4000-8000-000000000001",
+      "body_utf8": "{\"runId\":\"run-001\"}",
+      "content_sha256": "f08729f55ce4df7e5125c728c0112224acfbcc6ecaac181ddb3fabeed3a8bd3b",
+      "canonical_utf8": "FASHION-HMAC-SHA256\nPOST\n/internal/v1/agent-runs:execute\nfashion-ai-runtime\nruoyi-fashion\n1799721000\n00000000-0000-4000-8000-000000000001\nf08729f55ce4df7e5125c728c0112224acfbcc6ecaac181ddb3fabeed3a8bd3b",
+      "signature": "v1=FoWrRRSt6fAGGByYy6q2AuZynD7SeJmNuXiKLtY1SGU"
+    }
+  ]
+}

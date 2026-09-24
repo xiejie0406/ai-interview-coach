@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "types": ["vite/client", "vitest/globals"]
+  },
+  "include": [
+    "src/types/aps/**/*.ts",
+    "src/api/aps/**/*.ts",
+    "src/components/aps/**/*.ts",
+    "src/components/aps/**/*.vue",
+    "src/views/aps/**/*.ts",
+    "src/views/aps/**/*.vue",
+    "tests/fixtures/aps/**/*.ts",
+    "tests/unit/aps/**/*.ts",
+    "tests/e2e/aps/**/*.ts"
+  ],
+  "exclude": ["dist", "node_modules"]
+}

@@ -1,0 +1,4650 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/commercial-interview/0.2.0/schemas.json",
+  "title": "Commercial Interview Pilot 0.2.0 Draft Schemas",
+  "description": "2026-09-09 Draft，FEAT-INTERVIEW-002。六项产品方向已接受；技术细则待审。仅MID、SIMULATION、MANUAL_CONFIRM；总分禁止。权限、时钟、归属、跨字段仍由领域校验。 Pilot constraints are draft: server validates ownership, referenced versions, timing sums and state transitions beyond JSON Schema.",
+  "$defs": {
+    "ErrorEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code",
+            "userMessage",
+            "retryable",
+            "correlationId",
+            "details"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96
+            },
+            "userMessage": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "retryable": {
+              "type": "boolean"
+            },
+            "correlationId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "details": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {
+                "currentVersion": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "recoveryAction": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 96
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "VersionPins": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profileVersion",
+        "promptHash",
+        "schemaVersion",
+        "routeVersion",
+        "toolPolicyVersion",
+        "rubricVersionId"
+      ],
+      "properties": {
+        "profileVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "promptHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "schemaVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "routeVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "toolPolicyVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "rubricVersionId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "PlanInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "targetRole",
+        "targetLevel",
+        "topics",
+        "durationMinutes",
+        "mode",
+        "rounds",
+        "practiceMode",
+        "locale",
+        "answerEndPolicy",
+        "timePolicy"
+      ],
+      "properties": {
+        "targetRole": {
+          "type": "string",
+          "enum": [
+            "JAVA_BACKEND"
+          ]
+        },
+        "targetLevel": {
+          "type": "string",
+          "enum": [
+            "MID"
+          ]
+        },
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96
+          },
+          "maxItems": 9,
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "durationMinutes": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 30
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "TEXT",
+            "CASCADE_VOICE"
+          ]
+        },
+        "rounds": {
+          "type": "array",
+          "oneOf": [
+            {
+              "const": [
+                "HR"
+              ]
+            },
+            {
+              "const": [
+                "TECHNICAL"
+              ]
+            },
+            {
+              "const": [
+                "HR",
+                "TECHNICAL"
+              ]
+            }
+          ]
+        },
+        "practiceMode": {
+          "type": "string",
+          "enum": [
+            "SIMULATION"
+          ]
+        },
+        "profileVersionId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "jobDescription": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 10000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "locale": {
+          "const": "zh-CN"
+        },
+        "answerEndPolicy": {
+          "const": "MANUAL_CONFIRM"
+        },
+        "timePolicy": {
+          "const": "EFFECTIVE_TRAINING"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "durationMinutes": {
+                "maximum": 8
+              }
+            },
+            "required": [
+              "durationMinutes"
+            ]
+          },
+          "then": {
+            "properties": {
+              "rounds": {
+                "maxItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "planVersionNo",
+        "state",
+        "mode",
+        "rounds",
+        "durationMinutes",
+        "questionCount",
+        "followUpBudget",
+        "estimatedUsage",
+        "reservationId",
+        "expiresAt",
+        "version",
+        "locale",
+        "answerEndPolicy",
+        "timePolicy",
+        "practiceMode",
+        "reservationExpiresAt",
+        "boundInterviewId"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "planVersionNo": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "DRAFT",
+            "CONFIRMED",
+            "EXPIRED",
+            "CANCELLED"
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "TEXT",
+            "CASCADE_VOICE"
+          ]
+        },
+        "rounds": {
+          "type": "array",
+          "oneOf": [
+            {
+              "const": [
+                "HR"
+              ]
+            },
+            {
+              "const": [
+                "TECHNICAL"
+              ]
+            },
+            {
+              "const": [
+                "HR",
+                "TECHNICAL"
+              ]
+            }
+          ]
+        },
+        "durationMinutes": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 30
+        },
+        "questionCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "followUpBudget": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 12,
+          "description": "Whole-plan cap; per-primary-question remainingFollowUps is capped separately at 2."
+        },
+        "estimatedUsage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "quantity",
+            "unit",
+            "estimateVersion",
+            "productVersion"
+          ],
+          "properties": {
+            "quantity": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1
+            },
+            "unit": {
+              "type": "string",
+              "enum": [
+                "SESSION"
+              ]
+            },
+            "estimateVersion": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "productVersion": {
+              "const": "INVITE_PILOT_V1"
+            }
+          }
+        },
+        "reservationId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "locale": {
+          "const": "zh-CN"
+        },
+        "answerEndPolicy": {
+          "const": "MANUAL_CONFIRM"
+        },
+        "timePolicy": {
+          "const": "EFFECTIVE_TRAINING"
+        },
+        "practiceMode": {
+          "type": "string",
+          "enum": [
+            "SIMULATION"
+          ]
+        },
+        "reservationExpiresAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "boundInterviewId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "durationMinutes": {
+                "maximum": 8
+              }
+            },
+            "required": [
+              "durationMinutes"
+            ]
+          },
+          "then": {
+            "properties": {
+              "rounds": {
+                "maxItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "PlanConfirmation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "acknowledgedEstimateVersion"
+      ],
+      "properties": {
+        "acknowledgedEstimateVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "CreateSession": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "confirmedPlanId",
+        "planVersionNo"
+      ],
+      "properties": {
+        "confirmedPlanId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "planVersionNo": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "RoundView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roundId",
+        "role",
+        "order",
+        "profileVersion",
+        "remainingSeconds",
+        "coverageRatio",
+        "state",
+        "completionReason"
+      ],
+      "properties": {
+        "roundId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "HR",
+            "TECHNICAL"
+          ]
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2
+        },
+        "profileVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "remainingSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "coverageRatio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "PLANNED",
+            "ACTIVE",
+            "COMPLETED",
+            "SKIPPED",
+            "CANCELLED"
+          ]
+        },
+        "completionReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "TurnView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "turnId",
+        "sequence",
+        "kind",
+        "state",
+        "roundId",
+        "role",
+        "questionText",
+        "answerVersionId",
+        "questionVersionId",
+        "presentedAt",
+        "parentTurnId"
+      ],
+      "properties": {
+        "turnId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "PRIMARY",
+            "FOLLOW_UP",
+            "CLARIFICATION"
+          ]
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "PLANNED",
+            "QUESTION_COMMITTED",
+            "ANSWER_CONFIRMED",
+            "CLOSED",
+            "SKIPPED",
+            "CANCELLED",
+            "FAILED"
+          ]
+        },
+        "roundId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "HR",
+            "TECHNICAL"
+          ]
+        },
+        "questionText": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Null in user snapshots before first presentation, or before question generation. Domain context retains the committed question; active presented questions must have text."
+        },
+        "answerVersionId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questionVersionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "presentedAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parentTurnId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "Snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "state",
+        "mode",
+        "practiceMode",
+        "planId",
+        "planVersionNo",
+        "activeRound",
+        "turns",
+        "allowedCommands",
+        "reportState",
+        "reportId",
+        "pendingJobIds",
+        "streamCursor",
+        "recoveryExpiresAt",
+        "failureCode",
+        "version",
+        "contractVersion",
+        "activationState",
+        "usageState",
+        "interactionEpoch",
+        "answerEndPolicy",
+        "timing",
+        "completion"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "READY",
+            "IN_PROGRESS",
+            "PAUSED",
+            "FAILED_RECOVERABLE",
+            "COMPLETING",
+            "COMPLETED",
+            "CANCELLED",
+            "FAILED_FINAL"
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "TEXT",
+            "CASCADE_VOICE"
+          ]
+        },
+        "practiceMode": {
+          "type": "string",
+          "enum": [
+            "SIMULATION"
+          ]
+        },
+        "planId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "planVersionNo": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "activeRound": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RoundView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "turns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TurnView"
+          },
+          "maxItems": 40
+        },
+        "allowedCommands": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "start",
+              "pause",
+              "resume",
+              "skip",
+              "complete",
+              "cancel",
+              "recover"
+            ]
+          },
+          "maxItems": 7
+        },
+        "reportState": {
+          "type": "string",
+          "enum": [
+            "NOT_REQUESTED",
+            "PENDING",
+            "RUNNING",
+            "READY",
+            "PARTIAL",
+            "FAILED",
+            "CANCELLED"
+          ]
+        },
+        "reportId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pendingJobIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "maxItems": 20
+        },
+        "streamCursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "recoveryExpiresAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "failureCode": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "contractVersion": {
+          "const": "0.2.0"
+        },
+        "activationState": {
+          "type": "string",
+          "enum": [
+            "NOT_PREPARED",
+            "AWAITING_PRESENTATION",
+            "ACTIVE",
+            "CLOSED"
+          ]
+        },
+        "usageState": {
+          "type": "string",
+          "enum": [
+            "RESERVED",
+            "IN_USE",
+            "SETTLED",
+            "RELEASED",
+            "RESTORED"
+          ]
+        },
+        "interactionEpoch": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "answerEndPolicy": {
+          "const": "MANUAL_CONFIRM"
+        },
+        "timing": {
+          "$ref": "#/$defs/TrainingTiming"
+        },
+        "completion": {
+          "$ref": "#/$defs/CompletionView"
+        }
+      }
+    },
+    "CommandInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "reasonCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96
+        }
+      }
+    },
+    "AnswerInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "turnId",
+        "turnSequence",
+        "text",
+        "submissionIntent"
+      ],
+      "properties": {
+        "turnId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "turnSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30000
+        },
+        "submissionIntent": {
+          "const": "USER_CONFIRM"
+        }
+      }
+    },
+    "Answer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "answerVersionId",
+        "turnId",
+        "turnSequence",
+        "source",
+        "text",
+        "transcriptVersionId",
+        "assistance",
+        "confirmedAt"
+      ],
+      "properties": {
+        "answerVersionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "turnId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "turnSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "TEXT",
+            "VOICE"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30000
+        },
+        "transcriptVersionId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assistance": {
+          "type": "string",
+          "enum": [
+            "NONE"
+          ]
+        },
+        "confirmedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "AnswerPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items",
+        "nextCursor"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Answer"
+          },
+          "maxItems": 50
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "Operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operationId",
+        "status",
+        "statusUrl",
+        "snapshotUrl",
+        "retryAfterSeconds"
+      ],
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "PENDING",
+            "RUNNING",
+            "SUCCEEDED",
+            "FAILED",
+            "CANCELLED"
+          ]
+        },
+        "statusUrl": {
+          "type": "string",
+          "pattern": "^/api/v2/operations/"
+        },
+        "snapshotUrl": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^/api/v2/interviews/"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "answerVersionId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "retryAfterSeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 30
+        },
+        "error": {
+          "$ref": "#/$defs/ErrorEnvelope"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "FAILED"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "error"
+            ]
+          }
+        }
+      ]
+    },
+    "PreflightInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "turnId",
+        "codecCandidates"
+      ],
+      "properties": {
+        "turnId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "codecCandidates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "maxItems": 8,
+          "minItems": 1
+        }
+      }
+    },
+    "Preflight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "consentRequired",
+        "supportedCodecs",
+        "maxDurationSeconds",
+        "maxBytes",
+        "unavailableReasonCode"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "consentRequired": {
+          "type": "boolean"
+        },
+        "supportedCodecs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "maxItems": 8
+        },
+        "maxDurationSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 180
+        },
+        "maxBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "unavailableReasonCode": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "OpenVoiceInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "turnId",
+        "codec",
+        "expectedSessionVersion"
+      ],
+      "properties": {
+        "turnId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "codec": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "expectedSessionVersion": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "VoiceHandle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "voiceSessionId",
+        "voiceExecutionId",
+        "websocketPath",
+        "socketTicket",
+        "expiresAt",
+        "codec",
+        "protocolVersion",
+        "socketGeneration",
+        "initialServerSequence",
+        "maxInFlightChunks",
+        "maxChunkBytes",
+        "maxBufferedDurationMs",
+        "maxDurationSeconds",
+        "maxBytes"
+      ],
+      "properties": {
+        "voiceSessionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "voiceExecutionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "websocketPath": {
+          "type": "string",
+          "pattern": "^/ws/v2/interviews/"
+        },
+        "socketTicket": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "codec": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "protocolVersion": {
+          "const": 2
+        },
+        "socketGeneration": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "initialServerSequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxInFlightChunks": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "maxChunkBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 262144
+        },
+        "maxBufferedDurationMs": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 2000
+        },
+        "maxDurationSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 180
+        },
+        "maxBytes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "Transcript": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "state",
+        "sessionId",
+        "turnId",
+        "latestVersion",
+        "confirmedVersionId",
+        "version",
+        "quality",
+        "frozenForCompletion"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "DRAFT",
+            "READY",
+            "CONFIRMED",
+            "CANCELLED",
+            "FAILED"
+          ]
+        },
+        "sessionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "turnId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "latestVersion": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "versionNo",
+                "text",
+                "offsetUnit",
+                "lowConfidenceSpans"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "versionNo": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 30000
+                },
+                "offsetUnit": {
+                  "const": "UTF16"
+                },
+                "lowConfidenceSpans": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "start",
+                      "end"
+                    ],
+                    "properties": {
+                      "start": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "end": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    }
+                  },
+                  "maxItems": 100
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "confirmedVersionId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "quality": {
+          "type": "string",
+          "enum": [
+            "RELIABLE",
+            "NEEDS_REVIEW",
+            "UNKNOWN"
+          ]
+        },
+        "frozenForCompletion": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ConfirmTranscript": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transcriptVersionId",
+        "lowConfidenceAcknowledged",
+        "submissionIntent"
+      ],
+      "properties": {
+        "transcriptVersionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "correctedText": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30000
+        },
+        "lowConfidenceAcknowledged": {
+          "type": "boolean"
+        },
+        "submissionIntent": {
+          "const": "USER_CONFIRM"
+        }
+      }
+    },
+    "Evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidenceId",
+        "answerVersionId",
+        "dimensionId",
+        "sourceType",
+        "start",
+        "end",
+        "offsetUnit",
+        "quote",
+        "audioStartMs",
+        "audioEndMs"
+      ],
+      "properties": {
+        "evidenceId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "answerVersionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "dimensionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96
+        },
+        "sourceType": {
+          "type": "string",
+          "enum": [
+            "ANSWER",
+            "TRANSCRIPT"
+          ]
+        },
+        "start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "offsetUnit": {
+          "const": "UTF16"
+        },
+        "quote": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "audioStartMs": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "audioEndMs": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "DimensionJudgement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dimensionId",
+        "status",
+        "anchorLevel",
+        "anchorId",
+        "confidence",
+        "evidenceIds",
+        "reason"
+      ],
+      "properties": {
+        "dimensionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "SCORED",
+            "INSUFFICIENT",
+            "CONFLICTING",
+            "DISPUTED"
+          ]
+        },
+        "anchorLevel": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "anchorId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "confidence": {
+          "type": "string",
+          "enum": [
+            "LOW",
+            "MEDIUM",
+            "HIGH"
+          ]
+        },
+        "evidenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "maxItems": 32,
+          "uniqueItems": true
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "SCORED"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "anchorLevel": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4
+              },
+              "anchorId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "evidenceIds": {
+                "minItems": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "anchorLevel": {
+                "type": "null"
+              },
+              "anchorId": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "RoundReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "rubricVersionId",
+        "coverageRatio",
+        "overallScore",
+        "dimensions",
+        "displayPolicy",
+        "askedCoverageRatio",
+        "coverageGaps"
+      ],
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": [
+            "HR",
+            "TECHNICAL"
+          ]
+        },
+        "rubricVersionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "coverageRatio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "overallScore": {
+          "type": "null"
+        },
+        "dimensions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DimensionJudgement"
+          },
+          "maxItems": 32
+        },
+        "displayPolicy": {
+          "const": "LEVELS_ONLY"
+        },
+        "askedCoverageRatio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "coverageGaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CoverageGap"
+          },
+          "maxItems": 32
+        }
+      }
+    },
+    "ReportView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "interviewId",
+        "state",
+        "reportId",
+        "reportVersion",
+        "inputSnapshotHash",
+        "rounds",
+        "evidence",
+        "strengths",
+        "improvements",
+        "practiceSuggestions",
+        "limitations",
+        "failedStages"
+      ],
+      "properties": {
+        "interviewId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "NOT_REQUESTED",
+            "PENDING",
+            "RUNNING",
+            "READY",
+            "PARTIAL",
+            "FAILED",
+            "CANCELLED"
+          ]
+        },
+        "reportId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reportVersion": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "inputSnapshotHash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rounds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RoundReport"
+          },
+          "maxItems": 2
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "maxItems": 200
+        },
+        "strengths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "maxItems": 10
+        },
+        "improvements": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "maxItems": 10
+        },
+        "practiceSuggestions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "maxItems": 10
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "maxItems": 16
+        },
+        "failedStages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "EVIDENCE",
+              "JUDGE",
+              "COMPOSE"
+            ]
+          },
+          "maxItems": 3
+        }
+      }
+    },
+    "FeedbackInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "category",
+        "comment"
+      ],
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": [
+            "WRONG_EVIDENCE",
+            "SCORING_DISAGREEMENT",
+            "TRANSCRIPTION_ERROR",
+            "OTHER"
+          ]
+        },
+        "dimensionId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "comment": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      }
+    },
+    "FeedbackReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "feedbackId",
+        "status"
+      ],
+      "properties": {
+        "feedbackId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "status": {
+          "const": "RECEIVED"
+        }
+      }
+    },
+    "PriceItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sku",
+        "productVersion",
+        "amountMinor",
+        "currency",
+        "currencyExponent",
+        "sessions",
+        "maxSessionMinutes",
+        "validDays",
+        "autoRenew"
+      ],
+      "properties": {
+        "sku": {
+          "type": "string",
+          "enum": [
+            "TRIAL_V1",
+            "STARTER_3_V1",
+            "PRACTICE_10_V1"
+          ]
+        },
+        "productVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "amountMinor": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "currency": {
+          "const": "CNY"
+        },
+        "currencyExponent": {
+          "const": 2
+        },
+        "sessions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "maxSessionMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "validDays": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 90
+        },
+        "autoRenew": {
+          "const": false
+        }
+      }
+    },
+    "PricingCatalog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "items"
+      ],
+      "properties": {
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PriceItem"
+          },
+          "maxItems": 10
+        }
+      }
+    },
+    "Entitlement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "availableSessions",
+        "reservedSessions",
+        "settledSessions",
+        "expiresAt",
+        "version"
+      ],
+      "properties": {
+        "availableSessions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reservedSessions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "settledSessions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expiresAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "ProfileVersion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profileId",
+        "version",
+        "role",
+        "pins",
+        "status",
+        "maxToolCalls",
+        "maxInputTokens",
+        "maxOutputTokens",
+        "deadlineMs",
+        "createdAt"
+      ],
+      "properties": {
+        "profileId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "HR",
+            "TECHNICAL",
+            "EVIDENCE",
+            "JUDGE",
+            "REPORT"
+          ]
+        },
+        "pins": {
+          "$ref": "#/$defs/VersionPins"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "DRAFT",
+            "PUBLISHED",
+            "RETIRED"
+          ]
+        },
+        "maxToolCalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "maxInputTokens": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12000
+        },
+        "maxOutputTokens": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3000
+        },
+        "deadlineMs": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 30000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "RubricVersion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rubricVersionId",
+        "targetRole",
+        "role",
+        "version",
+        "contentHash",
+        "dimensions"
+      ],
+      "properties": {
+        "rubricVersionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "targetRole": {
+          "type": "string",
+          "enum": [
+            "JAVA_BACKEND"
+          ]
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "HR",
+            "TECHNICAL"
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "contentHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "dimensions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "dimensionId",
+              "title",
+              "weight",
+              "anchors"
+            ],
+            "properties": {
+              "dimensionId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "weight": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1
+              },
+              "anchors": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "anchorId",
+                    "level",
+                    "description"
+                  ],
+                  "properties": {
+                    "anchorId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 96
+                    },
+                    "level": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 4
+                    },
+                    "description": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2000
+                    }
+                  }
+                },
+                "maxItems": 5,
+                "minItems": 5
+              }
+            }
+          },
+          "maxItems": 32,
+          "minItems": 1
+        }
+      }
+    },
+    "AgentContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessionId",
+        "roundId",
+        "role",
+        "targetRole",
+        "targetLevel",
+        "practiceMode",
+        "currentTurn",
+        "confirmedAnswerRefs",
+        "verifiedProfileFacts",
+        "candidateClaims",
+        "coverage",
+        "remainingSeconds",
+        "remainingFollowUps",
+        "allowedActions",
+        "pins",
+        "handoffClaims",
+        "answerEndPolicy",
+        "remainingClarifications"
+      ],
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "roundId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "HR",
+            "TECHNICAL"
+          ]
+        },
+        "targetRole": {
+          "type": "string",
+          "enum": [
+            "JAVA_BACKEND"
+          ]
+        },
+        "targetLevel": {
+          "type": "string",
+          "enum": [
+            "MID"
+          ]
+        },
+        "practiceMode": {
+          "type": "string",
+          "enum": [
+            "SIMULATION"
+          ]
+        },
+        "currentTurn": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TurnView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "confirmedAnswerRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "maxItems": 40
+        },
+        "verifiedProfileFacts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "maxItems": 0
+        },
+        "candidateClaims": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "maxItems": 50
+        },
+        "coverage": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "dimensionId",
+              "status",
+              "evidenceIds",
+              "asked"
+            ],
+            "properties": {
+              "dimensionId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "NOT_COVERED",
+                  "PARTIAL",
+                  "SUFFICIENT",
+                  "CONFLICTING"
+                ]
+              },
+              "evidenceIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "maxItems": 32
+              },
+              "asked": {
+                "type": "boolean"
+              }
+            }
+          },
+          "maxItems": 32
+        },
+        "remainingSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "remainingFollowUps": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2,
+          "description": "Remaining follow-ups for the current primary question; never reset by creating a follow-up turn."
+        },
+        "allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "ASK",
+              "FOLLOW_UP",
+              "CLARIFY",
+              "NEXT",
+              "COMPLETE"
+            ]
+          },
+          "maxItems": 5
+        },
+        "pins": {
+          "$ref": "#/$defs/VersionPins"
+        },
+        "handoffClaims": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/HandoffClaim"
+          },
+          "maxItems": 10
+        },
+        "answerEndPolicy": {
+          "const": "MANUAL_CONFIRM"
+        },
+        "remainingClarifications": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        }
+      }
+    },
+    "InterviewerActionV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "role",
+        "action",
+        "reasonCode",
+        "questionText",
+        "targetDimension",
+        "sourceAnswerVersionIds",
+        "decisionSummary",
+        "coverageUpdates"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "interviewer-action-v2"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "HR",
+            "TECHNICAL"
+          ]
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "ASK",
+            "FOLLOW_UP",
+            "CLARIFY",
+            "NEXT",
+            "COMPLETE"
+          ]
+        },
+        "reasonCode": {
+          "type": "string",
+          "enum": [
+            "INITIAL_QUESTION",
+            "MISSING_DETAIL",
+            "CONTRADICTORY_EVIDENCE",
+            "UNCLEAR_MEANING",
+            "SUFFICIENT_EVIDENCE",
+            "BUDGET_EXHAUSTED",
+            "BLUEPRINT_COMPLETE"
+          ]
+        },
+        "questionText": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "targetDimension": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sourceAnswerVersionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "maxItems": 5,
+          "uniqueItems": true
+        },
+        "decisionSummary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "coverageUpdates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CoverageUpdate"
+          },
+          "maxItems": 32
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "enum": [
+                  "NEXT",
+                  "COMPLETE"
+                ]
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          "then": {
+            "properties": {
+              "questionText": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "questionText": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "targetDimension": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ToolCall": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "callId",
+            "name",
+            "arguments"
+          ],
+          "properties": {
+            "callId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": {
+              "const": "search_questions"
+            },
+            "arguments": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "competencyIds",
+                "difficulty",
+                "excludeQuestionIds",
+                "limit"
+              ],
+              "properties": {
+                "competencyIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "maxItems": 5,
+                  "minItems": 1
+                },
+                "difficulty": {
+                  "type": "string",
+                  "enum": [
+                    "MID"
+                  ]
+                },
+                "excludeQuestionIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "maxItems": 40
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "callId",
+            "name",
+            "arguments"
+          ],
+          "properties": {
+            "callId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": {
+              "const": "read_rubric"
+            },
+            "arguments": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "rubricVersionId"
+              ],
+              "properties": {
+                "rubricVersionId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "callId",
+            "name",
+            "arguments"
+          ],
+          "properties": {
+            "callId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": {
+              "const": "read_evidence"
+            },
+            "arguments": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "answerVersionIds"
+              ],
+              "properties": {
+                "answerVersionIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "maxItems": 5,
+                  "minItems": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "callId",
+            "name",
+            "arguments"
+          ],
+          "properties": {
+            "callId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": {
+              "const": "read_profile_facts"
+            },
+            "arguments": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "section"
+              ],
+              "properties": {
+                "section": {
+                  "type": "string",
+                  "enum": [
+                    "PROJECTS",
+                    "EXPERIENCE",
+                    "SKILLS"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "callId",
+            "name",
+            "arguments"
+          ],
+          "properties": {
+            "callId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": {
+              "const": "search_knowledge"
+            },
+            "arguments": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "query",
+                "competencyIds",
+                "limit"
+              ],
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "competencyIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "maxItems": 5,
+                  "minItems": 1
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 3
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ToolResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "callId",
+        "status",
+        "items",
+        "errorCode"
+      ],
+      "properties": {
+        "callId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "OK",
+            "DENIED",
+            "TIMEOUT",
+            "NOT_FOUND"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "resourceId",
+              "version",
+              "kind",
+              "content"
+            ],
+            "properties": {
+              "resourceId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "QUESTION",
+                  "RUBRIC",
+                  "EVIDENCE",
+                  "PROFILE_FACT",
+                  "KNOWLEDGE"
+                ]
+              },
+              "content": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 8000
+              }
+            }
+          },
+          "maxItems": 5
+        },
+        "errorCode": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "InterviewEventV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "interviewId",
+        "sequence",
+        "aggregateVersion",
+        "occurredAt",
+        "type",
+        "data"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 2
+        },
+        "eventId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "interviewId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "aggregateVersion": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "interview.snapshot.changed",
+            "question.committed",
+            "answer.confirmed",
+            "report.updated",
+            "session.terminal"
+          ]
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": [
+                "READY",
+                "IN_PROGRESS",
+                "PAUSED",
+                "FAILED_RECOVERABLE",
+                "COMPLETING",
+                "COMPLETED",
+                "CANCELLED",
+                "FAILED_FINAL"
+              ]
+            },
+            "reportState": {
+              "type": "string",
+              "enum": [
+                "NOT_REQUESTED",
+                "PENDING",
+                "RUNNING",
+                "READY",
+                "PARTIAL",
+                "FAILED",
+                "CANCELLED"
+              ]
+            },
+            "turnId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "reasonCode": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96
+            }
+          }
+        }
+      }
+    },
+    "VoiceFrameV2": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "client.hello"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "socketTicket"
+              ],
+              "properties": {
+                "socketTicket": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "server.hello"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "codec",
+                "maxInFlightChunks",
+                "maxChunkBytes",
+                "maxBufferedDurationMs"
+              ],
+              "properties": {
+                "codec": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "maxInFlightChunks": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 8
+                },
+                "maxChunkBytes": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 262144
+                },
+                "maxBufferedDurationMs": {
+                  "type": "integer",
+                  "minimum": 100,
+                  "maximum": 2000
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "client.audio.start"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "turnId",
+                "captureId"
+              ],
+              "properties": {
+                "turnId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "captureId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "client.audio.chunk"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "turnId",
+                "captureId",
+                "chunkIndex",
+                "audioBase64"
+              ],
+              "properties": {
+                "turnId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "captureId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "chunkIndex": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "audioBase64": {
+                  "type": "string",
+                  "minLength": 4,
+                  "maxLength": 350000,
+                  "contentEncoding": "base64"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "client.audio.stop"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "captureId",
+                "lastChunkIndex"
+              ],
+              "properties": {
+                "captureId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "lastChunkIndex": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "client.audio.cancel"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "captureId",
+                "reasonCode"
+              ],
+              "properties": {
+                "captureId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "reasonCode": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 96
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "client.ack"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ackSequence"
+              ],
+              "properties": {
+                "ackSequence": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "server.ack"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ackSequence"
+              ],
+              "properties": {
+                "ackSequence": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "server.nack"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "expectedSequence",
+                "reasonCode"
+              ],
+              "properties": {
+                "expectedSequence": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "reasonCode": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 96
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "server.flow_control"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "maxInFlightChunks"
+              ],
+              "properties": {
+                "maxInFlightChunks": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 8
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "transcript.partial"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "captureId",
+                "revision",
+                "text"
+              ],
+              "properties": {
+                "captureId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 30000
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "transcript.final"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "captureId",
+                "transcriptId",
+                "transcriptVersionId"
+              ],
+              "properties": {
+                "captureId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "transcriptId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "transcriptVersionId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "tts.chunk"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "outputId",
+                "chunkIndex",
+                "codec",
+                "audioBase64",
+                "endOfOutput"
+              ],
+              "properties": {
+                "outputId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "chunkIndex": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "codec": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "audioBase64": {
+                  "type": "string",
+                  "maxLength": 350000,
+                  "contentEncoding": "base64"
+                },
+                "endOfOutput": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "tts.state"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "outputId",
+                "state"
+              ],
+              "properties": {
+                "outputId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "STARTED",
+                    "COMPLETED",
+                    "CANCELLED",
+                    "FAILED"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "client.tts.cancel"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "outputId",
+                "reasonCode"
+              ],
+              "properties": {
+                "outputId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "reasonCode": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 96
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "resync.required"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reasonCode",
+                "recoveryAction"
+              ],
+              "properties": {
+                "reasonCode": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 96
+                },
+                "recoveryAction": {
+                  "const": "READ_SNAPSHOT"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "voice.degraded"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reasonCode",
+                "recoveryAction"
+              ],
+              "properties": {
+                "reasonCode": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 96
+                },
+                "recoveryAction": {
+                  "type": "string",
+                  "enum": [
+                    "RECORD_AGAIN",
+                    "USE_TEXT",
+                    "READ_SNAPSHOT"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "terminal"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reasonCode",
+                "recoverable"
+              ],
+              "properties": {
+                "reasonCode": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 96
+                },
+                "recoverable": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "client.tts.replay"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "turnId"
+              ],
+              "properties": {
+                "turnId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "protocolVersion",
+            "type",
+            "frameId",
+            "interviewId",
+            "voiceSessionId",
+            "generation",
+            "sequence",
+            "payload"
+          ],
+          "properties": {
+            "protocolVersion": {
+              "const": 2
+            },
+            "type": {
+              "const": "client.playback.started"
+            },
+            "frameId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "interviewId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "voiceSessionId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "generation": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "outputId",
+                "turnId"
+              ],
+              "properties": {
+                "outputId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "turnId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "TrainingTiming": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policyVersion",
+        "totalBudgetSeconds",
+        "consumedSeconds",
+        "remainingSeconds",
+        "clockState",
+        "clockReason",
+        "asOf",
+        "confirmationDeadlineAt"
+      ],
+      "properties": {
+        "policyVersion": {
+          "const": "effective-training-v1"
+        },
+        "totalBudgetSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1800
+        },
+        "consumedSeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1800
+        },
+        "remainingSeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1800
+        },
+        "clockState": {
+          "type": "string",
+          "enum": [
+            "NOT_STARTED",
+            "RUNNING",
+            "SYSTEM_WAIT",
+            "PAUSED",
+            "EXHAUSTED",
+            "STOPPED"
+          ]
+        },
+        "clockReason": {
+          "type": "string",
+          "enum": [
+            "PREPARING",
+            "QUESTION_VISIBLE",
+            "USER_ACTIVITY",
+            "ASR_WAIT",
+            "MODEL_WAIT",
+            "TTS_WAIT",
+            "USER_PAUSE",
+            "DISCONNECTED",
+            "BUDGET_EXHAUSTED",
+            "TERMINAL"
+          ]
+        },
+        "asOf": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "confirmationDeadlineAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "CompletionView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "intentId",
+        "reason",
+        "resumeTarget",
+        "inputSnapshotHash",
+        "excludedPendingAnswer"
+      ],
+      "properties": {
+        "intentId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "USER_COMPLETE",
+                "BUDGET_EXHAUSTED",
+                "USER_CANCEL",
+                "RECOVERY_EXPIRED"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resumeTarget": {
+          "type": "string",
+          "enum": [
+            "INTERACTION",
+            "COMPLETION",
+            "NONE"
+          ]
+        },
+        "inputSnapshotHash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "excludedPendingAnswer": {
+          "type": "boolean"
+        }
+      }
+    },
+    "CoverageGap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dimensionId",
+        "reason"
+      ],
+      "properties": {
+        "dimensionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "NOT_ASKED",
+            "SKIPPED",
+            "INSUFFICIENT",
+            "CONFLICTING",
+            "TRANSCRIPT_UNRELIABLE",
+            "TIME_EXHAUSTED",
+            "DISPUTED"
+          ]
+        }
+      }
+    },
+    "CoverageUpdate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dimensionId",
+        "evidenceStatus",
+        "sourceAnswerVersionIds",
+        "reason"
+      ],
+      "properties": {
+        "dimensionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96
+        },
+        "evidenceStatus": {
+          "type": "string",
+          "enum": [
+            "NOT_COVERED",
+            "PARTIAL",
+            "SUFFICIENT",
+            "CONFLICTING"
+          ]
+        },
+        "sourceAnswerVersionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "maxItems": 5
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        }
+      }
+    },
+    "HandoffClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim",
+        "sourceAnswerVersionIds"
+      ],
+      "properties": {
+        "claim": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "sourceAnswerVersionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "maxItems": 5
+        }
+      }
+    },
+    "CompleteInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expectedLastAnswerVersionId",
+        "pendingAnswerDisposition",
+        "reasonCode"
+      ],
+      "properties": {
+        "expectedLastAnswerVersionId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pendingAnswerDisposition": {
+          "type": "string",
+          "enum": [
+            "NONE",
+            "DISCARD"
+          ]
+        },
+        "reasonCode": {
+          "type": "string",
+          "enum": [
+            "USER_COMPLETE"
+          ]
+        }
+      }
+    },
+    "PresentationInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "turnId",
+        "questionVersionId",
+        "startAcknowledged",
+        "channel"
+      ],
+      "properties": {
+        "turnId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "questionVersionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "startAcknowledged": {
+          "type": "boolean"
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "TEXT",
+            "VOICE"
+          ]
+        }
+      }
+    },
+    "InteractionLeaseInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "interactionEpoch",
+        "sequence",
+        "turnId"
+      ],
+      "properties": {
+        "interactionEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "turnId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "InteractionLease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "interactionEpoch",
+        "ackSequence",
+        "expiresAt",
+        "timing"
+      ],
+      "properties": {
+        "interactionEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "ackSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "timing": {
+          "$ref": "#/$defs/TrainingTiming"
+        }
+      }
+    },
+    "VoiceCapabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "source",
+        "observedAt",
+        "supportedCodecs",
+        "unavailableReasonCode"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "source": {
+          "const": "CONFIGURATION"
+        },
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "supportedCodecs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "maxItems": 8
+        },
+        "unavailableReasonCode": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "SessionSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "interviewId",
+        "createdAt",
+        "state",
+        "reportState",
+        "rounds",
+        "recoveryExpiresAt"
+      ],
+      "properties": {
+        "interviewId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "READY",
+            "IN_PROGRESS",
+            "PAUSED",
+            "FAILED_RECOVERABLE",
+            "COMPLETING",
+            "COMPLETED",
+            "CANCELLED",
+            "FAILED_FINAL"
+          ]
+        },
+        "reportState": {
+          "type": "string",
+          "enum": [
+            "NOT_REQUESTED",
+            "PENDING",
+            "RUNNING",
+            "READY",
+            "PARTIAL",
+            "FAILED",
+            "CANCELLED"
+          ]
+        },
+        "rounds": {
+          "type": "array",
+          "oneOf": [
+            {
+              "const": [
+                "HR"
+              ]
+            },
+            {
+              "const": [
+                "TECHNICAL"
+              ]
+            },
+            {
+              "const": [
+                "HR",
+                "TECHNICAL"
+              ]
+            }
+          ]
+        },
+        "recoveryExpiresAt": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "SessionPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items",
+        "nextCursor"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SessionSummary"
+          },
+          "maxItems": 50
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "CandidateProfileInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "confirmedByUser",
+        "projects"
+      ],
+      "properties": {
+        "confirmedByUser": {
+          "const": true
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "myResponsibility",
+              "technologies",
+              "outcomeClaim"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "myResponsibility": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "technologies": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 96
+                },
+                "maxItems": 20
+              },
+              "outcomeClaim": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "maxItems": 5
+        }
+      }
+    },
+    "CandidateProfileView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profileVersionId",
+        "sourceType",
+        "content",
+        "createdAt",
+        "version"
+      ],
+      "properties": {
+        "profileVersionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sourceType": {
+          "const": "USER_CONFIRMED_SELF_REPORT"
+        },
+        "content": {
+          "$ref": "#/$defs/CandidateProfileInput"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

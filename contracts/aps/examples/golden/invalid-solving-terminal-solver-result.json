@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0",
+  "contractType": "SOLVER_RESULT",
+  "requestId": "50000000-0000-4000-8000-000000000001",
+  "planVersionId": "50000000-0000-4000-8000-000000000002",
+  "generatedAt": "2026-09-15T00:00:00.000Z",
+  "definitionRevision": 7,
+  "executionRevision": 3,
+  "inputHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "modelVersion": "aps-cpsat-v1",
+  "solverVersion": "ortools-9.15",
+  "planStatus": "SOLVING",
+  "solverStatus": "INFEASIBLE",
+  "resultKind": "INFEASIBLE_PROVEN",
+  "solverSummary": {
+    "stopReason": "COMPLETED",
+    "wallTimeMillis": 100,
+    "firstSolutionMillis": null,
+    "objectiveValue": null,
+    "bestBound": null,
+    "absoluteGap": null,
+    "relativeGap": null,
+    "variableCount": 10,
+    "constraintCount": 10,
+    "searchThreads": 1,
+    "randomSeed": 1,
+    "objectives": []
+  },
+  "candidateHash": null,
+  "candidate": null,
+  "problems": []
+}

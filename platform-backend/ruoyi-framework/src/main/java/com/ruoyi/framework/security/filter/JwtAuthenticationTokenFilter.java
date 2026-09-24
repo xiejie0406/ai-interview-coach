@@ -32,6 +32,28 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter
             throws ServletException, IOException
     {
         LoginUser loginUser = tokenService.getLoginUser(request);
+        // 浏览器 WebSocket 的同一若依令牌必须在 SecurityFilterChain 授权之前解析。
+        // 只接受语音升级路径的子协议，不开放匿名端点，也不接受 query token。
+        if (loginUser == null && "GET".equals(request.getMethod())
+                && "websocket".equalsIgnoreCase(request.getHeader("Upgrade"))
+                && request.getRequestURI().matches("/ws/v1/interviews/[0-9a-fA-F-]{36}/voice"))
+        {
+            String protocols = request.getHeader("Sec-WebSocket-Protocol");
+            if (protocols != null)
+            {
+                String bearer = null;
+                for (String protocol : protocols.split(","))
+                {
+                    String candidate = protocol.trim();
+                    if (candidate.startsWith("ruoyi-bearer."))
+                    {
+                        if (bearer != null) { bearer = null; break; }
+                        bearer = candidate.substring("ruoyi-bearer.".length());
+                    }
+                }
+                if (bearer != null && !bearer.isBlank()) loginUser = tokenService.getLoginUserByToken(bearer);
+            }
+        }
         if (StringUtils.isNotNull(loginUser) && StringUtils.isNull(SecurityUtils.getAuthentication()))
         {
             tokenService.verifyToken(loginUser);

@@ -1,0 +1,8 @@
+{
+  "code": 409,
+  "msg": "幂等键已用于不同请求",
+  "data": null,
+  "errorCode": "ADEN_IDEMPOTENCY_KEY_REUSED",
+  "retryable": false,
+  "correlationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+}

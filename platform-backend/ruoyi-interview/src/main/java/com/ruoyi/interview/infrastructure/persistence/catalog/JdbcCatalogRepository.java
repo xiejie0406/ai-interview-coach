@@ -322,6 +322,14 @@ public class JdbcCatalogRepository implements CatalogRepository, PublishedQuesti
     }
 
     @Override
+    public Optional<RubricVersion> findPublishedRubric(TenantId tenantId, ImmutableVersionRef questionVersion,
+                                                     ImmutableVersionRef rubricVersion) {
+        if (findPublishedVersion(tenantId, questionVersion, rubricVersion).isEmpty()) return Optional.empty();
+        return findRubricVersion(tenantId, rubricVersion.resourceId()).filter(r ->
+                r.versionRef().equals(rubricVersion) && r.questionVersionId().equals(questionVersion.resourceId()));
+    }
+
+    @Override
     public Optional<PublishedQuestionSnapshot> findPublishedVersion(
             TenantId tenantId,
             ImmutableVersionRef questionVersion,

@@ -1,0 +1,60 @@
+# FEAT-FASHION-001 服装智能选品生产首版：控制页
+
+> 文档类型：Feature 控制页；版本：0.4.26；文档状态：Draft  
+> Feature：FEAT-FASHION-001；风险：L2  
+> 当前阶段：Stage 8 审查验证；阶段状态：InProgress  
+> owner：用户维护产品方向与执行包批准；Codex 维护计划和实际工程事实；业务验收人待实际指定  
+> 批准记录：2026-09-12 用户已确认产品与架构基线，并批准 `IMP-01`～`IMP-10` 十阶段执行包、授权进入编码；2026-09-13 `IMP-01`～`IMP-09` Completed / Pass，`IMP-10` WaitingForApproval / Blocked  
+> 创建日期：2026-09-12；更新日期：2026-09-13
+
+## 1. 当前结论
+
+本 Feature 已完成从商品与数据、客户需求、1～4 品类选品与人工搭配、图片工作台、确定性报价到 PPTX/CSV/ZIP/JPG 交付的生产代码闭环。当前处于 **Stage 8 审查验证 / InProgress**；`IMP-01`～`IMP-09` 已经 Completed / Pass，`IMP-10` 的本地容量、并发、重启、逻辑恢复、安全、文件检查、候选输入离线预检和共享后台 18 模块聚合打包已通过；生产候选环境、真实 Provider 质量试点和正式 UAT 尚无执行条件，因此为 WaitingForApproval / Blocked。当前 `ReleaseReady=No`，尚未发布。
+
+P0 恰好落在三个代码项目中：
+
+| 代码项目 | P0 落点 | 权威职责 | 当前事实 |
+| --- | --- | --- | --- |
+| `platform-backend/` | Maven 模块 `ruoyi-fashion` | 身份与 RBAC、MySQL 业务事实、商品当前价、库存、方案、报价、事务、预算、业务幂等、审计和 AI 结果采用；物理落表只采用数据库设计 v2.3 的 16 张表 | 九个业务模块及文件/运维 API 已完成；129 项 Java 回归、本地 10 万级容量、20 并发、恢复、完整 Java 进程重启（含重启前后 AI Worker 自动处理已超时 Run）及 Java↔Python 真网络/Python 重启已取证；共享后台 18/18 模块聚合打包通过 |
+| `admin-web/` | `fashion` 功能模块 | 内部销售和商品运营页面，只调用 Java API | 设置、商品、数据、客户、方案、Agent、选品、图片、报价、交付和运维页面已完成；11 files / 37 tests、构建及 Chrome 7/7 通过，浏览器证据使用 Mock Java API |
+| `fashion-ai-runtime/` | 唯一 Python 3.12 AI Runtime | 需求解析、候选排序、搭配、提示、Provider 适配、护栏、trace 和 eval | 严格契约、候选、安全护栏、40 任务 evaluator 及候选就绪最终离线门已完成，151 tests、Ruff、Pyright 通过；Provider 仍 disabled，真实质量试点和 UAT NotRun |
+
+`contracts/fashion/` 是三个项目共享的契约目录，不是第四个部署项目。P0 不纳入 `portal-web/`、`mobile/` 或浏览器扩展；浏览器不得直接调用 Python Runtime。
+
+## 2. 唯一事实源与入口
+
+| 事实 | 唯一入口 | 当前状态 |
+| --- | --- | --- |
+| REQ 01–17、AC 01–32 产品正文 | [产品需求文档](../../产品/产品需求文档.md) | Draft v1.4；本 Feature 不复制正文 |
+| 跨项目技术架构 | [技术架构设计](../../架构/技术架构设计.md) | 当前目标入口；批准状态以该文档实际记录为准 |
+| 数据库字段、关系与物理表清单 | [数据库设计 v2.3](../../架构/数据库设计.md) | 唯一数据库事实源；P0 为 6 模块 16 张 `fq_*` 业务表，migration 已在临时隔离 MySQL 验证 |
+| 本 Feature 范围映射 | [功能规格](功能规格.md) | Draft；已按 P0 边界收敛 |
+| 本 Feature 技术落点 | [技术设计](技术设计.md) | Draft；IMP-01 双向契约已冻结，真实 Provider-ready 仍未成立 |
+| 唯一生产任务事实源 | [任务清单](任务清单.md) | v0.4.32；`IMP-01`～`IMP-09` Completed / Pass，`IMP-10` WaitingForApproval / Blocked |
+| 实际工程检查 | [验证记录](验证记录.md) | IMP-01～09 退出门已关闭；IMP-10 本地检查通过、外部条件阻断已记录 |
+| 用户或业务验收 | [验收记录](验收记录.md) | UAT 阶段 NotStarted；场景证据 NotRun |
+| Python 内部 API 契约 | [`contracts/fashion/ai-runtime.openapi.yaml`](../../../../../contracts/fashion/ai-runtime.openapi.yaml) | 需求分析、商品属性与选品搭配均已确定性导出；与 Java Gateway、共享 Schema 和认证规范共同构成内部契约基线 |
+
+## 3. 已定边界
+
+- Java 是业务真相和授权边界；Python 不直连服装业务 MySQL，不计算或确认最终价格、库存、预算、报价和采用状态。
+- 首期每个 SKU 只有一套当前销售价；客户价、渠道价、阶梯价和预约价属于 P1，不提前设计为 P0 已支持。
+- P0 数据库只包含商品资料、库存、客户、报价方案、导入管理、AI Agent 六个模块的 T01–T16。价格和库存采用当前表加导入批次/明细留痕；已确认的 `fq_quote`、`fq_quote_combo`、`fq_quote_detail` 三层记录本身就是历史报价版本。
+- 六张 AI 生命周期表由 Java/MySQL 持有；Python Runtime 不建立第二套 Agent、对话、消息、Run 或 Step 状态源。
+- 归档第一版只供追溯，禁止用于生成 DDL、实体、Mapper、兼容表或任务。P0 不建独立导入模板、AI 反馈、报价快照、价格版本、库存版本、审计、预算账本或 outbox 表；相关能力按当前数据库设计和 RuoYi 平台边界实现。
+- Python 输出只能是候选或待人工确认草案；Java 必须按当前商品、价格、库存、方案版本和权限重新校验后才能采用。
+- 浏览器只访问 `platform-backend`；不向前端暴露 Python 地址、Provider 密钥或内部 trace。
+- Provider 默认 disabled。服务认证、解析前 body limit、通用 Run 的 MySQL 租约/fencing/idempotency、选品冻结/采用、图片异步复核、确定性报价和文件交付已经完成；共享 `ruoyi-admin.jar` 在隔离 MySQL 上的不同 Java PID 重启、Java↔Python 本机 HTTP socket 与 Python 不同 PID 重启均已验证，候选环境私网 TLS、多实例及真实 Provider 质量试点仍未执行。
+
+## 4. 独立审查结论与阻断门
+
+开工前独立审查允许保留 fail-closed disabled Python 骨架；2026-09-13 的 IMP-01 复核进一步批准了当前 Java/Python 双向契约基线，但不表示 Runtime 已达到真实 Provider-ready。
+
+下列门关闭前，不得启用真实 Provider或声称生产闭环完成：
+
+1. Java ↔ Python 身份、授权、请求/响应版本、超时、错误和采用语义继续以 IMP-01 冻结契约为准，不得在后续实现中漂移。
+2. 解析前请求体大小限制和单进程重放保护已通过；多实例前必须替换共享 nonce store，并继续保持实际字节限制。
+3. 通用 Agent Run 的租约、fencing、幂等、晚到结果、取消及 MySQL 重启/逻辑恢复已在本地隔离环境取证；候选环境多实例演练仍未执行。
+4. T01–T16 migration 和 IMP-02～IMP-10 的本地数据库验证已通过；真实 Provider、候选环境文件兼容和 UAT 仍须分别取得实际证据。
+
+`IMP-01`～`IMP-09` 已完成并通过各自退出门，当前实现已到达“商品/数据 → 客户需求 → 选品搭配 → 图片复核 → 报价冻结 → 文件交付与运维”。IMP-10 的本地工程检查也已执行，外部阻断与最小输入见[阶段 10 证据](证据/阶段-10/生产候选本地验证与上线就绪评估.md)。任何任务状态变化只回写唯一[任务清单](任务清单.md)；正式验收决定只写入[验收记录](验收记录.md)。

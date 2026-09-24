@@ -1,0 +1,135 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Aden Runner API",
+    "version": "1.0.0",
+    "description": "FEAT-ADEN-001 current low-privilege Runner simulator surface. RuoYi user JWT and future Agent Worker credentials are never accepted. Body DTOs are external JSON Schema refs."
+  },
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "x-aden-example-manifest": "../examples/manifest.json",
+  "tags": [{"name": "Runner session"}, {"name": "Runner delivery"}],
+  "paths": {
+    "/api/v1/aden/runner/v1/sessions": {
+      "post": {
+        "operationId": "createRunnerSession",
+        "tags": ["Runner session"],
+        "security": [{"RunnerCredential": []}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateRunnerSessionRequest"}}}},
+        "responses": {
+          "201": {"description": "New highest-epoch active Session; sessionToken is returned once", "headers": {"Cache-Control": {"schema": {"type": "string", "const": "no-store"}}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RunnerSession"}}}},
+          "400": {"$ref": "#/components/responses/InvalidArgument"},
+          "401": {"$ref": "#/components/responses/RunnerAuthInvalid"},
+          "409": {"$ref": "#/components/responses/Conflict"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/api/v1/aden/runner/v1/sessions/{sessionId}/heartbeats": {
+      "post": {
+        "operationId": "heartbeatRunnerSession",
+        "tags": ["Runner session"],
+        "security": [{"RunnerSession": []}],
+        "parameters": [{"$ref": "#/components/parameters/SessionId"}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SessionHeartbeatRequest"}}}},
+        "responses": {
+          "200": {"description": "Session lease refreshed; heartbeat emits no domain event/audit", "headers": {"Cache-Control": {"schema": {"type": "string", "const": "no-store"}}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SessionHeartbeatResponse"}}}},
+          "400": {"$ref": "#/components/responses/InvalidArgument"},
+          "401": {"$ref": "#/components/responses/RunnerAuthInvalid"},
+          "409": {"$ref": "#/components/responses/Conflict"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/api/v1/aden/runner/v1/deliveries:claim": {
+      "post": {
+        "operationId": "claimRunnerDeliveries",
+        "tags": ["Runner delivery"],
+        "security": [{"RunnerSession": []}],
+        "parameters": [{"$ref": "#/components/parameters/IdempotencyKey"}],
+        "description": "Idempotency-Key and body claimRequestId identify one logical claim. Same key/hash replays the exact live batch; changed hash conflicts; expired original lease returns ADEN_RUNNER_LEASE_LOST.",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClaimDeliveriesRequest"}}}},
+        "responses": {
+          "200": {"description": "Bounded lease batch; an empty items array is valid", "headers": {"Cache-Control": {"schema": {"type": "string", "const": "no-store"}}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ClaimDeliveriesResponse"}}}},
+          "400": {"$ref": "#/components/responses/InvalidArgument"},
+          "401": {"$ref": "#/components/responses/RunnerAuthInvalid"},
+          "409": {"$ref": "#/components/responses/Conflict"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/api/v1/aden/runner/v1/deliveries/{deliveryId}/heartbeats": {
+      "post": {
+        "operationId": "heartbeatRunnerDelivery",
+        "tags": ["Runner delivery"],
+        "security": [{"RunnerSession": []}],
+        "parameters": [{"$ref": "#/components/parameters/DeliveryId"}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DeliveryHeartbeatRequest"}}}},
+        "responses": {
+          "200": {"description": "Delivery lease refreshed and current cancel instruction returned", "headers": {"Cache-Control": {"schema": {"type": "string", "const": "no-store"}}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DeliveryHeartbeatResponse"}}}},
+          "400": {"$ref": "#/components/responses/InvalidArgument"},
+          "401": {"$ref": "#/components/responses/RunnerAuthInvalid"},
+          "409": {"$ref": "#/components/responses/Conflict"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/api/v1/aden/runner/v1/deliveries/{deliveryId}/receipts": {
+      "post": {
+        "operationId": "submitRunnerReceipt",
+        "tags": ["Runner delivery"],
+        "security": [{"RunnerSession": []}],
+        "parameters": [{"$ref": "#/components/parameters/DeliveryId"}, {"$ref": "#/components/parameters/IdempotencyKey"}],
+        "description": "Runner submits a typed receipt, never a Task command. The server adapter validates Session epoch, owner, fence, lease and receipt sequence before deriving an internal domain command.",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ReceiptRequest"}}}},
+        "responses": {
+          "200": {"description": "Receipt accepted or exact prior result replayed", "headers": {"Cache-Control": {"schema": {"type": "string", "const": "no-store"}}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ReceiptResponse"}}}},
+          "400": {"$ref": "#/components/responses/InvalidArgument"},
+          "401": {"$ref": "#/components/responses/RunnerAuthInvalid"},
+          "409": {"$ref": "#/components/responses/Conflict"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "RunnerCredential": {"type": "apiKey", "in": "header", "name": "Authorization", "description": "Exactly: AdenCredential <credentialId.secret>. It is accepted only by Session exchange.", "x-aden-auth-scheme": "AdenCredential"},
+      "RunnerSession": {"type": "apiKey", "in": "header", "name": "Authorization", "description": "Exactly: AdenRunner <sessionId.secret>. It is never accepted by Operator or Agent paths.", "x-aden-auth-scheme": "AdenRunner"}
+    },
+    "parameters": {
+      "SessionId": {"name": "sessionId", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}},
+      "DeliveryId": {"name": "deliveryId", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}},
+      "IdempotencyKey": {"name": "Idempotency-Key", "in": "header", "required": true, "schema": {"type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"}}
+    },
+    "headers": {
+      "CorrelationId": {"description": "Request correlation UUID", "schema": {"type": "string", "format": "uuid"}},
+      "RetryAfter": {"description": "Bounded retry delay in seconds", "schema": {"type": "integer", "minimum": 1, "maximum": 300}}
+    },
+    "schemas": {
+      "ErrorEnvelope": {"$ref": "../schemas/current/common.schema.json#/$defs/ErrorEnvelope"},
+      "CreateRunnerSessionRequest": {"$ref": "../schemas/current/runner.schema.json#/$defs/CreateRunnerSessionRequest"},
+      "RunnerSession": {"$ref": "../schemas/current/runner.schema.json#/$defs/RunnerSession"},
+      "SessionHeartbeatRequest": {"$ref": "../schemas/current/runner.schema.json#/$defs/SessionHeartbeatRequest"},
+      "SessionHeartbeatResponse": {"$ref": "../schemas/current/runner.schema.json#/$defs/SessionHeartbeatResponse"},
+      "ClaimDeliveriesRequest": {"$ref": "../schemas/current/runner.schema.json#/$defs/ClaimDeliveriesRequest"},
+      "ClaimDeliveriesResponse": {"$ref": "../schemas/current/runner.schema.json#/$defs/ClaimDeliveriesResponse"},
+      "TaskPackage": {"$ref": "../schemas/current/runner.schema.json#/$defs/TaskPackage"},
+      "DeliveryHeartbeatRequest": {"$ref": "../schemas/current/runner.schema.json#/$defs/DeliveryHeartbeatRequest"},
+      "DeliveryHeartbeatResponse": {"$ref": "../schemas/current/runner.schema.json#/$defs/DeliveryHeartbeatResponse"},
+      "ReceiptRequest": {"$ref": "../schemas/current/runner.schema.json#/$defs/ReceiptRequest"},
+      "ReceiptResponse": {"$ref": "../schemas/current/runner.schema.json#/$defs/ReceiptResponse"}
+    },
+    "responses": {
+      "InvalidArgument": {"description": "Malformed input", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}},
+      "RunnerAuthInvalid": {"description": "Credential/Session invalid at authentication time, including expired, revoked or already superseded Session; real HTTP 401", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}},
+      "Conflict": {"description": "Idempotency, post-auth Session epoch, lease, fence or receipt sequence conflict; no state advancement", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}},
+      "RateLimited": {"description": "Bounded retry allowed", "headers": {"Retry-After": {"$ref": "#/components/headers/RetryAfter"}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}},
+      "Unavailable": {"description": "Dependency or audit unavailable", "headers": {"Retry-After": {"$ref": "#/components/headers/RetryAfter"}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}}
+    }
+  }
+}

@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.example.internal/fashion/schemas/v1/internal-common.schema.json",
+  "title": "Fashion internal service common contract v1",
+  "type": "object",
+  "$defs": {
+    "contractVersion": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "stableId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "dateTimeWithOffset": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 时间；必须包含 Z 或明确 UTC offset。"
+    },
+    "runAttempt": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647,
+      "description": "首次执行为 0；每次合法接管后单调递增。"
+    },
+    "attemptNo": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647,
+      "description": "同一 call_key 的首次真实外部尝试为 1；重试单调递增。"
+    },
+    "fencingToken": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9223372036854775807,
+      "description": "Java 权威分配的单调栅栏令牌；旧令牌不得产生新副作用。"
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "traceId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{32}$"
+    },
+    "runState": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "running",
+        "waiting_approval",
+        "succeeded",
+        "failed",
+        "cancel_requested",
+        "cancelled",
+        "unknown"
+      ]
+    },
+    "stepType": {
+      "type": "string",
+      "enum": [
+        "model",
+        "tool",
+        "handoff",
+        "guardrail",
+        "human_approval",
+        "checkpoint"
+      ]
+    },
+    "stepState": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "running",
+        "waiting_approval",
+        "succeeded",
+        "failed",
+        "skipped",
+        "cancelled",
+        "unknown"
+      ]
+    },
+    "errorCode": {
+      "type": "string",
+      "enum": [
+        "SERVICE_AUTHENTICATION_FAILED",
+        "SERVICE_NOT_AUTHORIZED",
+        "DEADLINE_EXCEEDED",
+        "IDEMPOTENCY_CONFLICT",
+        "VERSION_CONFLICT",
+        "FENCING_CONFLICT",
+        "LEASE_EXPIRED",
+        "RUN_TERMINAL",
+        "DELEGATION_EXPIRED",
+        "PAYLOAD_TOO_LARGE",
+        "REQUEST_VALIDATION_FAILED",
+        "BUDGET_EXCEEDED",
+        "RATE_LIMITED",
+        "PROVIDER_DISABLED",
+        "DEPENDENCY_UNAVAILABLE",
+        "UPSTREAM_TIMEOUT",
+        "INTERNAL_ERROR"
+      ]
+    },
+    "fieldViolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "reason"],
+      "properties": {
+        "field": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        }
+      }
+    },
+    "errorDetail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "retryable"],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/errorCode"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "description": "稳定、安全、不可包含请求正文、Secret、SQL 或内部堆栈的消息。"
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "retry_after_seconds": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 86400
+        },
+        "field_violations": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/$defs/fieldViolation"
+          }
+        }
+      }
+    },
+    "errorEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "request_id",
+        "correlation_id",
+        "run_id",
+        "trace_id",
+        "error"
+      ],
+      "properties": {
+        "version": {
+          "$ref": "#/$defs/contractVersion"
+        },
+        "request_id": {
+          "anyOf": [
+            { "$ref": "#/$defs/uuid" },
+            { "type": "null" }
+          ]
+        },
+        "correlation_id": {
+          "anyOf": [
+            { "$ref": "#/$defs/stableId" },
+            { "type": "null" }
+          ]
+        },
+        "run_id": {
+          "anyOf": [
+            { "$ref": "#/$defs/stableId" },
+            { "type": "null" }
+          ]
+        },
+        "trace_id": {
+          "anyOf": [
+            { "$ref": "#/$defs/traceId" },
+            { "type": "null" }
+          ]
+        },
+        "error": {
+          "$ref": "#/$defs/errorDetail"
+        }
+      }
+    },
+    "executionIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "run_attempt",
+        "execution_lease_id",
+        "fencing_token"
+      ],
+      "properties": {
+        "run_id": {
+          "$ref": "#/$defs/stableId"
+        },
+        "run_attempt": {
+          "$ref": "#/$defs/runAttempt"
+        },
+        "execution_lease_id": {
+          "$ref": "#/$defs/stableId"
+        },
+        "fencing_token": {
+          "$ref": "#/$defs/fencingToken"
+        }
+      }
+    }
+  }
+}

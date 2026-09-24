@@ -1,0 +1,30 @@
+{
+  "at": "2026-09-10T17:10:50.387Z",
+  "results": [
+    {
+      "label": "数量门槛编辑与共同批次网络层级",
+      "result": "Pass",
+      "detail": {
+        "dep": {
+          "taskId": "A10",
+          "type": "quantity",
+          "qty": 40,
+          "lag": 10
+        },
+        "layout": {
+          "A20": 534,
+          "B20": 534,
+          "A30": 792
+        }
+      }
+    },
+    {
+      "label": "主数据流程浏览器异常",
+      "result": "Pass",
+      "detail": {
+        "errors": []
+      }
+    }
+  ],
+  "errors": []
+}

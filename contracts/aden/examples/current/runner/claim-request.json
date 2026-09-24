@@ -1,0 +1,6 @@
+{
+  "claimRequestId": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+  "capabilities": ["CORE"],
+  "capacity": 2,
+  "batchLimit": 1
+}

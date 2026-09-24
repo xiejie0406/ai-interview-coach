@@ -1,0 +1,36 @@
+# APS 生产排程功能在完成后续阶段前保持默认关闭。
+# 本文件只声明配置边界，不会创建数据源、启动 Worker 或执行求解。
+aps:
+  enabled: ${APS_ENABLED:false}
+  api:
+    enabled: ${APS_API_ENABLED:false}
+  persistence:
+    enabled: ${APS_PERSISTENCE_ENABLED:false}
+  reporting:
+    # 报表查询可能扫描较大时间窗，必须与 API/数据源分别显式启用。
+    enabled: ${APS_REPORTING_ENABLED:false}
+  flyway:
+    # 迁移必须和 APS 总开关、持久化开关、独立数据源开关同时显式开启。
+    enabled: ${APS_FLYWAY_ENABLED:false}
+    locations: ${APS_FLYWAY_LOCATIONS:classpath:db/migration/aps}
+    table: ${APS_FLYWAY_TABLE:aps_flyway_schema_history}
+  solver:
+    enabled: ${APS_SOLVER_ENABLED:false}
+  worker:
+    enabled: ${APS_WORKER_ENABLED:false}
+    polling-enabled: ${APS_WORKER_POLLING_ENABLED:false}
+  site:
+    code: ${APS_SITE_CODE:}
+    zone-id: ${APS_ZONE_ID:Asia/Shanghai}
+  datasource:
+    # APS 独立数据源；不得复用或覆盖 RuoYi 主数据源。
+    enabled: ${APS_DATASOURCE_ENABLED:false}
+    url: ${APS_DB_URL:}
+    username: ${APS_DB_USERNAME:}
+    password: ${APS_DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    connect-timeout-ms: ${APS_DB_CONNECT_TIMEOUT_MS:5000}
+    socket-timeout-ms: ${APS_DB_SOCKET_TIMEOUT_MS:30000}
+    initial-size: ${APS_DB_INITIAL_SIZE:0}
+    min-idle: ${APS_DB_MIN_IDLE:0}
+    max-active: ${APS_DB_MAX_ACTIVE:8}

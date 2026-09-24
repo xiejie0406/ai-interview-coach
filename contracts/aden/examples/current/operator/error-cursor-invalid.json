@@ -1,0 +1,8 @@
+{
+  "code": 400,
+  "msg": "事件游标无效或不属于当前工作空间",
+  "data": null,
+  "errorCode": "ADEN_STREAM_CURSOR_INVALID",
+  "retryable": false,
+  "correlationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+}

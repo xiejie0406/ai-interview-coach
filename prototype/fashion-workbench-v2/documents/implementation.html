@@ -1,0 +1,417 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>织选 · 交互设计与实施规格</title><style>body{margin:0;color:#293c31;background:#f4f5ef;font:15px/1.9 "Microsoft YaHei",system-ui,sans-serif}nav{position:sticky;top:0;background:#fafcf6f5;border-bottom:1px solid #dce3d5;padding:17px 5%;display:flex;gap:24px;flex-wrap:wrap;backdrop-filter:blur(8px)}a{color:#365e43;text-decoration:none}a:hover{text-decoration:underline}nav a[aria-current]{font-weight:bold}main{max-width:1100px;padding:42px 55px;margin:30px auto;background:white;border:1px solid #dfe5d8;border-radius:14px}h1{font-size:30px;line-height:1.5}h2{font-size:23px;margin-top:42px;border-bottom:1px solid #e2e8dc;padding-bottom:12px}h3{font-size:18px;margin-top:28px}h4{font-size:16px}p{margin:14px 0}blockquote{border-left:3px solid #6b8a58;margin:20px 0;padding:8px 20px;background:#f4f7ef;color:#6b765f}table{border-collapse:collapse;width:100%;font-size:12px;margin:20px 0;display:block;overflow:auto}th,td{border:1px solid #dfe5d9;padding:10px 13px;min-width:100px;vertical-align:top}th{background:#eff4e9}tr:nth-child(even){background:#fafcf7}code{font-size:.9em;background:#f0f3ed;padding:2px 5px;border-radius:4px}pre{overflow:auto;padding:18px;background:#f1f4ec;border-radius:8px}pre code{padding:0}footer{font-size:11px;color:#86917d;margin-top:35px;border-top:1px solid #e1e7db;padding-top:20px;overflow-wrap:anywhere}button{border:1px solid #bacaae;color:#3a5f3a;border-radius:6px;background:white;padding:5px 14px;cursor:pointer}@media(max-width:700px){main{margin:12px;padding:24px 20px}nav{gap:12px;font-size:12px}h1{font-size:25px}}@media print{nav{display:none}body{background:white}main{padding:0;margin:0;max-width:none;border:0}h2,h3{break-after:avoid}tr{break-inside:avoid}table{display:table;font-size:10px}a{color:inherit}footer{display:none}}</style></head><body><nav><a href="../index.html">织选工作台 ↗</a><a href="prd.html" >产品需求 PRD v1.4</a><a href="research.html" >市场产品调研</a><a href="implementation.html" aria-current="page">交互设计与实施规格</a><button onclick="print()">打印 / 保存 PDF</button></nav><main><h1>服装工作台原型设计与生产任务转交</h1>
+<blockquote>
+<p>文档类型：原型设计与生产任务转交 · 版本：1.2 · 文档状态：Draft<br>创建日期：2026-09-11 · 更新日期：2026-09-12 · owner：Codex 按用户授权设计与实施；用户负责产品方向<br>上游：<a href="prd.html">产品需求文档</a> · 控制入口：<a href="../../../文档/项目/智能选品项目/README.md">项目说明</a> · 原型结果事实源：<a href="../../../文档/项目/智能选品项目/原型/服装工作台原型验证记录.md">服装工作台原型验证记录</a><br>适用范围：完整本地原型及生产接入背景；生产任务唯一事实源为 <a href="../../../文档/项目/智能选品项目/功能/FEAT-FASHION-001-服装智能选品生产首版/任务清单.md">FEAT-FASHION-001 任务清单</a></p>
+</blockquote>
+<p>本文保留完整原型的设计、契约意图和执行历史，不复制 REQ、BR 或 AC 正文。用户要求自行完成 PRD 与完整原型，已覆盖安全可逆的本地实现、实际文件处理和定向验证。普通产品取舍沿用 PRD v1.4 保留的既定默认，不重复等待提问。原型 TASK 01–07 已冻结为历史计划，TASK 08 已转交生产 Feature；从 2026-09-12 起，本文件不再作为生产任务状态源。</p>
+<h2>1 执行范围与选择</h2>
+<p>本地原型放在 <code>prototype/fashion-workbench-v2/</code>，采用现有工作区可用浏览器与脚本能力，形成独立静态页面及可维护的业务模块。原有 <code>prototype/business-suite-v1/</code>、其他产品原型、用户原始 Word 和 AI Interview Coach 业务工程均保持其既有责任边界。本次不借服装原型改动面试训练生产模块。</p>
+<p>采用这一方案是因为完整原型需要真实上传解析、状态保存、图片采用、报价和文件生成，可直接以浏览器操作验证；单张静态设计图无法验证这些动作。后续生产实现采用“Vue 3/TypeScript 前端 + Spring Boot/RuoYi 业务控制面 + 独立 Python AI Runtime”的边界：Java 继续承担权限、业务事实、事务和正式副作用，Python 承担模型编排、结构化 AI 输出与评测。完整边界见<a href="../../../文档/项目/智能选品项目/架构/Python智能体架构设计.md">Python 智能体架构设计</a>，不得把可修改的浏览器状态或模型输出当生产账本。</p>
+<table>
+<thead>
+<tr>
+<th>设计决定</th>
+<th>本地原型</th>
+<th>生产目标与迁移要求</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>商品、批次、方案</td>
+<td>本原型专属持久化；保存失败保持上一可读取版本</td>
+<td>数据库事务、导入批次与当前行版本的服务端并发检查</td>
+</tr>
+<tr>
+<td>文件解析</td>
+<td>浏览器实际读取 XLSX/CSV/图片/ZIP，提供预览与错误报告</td>
+<td>服务端重复校验、文件隔离区及受控存储，客户端结果不能直接发布</td>
+</tr>
+<tr>
+<td>需求与候选</td>
+<td>可解释规则解析/筛选，明确“规则推荐/示例理解”；人工可修正</td>
+<td>可接语言模型提出候选，但硬约束与 SKU 存在性由业务服务决定</td>
+</tr>
+<tr>
+<td>图片任务</td>
+<td>明示样例任务、用户已有生成图上传、真实素材拼版</td>
+<td>供应商适配器及任务队列；真实输入、响应和费用记录</td>
+</tr>
+<tr>
+<td>报价</td>
+<td>确定性金额、配比、库存和版本检查，形成对客确认版本</td>
+<td>同一规则在服务端验证并锁定报价主表、组合和明细，客户端预览不是最终授权</td>
+</tr>
+<tr>
+<td>PPTX</td>
+<td>依据已确认报价版本实际生成文件，原生文本/表格和嵌入图片</td>
+<td>后台异步导出、访问控制与下载审计，模板版本和产物哈希可追溯</td>
+</tr>
+<tr>
+<td>权限</td>
+<td>角色切换展示允许/拒绝场景</td>
+<td>真实身份、字段权限、客户归属、下载鉴权，不能复用角色切换作为认证</td>
+</tr>
+<tr>
+<td>恢复</td>
+<td>本地工作区备份、结构校验后恢复、限定范围重置</td>
+<td>定时数据库/媒体备份和隔离恢复演练，按 PRD 的 RPO/RTO 验证</td>
+</tr>
+</tbody></table>
+<p>在安装依赖或启动服务前确认实际目录、脚本、端口与进程影响，优先使用已捆绑依赖和仅绑定本机的静态服务；不全局安装、不占用现有服务端口、不上传用户商品或客户数据。新增依赖需有来源、版本和许可记录。无 Git 授权时不暂存、提交、分支、推送或发布。</p>
+<h2>2 模块、页面与业务边界</h2>
+<p>页面入口包括总览、商品库、导入更新、京东素材、客户方案、搭配工作台、图片工作台、报价交付及设置/恢复。销售主路径从方案开始，商品运营主路径从导入与素材开始；未完成数据会作为方案阻断项返回对应页面。</p>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>负责事实</th>
+<th>禁止承担的职责</th>
+<th>直接上游</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Catalog</td>
+<td>款色、SKU、状态、人工确认属性</td>
+<td>从图片猜定价格、库存或材质成分事实</td>
+<td>REQ 01、05</td>
+</tr>
+<tr>
+<td>Imports</td>
+<td>文件校验、冻结范围、差异、批次版本与恢复</td>
+<td>缺行归零、部分发布严格全量、未知 SKU 自动建档</td>
+<td>REQ 01–03</td>
+</tr>
+<tr>
+<td>Media</td>
+<td>京东映射、来源权限、图片预览、主图版本</td>
+<td>自动声称已采图、标题匹配后免人工确认</td>
+<td>REQ 04–05</td>
+</tr>
+<tr>
+<td>Planning</td>
+<td>客户条件、1–4槽位、候选、锁定、替换与数量</td>
+<td>因候选不足放宽硬约束、模型虚构商品</td>
+<td>REQ 06–08</td>
+</tr>
+<tr>
+<td>Images</td>
+<td>样例/真实/上传任务来源、复核、采用和版本关联</td>
+<td>将拼版作为模型成功，将旧版本结果自动采用</td>
+<td>REQ 09–11</td>
+</tr>
+<tr>
+<td>Quotation</td>
+<td>确定性金额、SKU配比、库存时效、例外与已确认报价版本</td>
+<td>将候选总额混加、信任客户端权限、重算历史</td>
+<td>REQ 12–15</td>
+</tr>
+<tr>
+<td>Delivery</td>
+<td>已确认报价预览、PPTX/图片/ZIP输出、导出记录</td>
+<td>生成途中读取当前价格、把客户下载当成交</td>
+<td>REQ 16–17</td>
+</tr>
+<tr>
+<td>Workspace</td>
+<td>保存/备份/恢复、角色场景、用量与审计</td>
+<td>清理其他项目存储、保存生产 Secret</td>
+<td>PRD 第11–12节</td>
+</tr>
+</tbody></table>
+<p>原型脚本的接口约定由 <a href="../module-contract.md">module-contract.md</a> 维护，实际模块按该约定协作。它是原型内部约定，不能取代未来服务端 OpenAPI，也不另定义价格、税费或库存业务规则。</p>
+<h2>3 数据设计与不变量</h2>
+<p>本节维护模块级数据意图；后续数据库表、字段、关系、索引和事务取舍的唯一详细正文为<a href="../../../文档/项目/智能选品项目/架构/数据库设计.md">数据库设计 v2.3</a>。首期按六个模块共 16 张 <code>fq_*</code> 业务表实施：10 张核心业务表覆盖商品/库存、客户、报价交付和导入，6 张 AI 表覆盖 Agent 主数据与版本、对话与消息、运行与步骤。固定导入模板随版本化代码/配置发布，不建模板表；采用/拒绝写运行状态、图片审核写方案图片记录，首期不建通用 AI 反馈表。确认后锁定 <code>fq_quote + fq_quote_combo + fq_quote_detail</code> 自身留档，修订复制新报价版本，不另建快照表；AI 运行输出经人工采用和业务重验后才写业务表。该文档不代表生产数据库已经建立或迁移完成。</p>
+<h3>3 1 对象与键</h3>
+<p>外部导入的字段、缺省值和校验以 PRD 第6节为唯一正文。以下说明持久化关系与并发信息，字段名可由正式代码契约映射。</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>主键/关键约束</th>
+<th>关系、版本与写入者</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>商品资料（SKU）</td>
+<td>source + sku 唯一；source + style + color + size 唯一</td>
+<td>一张商品表保存款号、颜色、尺码、单位、图片与当前销售价；页面可按款号和颜色分组，下架保留历史引用</td>
+</tr>
+<tr>
+<td>商品当前价格</td>
+<td>与商品SKU一对一，不是独立业务表</td>
+<td>salePrice、币种、税口径和asOf直接更新商品行并立即生效；完整价格批次在导入明细保留前后值，首期不支持预约调价</td>
+</tr>
+<tr>
+<td>当前库存</td>
+<td>product + warehouse 唯一</td>
+<td>availableQty、asOf和核实来源；库存批次与价格批次独立，历史变化由导入明细追溯</td>
+</tr>
+<tr>
+<td>商品图片</td>
+<td>当前图片随商品资料维护，文件按内容摘要识别</td>
+<td>源链接、用途许可和imageVersion；确认报价明细冻结实际图片键、摘要和版本</td>
+</tr>
+<tr>
+<td>导入批次</td>
+<td>batchId + 文件摘要 + 范围 + 业务时间</td>
+<td>原文件、列映射、冻结SKU清单、校验结果、逐行前后值和操作者</td>
+</tr>
+<tr>
+<td>客户与报价</td>
+<td>customerId、quoteId、quoteRowVersion；owner及授权成员</td>
+<td>客户、brief、versionNo、状态；当前售价从商品读取，内部备注不进入对客投影</td>
+</tr>
+<tr>
+<td>组合及配比</td>
+<td>comboId + quoteId + visualHash；<code>fq_quote_detail</code> 引用真实SKU</td>
+<td>1–4互异 <code>slot_code</code>，明细 <code>qty</code> 守恒，锁定商品、顺序、采购套数、图像采用记录</td>
+</tr>
+<tr>
+<td>方案图片记录</td>
+<td>quoteImageId + requestKey</td>
+<td>comboVisualHash、输入图版本、来源模式、供应商ID、1–4个结果、复核、费用状态</td>
+</tr>
+<tr>
+<td>确认报价留档</td>
+<td>quoteNo + versionNo，不可覆盖已确认内容</td>
+<td>方案、组合和明细三层冻结白名单对客字段、完整金额数量、取价批次、素材与模板版本</td>
+</tr>
+<tr>
+<td>导出记录与文件</td>
+<td>quoteFileId + confirmedQuoteId + rendererVersion + fileType</td>
+<td>只读确认报价；记录状态、文件摘要/大小和生成时间，下载前重新检查访问权和素材禁用</td>
+</tr>
+<tr>
+<td>操作审计</td>
+<td>复用 RuoYi 操作日志能力和业务关联ID，不新增 <code>fq_audit_log</code></td>
+<td>操作者、动作、对象、时间、前后版本、原因；实施时核实现有平台落点，不保存秘密或完整凭据</td>
+</tr>
+</tbody></table>
+<h3>3 2 必须在实现中保持的约束</h3>
+<p>金额在原型内使用安全范围内的整数分和明确舍入；生产数据库统一使用 <code>DECIMAL(16,2)</code> 元，百分率使用 <code>DECIMAL(5,2)</code> 的百分数值，服务端采用十进制定点运算并按分币舍入，禁止二进制浮点累计。UI 输入先校验允许精度再转换，不能先四舍五入后接受非法输入。平均每套价格仅用于展示。</p>
+<p>每个组合的品类数等于互异槽位数，SKU尺码行数不会增加品类数；每个槽位的 <code>fq_quote_detail.qty</code> 之和等于采购套数。备选按候选分别检查；合并先逐组合检查配比，再跨组合汇总 SKU，报价优惠/费用只计算一次。候选生成、人工替换、报价预检应调用同一业务校验，避免三个页面各自计算出不同结果。</p>
+<p>确认时把当前明确对客数据写入并锁定 <code>fq_quote + fq_quote_combo + fq_quote_detail</code> 三层稳定记录，不保留可变商品对象引用，也不另建快照表。导出只读该已确认报价版本，不能再次取最新价格。素材本体版本稳定，后续禁用产生新的禁止使用事实，既不悄悄换历史图片，也不允许绕开禁用再次外发。</p>
+<p>浏览器存储有容量与事务限制。原型须在克隆状态上完成校验，持久化成功后再替换当前状态；写入失败不提示成功。大图缩略图和实际下载素材需要保持明确关联，不能仅保存临时 <code>blob:</code> 地址导致刷新失图。生产把大文件放受控对象存储，数据库记录引用、版本、摘要和权限；存储 URL 不是业务主键。</p>
+<h3>3 3 版本迁移与恢复</h3>
+<p>工作区备份含 schemaVersion、导出时间、数据版本和全部必要集合及素材引用，恢复先校验 JSON/文件结构、已知schema、金额/数量范围、对象引用和文件限制。恢复动作在确认范围后一次替换本原型状态，保留现有数据的可导出恢复途径；未知未来schema拒绝写入。</p>
+<p>生产数据库迁移先备份并记录行数/校验摘要，采取兼容新增字段 → 回填 → 校验 → 切换读写的顺序；移除旧字段或不可逆数据转换须形成实际迁移与恢复执行包。原型本地备份不是生产数据库迁移工具，不自动把示例客户、示例供应商账单或角色状态导入生产。</p>
+<h2>4 服务契约意图</h2>
+<p>本节定义未来业务接口职责与失败语义，正式开发时由单一 OpenAPI/类型 schema 维护字段，不另把 Markdown 维护为第二套机器契约。原型的浏览器函数不是外部公共 API。Java 与 Python 的 Agent Run、事件、Tool Gateway、鉴权、幂等和暂停恢复职责由<a href="../../../文档/项目/智能选品项目/架构/Python智能体架构设计.md">Python 智能体架构设计</a>维护，实施时同样收敛为生成双端类型的机器契约。</p>
+<table>
+<thead>
+<tr>
+<th>接口职责（候选路径）</th>
+<th>输入/输出边界</th>
+<th>权限与一致性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>POST /imports/validate</code></td>
+<td>原文件标识、类型、范围、映射、业务时间；返回batchId、差异、行错误、覆盖数和baseDataHash</td>
+<td>运营所属范围；冻结商品范围与当前行版本；错误批次不能发布</td>
+</tr>
+<tr>
+<td><code>POST /imports/{id}/publish</code></td>
+<td>batchId、expectedScopeHash、baseDataHash、确认差异摘要；返回成功批次与更新行数</td>
+<td>运营范围；幂等键；范围或当前数据变化返回冲突，在一个事务中更新当前商品价格或库存行</td>
+</tr>
+<tr>
+<td><code>POST /imports/{id}/restore</code></td>
+<td>历史batchId、选择before/after、当前baseDataHash、恢复原因</td>
+<td>运营/管理员；创建新的restore批次，保留目标值原asOf和完整前后值</td>
+</tr>
+<tr>
+<td><code>POST /products/{id}/images</code>、<code>POST /products/{id}/images/{imageId}:confirm</code></td>
+<td>文件、商品映射、来源/使用范围；返回商品图片版本</td>
+<td>运营范围；内容与格式检查；主图变更发出受影响引用提示</td>
+</tr>
+<tr>
+<td><code>POST /quotes</code>、<code>PATCH /quotes/{id}</code></td>
+<td>客户需求、expectedRowVersion；返回 quoteId 和新 rowVersion</td>
+<td>本人或分配范围；字段白名单；旧行版本写入返回409；已确认版本不得覆盖</td>
+</tr>
+<tr>
+<td><code>POST /quotes/{id}/combos:generate</code></td>
+<td>明确确认条件、档位、数量、模式与锁定项</td>
+<td>返回库内SKU候选和约束原因；异步结果带 quoteRowVersion</td>
+</tr>
+<tr>
+<td><code>POST /quote-images</code></td>
+<td>quoteId、comboId、comboVisualHash、输入商品/图版本、画幅、模式、张数和费用上限</td>
+<td>权限和额度先检查；重复 requestKey 复用记录；后台密钥调用供应商</td>
+</tr>
+<tr>
+<td><code>GET /quote-images/{id}</code>、取消/复核动作</td>
+<td>返回当前状态、1–4个结果和账单状态；复核写输入版本与原因</td>
+<td>报价访问权；终态规则与晚到结果隔离；取消不承诺退款</td>
+</tr>
+<tr>
+<td><code>POST /quotes/{id}:validate</code>、<code>POST /quotes/{id}:confirm</code></td>
+<td>expectedRowVersion 及商务参数；返回阻断清单或已确认 quoteId/versionNo</td>
+<td>服务端重算金额/配比/库存/权限；确认后锁定三层记录，不建快照表</td>
+</tr>
+<tr>
+<td><code>POST /quote-files</code>、<code>GET /quote-files/{id}</code></td>
+<td>confirmedQuoteId、quoteHash、rendererVersion 与 fileType；返回记录及受控下载</td>
+<td>输出对客白名单；同确认报价幂等；下载再次鉴权与检查禁用素材</td>
+</tr>
+<tr>
+<td>配置/额度/备份接口</td>
+<td>管理设置、版本及操作原因</td>
+<td>管理/运维权限；不把完整内部备份暴露给普通销售</td>
+</tr>
+</tbody></table>
+<p>变更请求携带 <code>expectedRowVersion</code> 和稳定幂等键；请求身份来自服务端认证，不接受 body 中伪造的 role。接口读取也按客户归属及字段过滤。耗时动作先返回受理状态和记录ID，任务受理不是图片或PPT成功。</p>
+<table>
+<thead>
+<tr>
+<th>错误类别</th>
+<th>面向用户的结果</th>
+<th>可重试规则</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>输入/格式错误（400/422）</td>
+<td>行/字段错误及修正入口</td>
+<td>修正后新校验；不对同样非法输入自动重试</td>
+</tr>
+<tr>
+<td>无权限/身份失效（403/401）</td>
+<td>拒绝访问，保留允许恢复的草稿</td>
+<td>重新登录或实际授权后重试，不自动换管理员身份</td>
+</tr>
+<tr>
+<td>版本冲突（409）</td>
+<td>展示已有新版本、差异和本地副本</td>
+<td>重新载入/合并/复制后新请求；不能覆盖旧baseVersion</td>
+</tr>
+<tr>
+<td>素材禁用/版本作废（410或业务拒绝）</td>
+<td>明确不可再次对客交付，指向修订流程</td>
+<td>先换素材或新确认，不重试原禁止对象</td>
+</tr>
+<tr>
+<td>额度或频率限制（429/业务拒绝）</td>
+<td>显示剩余额度/配额及已有排队任务</td>
+<td>等待有效配额；禁止前端循环重试绕开上限</td>
+</tr>
+<tr>
+<td>依赖或网络故障（503/超时）</td>
+<td>保留任务ID与“待查结果”或明确失败</td>
+<td>先回查；确定未受理才有限重提，真实费用状态保持</td>
+</tr>
+</tbody></table>
+<h2>5 状态、并发和外部任务</h2>
+<h3>5 1 状态转换</h3>
+<p>导入正常路径为“待校验 → 待确认 → 发布中 → 成功”；校验错误转“校验失败”，发布前可“取消”，数据冲突回到需重新校验。成功后的修正通过新批次或显式历史恢复完成，不把原成功批次改写为另一份文件。发布事务失败整批回滚，商品价格或库存保持事务前状态，同时保留失败批次。</p>
+<p>报价草稿编辑使 <code>row_version</code> 递增；候选和图片请求保存 <code>quoteRowVersion/comboVisualHash</code>。返回结果与当前版本相符才可进入当前可复核集合，否则标记为旧输入结果。锁定项与请求一起保存；编辑过程中晚到结果不得覆盖人工修改。价格/库存更新不是直接改写报价，而是添加需复核原因。</p>
+<p>图片任务的供应商执行状态与业务复核状态分别维护。执行成功表示有候选文件，人工采用表示该文件经过对应版本复核；取消、生成失败、未采用都不是已采用。未知执行结果要继续回查，不能以网络超时作为重复扣费的理由。原图拼版交付可继续业务，但任务仍保留真实失败或降级原因。</p>
+<p>报价草稿通过预检后锁定当前 <code>fq_quote + fq_quote_combo + fq_quote_detail</code> 为已确认版本；修订复制为新的 quoteId/versionNo。失效/作废与原金额分开保存。导出从排队进入生成，成功必须存在可读且可下载文件；失败重试使用同 <code>confirmedQuoteId + quoteHash + rendererVersion</code>，成功文件不能因另一记录失败被清除。</p>
+<h3>5 2 并发与幂等设计</h3>
+<p>生产批次发布用数据库事务比较 <code>baseDataHash + scopeHash + rowVersion</code>，当前商品价格或库存行的批量更新与导入明细状态在同一事务完成。价格批次和库存批次彼此独立，不人为制造跨资源实时一致承诺；同一商品价格范围或同一仓库重叠库存范围的并发发布只允许一个符合预期基线的请求成功。</p>
+<p>方案保存用乐观锁；另一用户或标签页更新时返回冲突，保留用户本地副本。原型至少用工作区revision和存储变更检测展示冲突；单机存储无法作为多用户数据库锁，生产必须重复验证。</p>
+<p>图片及导出请求使用“输入内容版本 + 请求意图 + 幂等键”去重，用户主动增加候选使用新意图。首期供应商状态使用轮询；若以后启用回调，须先补齐回调原文、事件幂等、保留和重放设计。队列重启后依据持久化记录恢复；最多两次自动重试、退避和人工处理入口，避免无限请求及无限费用。局部失败只重试失败项。</p>
+<h2>6 视觉交接和导出设计</h2>
+<p>原型视觉使用统一侧栏、页标题、状态标签、主/次操作、表格、抽屉/弹窗和空态，重点展示商品与方案比较。商品卡的款号、颜色、可售量和价格可读；组合页体现1–4个清楚槽位，锁定、替换及错误反馈就近呈现。主要动作有实际状态/文件结果，不用仅提示“成功”的按钮替代实现。</p>
+<p>图片对比视图同时显示输入原图与候选图，逐项复核与版本状态可见；缺件、变款、禁用、来源为样例均不能只靠颜色提醒。费用与耗时标签按任务来源显示真实语义。报价页显示税口径、模式、SKU数量、折扣、费用、有效期和阻断原因，不能让大总额遮盖计价基础。</p>
+<p>导出模板从已确认报价三层记录建立页面数据，再生成16:9 PPTX。标题、正文、报价表以原生文本/表格输出；图片按原比例contain，不能裁掉四品类关键物件。表格超出可用高度时自动续页并重复表头，长标题换行并限制最小可读字号。模板预览使用同一份页面数据；PPTX解析检查、缩略图或浏览器预览仍不能单独证明PowerPoint/WPS兼容。</p>
+<p>文件命名包含方案、报价版本和日期，图片ZIP带图片清单；客户文件只投影对客字段。生成前核实所有引用图片可读取，生成失败不下发0字节或假扩展名文件。原型产物可加清楚的示例标识，生产模板通过已确认企业配置替换示例联系方式。</p>
+<h2>7 原型任务历史与生产任务转交</h2>
+<p>下表只保留 2026-09-11 完整原型的任务切片。TASK 01–07 已冻结为原型历史，实际结果仍以<a href="../../../文档/项目/智能选品项目/原型/服装工作台原型验证记录.md">原型验证记录</a>为准；TASK 08 已由 <a href="../../../文档/项目/智能选品项目/功能/FEAT-FASHION-001-服装智能选品生产首版/任务清单.md">FEAT-FASHION-001 生产任务清单</a>取代，不能同时在两处更新生产状态。</p>
+<table>
+<thead>
+<tr>
+<th>任务</th>
+<th>依赖及范围</th>
+<th>对应需求/验收</th>
+<th>完成应有的产物与检查</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TASK 01 固化PRD与规则基线（原型历史）</td>
+<td>当前用户需求和已核实调研</td>
+<td>全部REQ；AC 01–32的可判定性</td>
+<td>原型当时采用的 PRD、默认值、字段、设计；链接、唯一编号、金额复算及语义复核</td>
+</tr>
+<tr>
+<td>TASK 02 商品与真实文件闭环</td>
+<td>TASK 01；商品/导入/素材模块</td>
+<td>REQ 01–05；AC 01–05、18、21、24</td>
+<td>XLSX/CSV模板和解析、行错误、严格全量、版本/恢复、上传映射与图片复核；实际文件和状态回读</td>
+</tr>
+<tr>
+<td>TASK 03 客户需求与搭配闭环</td>
+<td>TASK 01、商品模型；可与TASK02并行使用明确fixture</td>
+<td>REQ 06–08；AC 06–08、19、22、29、31</td>
+<td>客户与条件、四档生成、锁定替换、尺码分配、无解原因、刷新恢复；确认真实用户操作路径</td>
+</tr>
+<tr>
+<td>TASK 04 图片工作台闭环</td>
+<td>TASK 03的组合版本与素材边界</td>
+<td>REQ 09–11；AC 09–10、18、27–28、31</td>
+<td>明示样例任务、真实图片上传、复核采用、失败重试、取消/额度、过期图失效；不声称真实模型联机</td>
+</tr>
+<tr>
+<td>TASK 05 确定性报价与确认版本</td>
+<td>TASK 02–04的输入；计算可独立先测</td>
+<td>REQ 12–15；AC 11–14、19–20、22–25</td>
+<td>备选/合并、税/折扣/费用、SKU守恒及共享库存、时效、权限例外、不可变确认版本；独立金额和边界用例</td>
+</tr>
+<tr>
+<td>TASK 06 PPT与图片实际交付</td>
+<td>TASK 05确认版本；模板可并行建设</td>
+<td>REQ 16–17；AC 15–17、28–30</td>
+<td>多档布局/续页、真实PPTX、图片与ZIP下载、失败重试、内容白名单；实际文件回读与视觉证据</td>
+</tr>
+<tr>
+<td>TASK 07 工作区恢复和完整验收</td>
+<td>TASK 02–06</td>
+<td>AC 04、16–18、24、26–31；全部核心主流程</td>
+<td>备份/恢复/坏文件拒绝、存储失败、跨页回读、浏览器成功/阻断、响应式/键盘检查、缺陷修复重验</td>
+</tr>
+<tr>
+<td>TASK 08 生产接入与上线准备（已转交）</td>
+<td>已由 FEAT-FASHION-001 接管；本行不再更新状态</td>
+<td>AC 32及AC 04、09–10、15–16、24、27的真实服务层</td>
+<td>见生产 Feature 的唯一任务清单、验证记录和验收记录</td>
+</tr>
+</tbody></table>
+<h3>7 1 证据分层</h3>
+<table>
+<thead>
+<tr>
+<th>验证层</th>
+<th>可证明</th>
+<th>不能据此宣称</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>文档结构及人工语义复核</td>
+<td>17REQ/32AC稳定、默认规则可实现、链接可解析、来源边界清楚</td>
+<td>用户接受、产品运行成功、真实供应商质量</td>
+</tr>
+<tr>
+<td>确定性规则测试</td>
+<td>严格全量判定、金额精度、配比守恒、库存聚合、版本失效等指定输入结果</td>
+<td>浏览器完整可用或生产事务/权限成立</td>
+</tr>
+<tr>
+<td>本地真实文件与浏览器</td>
+<td>实际XLSX/CSV/图片解析、状态保存、点击路径、下载文件、视觉和可用状态</td>
+<td>真实AI生成、京东账号采集、真实多用户后端安全</td>
+</tr>
+<tr>
+<td>PPTX结构与页面检查</td>
+<td>文件可解析、可编辑文本/表格存在、页面数据与已确认报价一致、视觉布局</td>
+<td>尚未运行的PowerPoint/WPS应用兼容</td>
+</tr>
+<tr>
+<td>生产集成/实测</td>
+<td>实际环境、身份、供应商、任务费用、容量、恢复及桌面兼容</td>
+<td>未覆盖客户/商品/供应商的无限成功率，或未授权发布</td>
+</tr>
+</tbody></table>
+<p>每个P0 AC在验证记录绑定证据或明确未验证范围。同一AC可同时有“原型层通过”和“生产层未执行”，必须把对象和断言写清；不能用笼统Pass掩盖真实服务未接入。失败记录保留，修复后追加本次版本的定向重验，不降低原先判定条件。AI真实质量按PRD第13节，不把样例图片算作40任务样本。</p>
+<h2>8 完成、停止与交接</h2>
+<p>本次交接给用户可直接打开的原型、PRD、设计任务、实际文件样例及验证入口，说明已完成的业务操作和实际限制。原型全流程可操作与真实生产上线是两项不同证据；本次必须完成前者，并把后者所需的实际接入条件写清。</p>
+<p>本地实现遇到可复现缺陷，可在当前目录定向修复并重验；存储损坏、版本覆盖或生成文件不一致时先保留原状态与失败输出，修复后再继续。不得为通过检查删除失败场景、修改未运行项为通过、伪造截图、补填供应商任务或替用户签署接受。</p>
+<p>真实环境的停止和恢复条件以PRD第14节为准；未取得模型额度、企业数据或发布对象时，先完成不依赖它们的所有文档与本地原型工作。生产接入与验收仍保留为真实条件，不以此阻断已授权原型制作，也不因此把用户要求缩成静态页面。</p>
+<footer>阅读版由唯一 Markdown 正文自动生成 · 2026-09-12 · <a href="sources/implementation.md">下载 Markdown 副本</a><br>SHA-256 f6c776a62509cd83c2334c72790c2c7b921d8525de94ff7c7db8a57c774f04bd<br>状态与生产依赖以正文及交付验证记录为准。</footer></main></body></html>

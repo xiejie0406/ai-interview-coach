@@ -1,3 +1,4 @@
+param([switch]$EnableVoice, [switch]$Migrate)
 $ErrorActionPreference = 'Stop'
 
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
@@ -9,9 +10,23 @@ if (-not (Test-Path $envFile)) {
 }
 
 Get-Content $envFile | ForEach-Object {
-  if ($_ -match '^(RUOYI_(DB_URL|DB_USERNAME|DB_PASSWORD|SERVER_PORT)|INTERVIEW_(DB_URL|DB_USERNAME|DB_PASSWORD|CATALOG_PUBLIC_TENANT_ID|FLYWAY_ENABLED|CATALOG_SEED_ENABLED))=(.*)$') {
-    [Environment]::SetEnvironmentVariable($Matches[0].Split('=')[0], $Matches[4], 'Process')
+  if ($_ -match '^((?:RUOYI|INTERVIEW)_[A-Z0-9_]+)=(.*)$') {
+    $settingName = $Matches[1]
+    $settingValue = $Matches[2].Trim().Trim('"').Trim("'")
+    # 忽略空模板行，避免同名空示例覆盖前面已填写的本地凭据。
+    if ($settingValue) { [Environment]::SetEnvironmentVariable($settingName, $settingValue, 'Process') }
   }
+}
+
+if ($Migrate) { $env:INTERVIEW_FLYWAY_ENABLED = 'true' }
+
+if ($EnableVoice) {
+  $env:INTERVIEW_EXTERNAL_PROVIDER_CALLS_ENABLED = 'true'
+  $env:INTERVIEW_OBJECT_STORAGE_WRITES_ENABLED = 'true'
+  if (-not $env:INTERVIEW_VOICE_STORAGE_ROOT) { $env:INTERVIEW_VOICE_STORAGE_ROOT = Join-Path $projectRoot '.runtime/private-audio' }
+  if (-not $env:INTERVIEW_SENSITIVE_ENVELOPE_KEY_ID) { $env:INTERVIEW_SENSITIVE_ENVELOPE_KEY_ID = $env:INTERVIEW_PERSISTENCE_KEY_ID }
+  if (-not $env:INTERVIEW_SENSITIVE_ENVELOPE_KEY_BASE64) { $env:INTERVIEW_SENSITIVE_ENVELOPE_KEY_BASE64 = $env:INTERVIEW_PERSISTENCE_KEY_BASE64 }
+  if (-not $env:INTERVIEW_VOLCENGINE_TTS_VOICE) { $env:INTERVIEW_VOLCENGINE_TTS_VOICE = 'zh_female_vv_uranus_bigtts' }
 }
 
 $jar = Join-Path $backendRoot 'ruoyi-admin/target/ruoyi-admin.jar'

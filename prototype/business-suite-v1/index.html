@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>业务产品原型 · 生产排程</title>
+  <link rel="stylesheet" href="shared/base.css">
+  <style>
+    body{height:100dvh;overflow:hidden;background:white}.suite-header{height:56px;display:flex;align-items:center;gap:22px;padding:0 22px;border-bottom:1px solid #dce2e1;background:#fbfcfc}.suite-brand{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:650;white-space:nowrap}.suite-brand svg{color:var(--primary)}.suite-tabs{display:flex;gap:4px;height:100%;align-items:stretch}.suite-tab{border:0;border-bottom:2px solid transparent;background:none;color:var(--muted);padding:0 17px;display:flex;gap:8px;align-items:center;justify-content:center;font-size:12px;white-space:nowrap}.suite-tab svg{width:15px;height:15px}.suite-tab[aria-selected=true]{color:var(--primary);border-bottom-color:var(--primary);font-weight:650}.suite-tab:hover{background:#edf5f0}.suite-tools{display:flex;gap:12px;align-items:center;margin-left:auto}.suite-version{color:#77828a;font-size:11px;white-space:nowrap}.suite-frame{display:block;border:0;width:100%;height:calc(100dvh - 56px);background:#f6f7f8}.suite-tools a{font-size:11px;display:flex;gap:5px;align-items:center}.suite-tools svg{width:14px;height:14px}.suite-tab .short{display:none}@media(max-width:860px){.suite-brand span,.suite-version{display:none}.suite-header{padding:0 12px;gap:10px}.suite-tab{padding:0 12px}.suite-tools{gap:8px}.suite-tools a span{display:none}}@media(max-width:520px){.suite-brand{display:none}.suite-header{padding:0 8px;gap:3px;height:51px}.suite-tabs{flex:1;min-width:0}.suite-tab{padding:0 8px;font-size:11px;gap:5px;flex:1}.suite-tab .long{display:none}.suite-tab .short{display:inline}.suite-tools a{min-width:30px;min-height:35px;justify-content:center}.suite-frame{height:calc(100dvh - 51px)}}
+  </style>
+</head>
+<body>
+  <header class="suite-header">
+    <div class="suite-brand"><i data-lucide="panels-top-left" aria-hidden="true"></i><span>产品原型</span></div>
+    <nav class="suite-tabs" aria-label="切换项目" role="tablist">
+      <button class="suite-tab" id="tab-scheduling" role="tab" aria-controls="prototype-frame" data-project="scheduling"><i data-lucide="gantt-chart" aria-hidden="true"></i><span class="long">生产排程</span><span class="short">生产排程</span></button>
+      <button class="suite-tab" id="tab-aden" role="tab" aria-controls="prototype-frame" data-project="aden"><i data-lucide="bot" aria-hidden="true"></i><span class="long">Aden 桌面 Agent</span><span class="short">Aden Agent</span></button>
+      <button class="suite-tab" id="tab-fashion" role="tab" aria-controls="prototype-frame" data-project="fashion"><i data-lucide="shirt" aria-hidden="true"></i><span class="long">服装搭配与报价</span><span class="short">服装搭配</span></button>
+    </nav>
+    <div class="suite-tools"><span class="suite-version">V1.0</span><a id="open-project" target="_blank" rel="noopener" title="独立打开当前项目" aria-label="独立打开当前项目"><span>独立打开</span><i data-lucide="external-link" aria-hidden="true"></i></a></div>
+  </header>
+  <iframe id="prototype-frame" class="suite-frame" title="生产排程交互原型" role="tabpanel"></iframe>
+  <script src="shared/lucide.min.js"></script>
+  <script src="shared/ui.js"></script>
+  <script>
+    (function(){
+      var projects={scheduling:{name:'生产排程 V2',path:'../production-workbench-v2/index.html'},aden:{name:'Aden 桌面 Agent',path:'02-agent-desktop-execution/index.html'},fashion:{name:'服装搭配与报价',path:'03-ai-fashion-styling-quotation/index.html'}};
+      var frame=document.getElementById('prototype-frame');
+      function show(){var key=location.hash.slice(1)||'scheduling';if(!projects[key])key='scheduling';var project=projects[key];frame.src=project.path;frame.title=project.name+'交互原型';frame.setAttribute('aria-labelledby','tab-'+key);document.title='业务产品原型 · '+project.name;document.getElementById('open-project').href=project.path;document.querySelectorAll('[data-project]').forEach(function(el){el.setAttribute('aria-selected',String(el.dataset.project===key));el.tabIndex=el.dataset.project===key?0:-1;});}
+      document.querySelectorAll('[data-project]').forEach(function(el){el.addEventListener('click',function(){location.hash=el.dataset.project;});el.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();var all=Array.from(document.querySelectorAll('[data-project]'));var step=e.key==='ArrowRight'?1:-1;var next=all[(all.indexOf(el)+step+all.length)%all.length];next.focus();next.click();}});});
+      window.addEventListener('hashchange',show);show();
+    }());
+  </script>
+</body>
+</html>

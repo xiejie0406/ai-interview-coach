@@ -1,0 +1,105 @@
+{
+  "generatedAt": "2026-09-11T13:24:11.571Z",
+  "kind": "documentation-static-check",
+  "document": "docs/architecture/projects/01-production-scheduling/database-design.md",
+  "documentSha256": "dad360ad52b5fbf148177a08a012f876999abbf45a0834285b252d85a2be49c6",
+  "runtime": "v24.19.0",
+  "summary": {
+    "pass": 10,
+    "fail": 0,
+    "tables": 62,
+    "explicitFields": 498,
+    "erDiagrams": 3
+  },
+  "checks": [
+    {
+      "name": "Table identities are unique and sequential",
+      "status": "Pass",
+      "detail": {
+        "expected": 62,
+        "actual": 62
+      }
+    },
+    {
+      "name": "Each table has typed fields, nullability, defaults and descriptions",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "Fields do not duplicate explicit or inherited fields",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "Dictionary foreign-key targets and columns exist",
+      "status": "Pass",
+      "detail": {
+        "foreignKeyCount": 158,
+        "errors": []
+      }
+    },
+    {
+      "name": "Declared UQ column names exist in their table",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "Three ER diagrams reference existing related tables (text check only)",
+      "status": "Pass",
+      "detail": {
+        "diagrams": 3,
+        "edgeCount": 61,
+        "errors": [],
+        "rendered": false
+      }
+    },
+    {
+      "name": "REQ-01 through REQ-10 appear once and exist in PRD",
+      "status": "Pass",
+      "detail": [
+        "REQ-01",
+        "REQ-02",
+        "REQ-03",
+        "REQ-04",
+        "REQ-05",
+        "REQ-06",
+        "REQ-07",
+        "REQ-08",
+        "REQ-09",
+        "REQ-10"
+      ]
+    },
+    {
+      "name": "Constraint IDs C01 through C18 are unique and sequential",
+      "status": "Pass",
+      "detail": "Cross-table consistency matrix, textual identity check"
+    },
+    {
+      "name": "Worked-example arithmetic is consistent (not a database simulation)",
+      "status": "Pass",
+      "detail": {
+        "furnaceHours": true,
+        "workerHours": true,
+        "lateHours": true,
+        "discreteGate": true,
+        "transferTotal": true,
+        "recoveryDelivery": true,
+        "standardCapacity": true
+      }
+    },
+    {
+      "name": "No conflict markers or unintended trailing whitespace",
+      "status": "Pass",
+      "detail": "Markdown two-space line breaks are permitted"
+    }
+  ],
+  "notRun": [
+    "PostgreSQL DDL",
+    "Foreign-key enforcement",
+    "Concurrent transactions",
+    "Query performance",
+    "Migration and restore",
+    "Mermaid rendering",
+    "User acceptance"
+  ]
+}

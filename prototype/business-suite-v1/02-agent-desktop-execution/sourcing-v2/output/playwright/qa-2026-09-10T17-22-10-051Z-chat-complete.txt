@@ -1,0 +1,110 @@
+- complementary "主导航":
+  - link "Aden. 采购执行中心":
+    - /url: "#dashboard"
+  - text: 采 品牌采购团队
+  - navigation:
+    - text: 采购工作台
+    - link "工作台":
+      - /url: "#dashboard"
+    - link "采购任务 4":
+      - /url: "#tasks"
+    - link "商品候选池":
+      - /url: "#candidates/AD-260911-SOW4F"
+    - link "供应商会话":
+      - /url: "#conversations/AD-260911-SOW4F"
+    - link "报价对比":
+      - /url: "#quotes/AD-260911-SOW4F"
+    - link "供应商库":
+      - /url: "#suppliers"
+    - text: 管理与设置
+    - link "执行电脑与连接":
+      - /url: "#connections"
+    - link "采购规则":
+      - /url: "#rules"
+    - link "活动日志":
+      - /url: "#activity"
+  - strong: 演示执行环境
+  - text: 真实平台未接入 · 仅本地保存
+  - link "查看环境状态":
+    - /url: "#connections"
+  - text: LC
+  - strong: 林采 · 采购负责人
+  - text: 示例身份
+- banner:
+  - text: 采购工作空间
+  - strong: 供应商会话
+  - text: 已保存在本地 交互原型 · 示例数据
+- main:
+  - text: SOURCING WORKSPACE
+  - heading "供应商会话" [level=1]
+  - paragraph: 让每次沟通都围绕商品条件，保留对方原话与报价证据。
+  - button "演示情景"
+  - button "人工接管"
+  - text: 当前采购任务
+  - combobox "当前采购任务":
+    - option "QA 完整保温杯采购" [selected]
+    - option "秋季品牌活动 · 定制 T 恤采购"
+    - option "门店补货 · 牛皮纸包装袋"
+    - option "客户礼赠 · 定制保温杯"
+  - text: 100 件 · 保温杯 · 待比较
+  - complementary:
+    - text: 供应商会话 3
+    - link "温度器物 AI 客服 完整报价，可比较 已收到回复":
+      - /url: "#conversations/AD-260911-SOW4F/AD-260911-SOW4F:conv:s-c1"
+      - heading "温度器物" [level=3]
+      - text: AI 客服
+      - paragraph: 完整报价，可比较
+      - text: 已收到回复
+    - link "日常杯业 人工客服 等待回复 等待回复":
+      - /url: "#conversations/AD-260911-SOW4F/AD-260911-SOW4F:conv:s-c2"
+      - heading "日常杯业" [level=3]
+      - text: 人工客服
+      - paragraph: 等待回复
+      - text: 等待回复
+    - link "归山金属制品 身份未知 等待回复 等待回复":
+      - /url: "#conversations/AD-260911-SOW4F/AD-260911-SOW4F:conv:s-c3"
+      - heading "归山金属制品" [level=3]
+      - text: 身份未知
+      - paragraph: 等待回复
+      - text: 等待回复
+  - heading "温度器物" [level=2]
+  - paragraph: 温度智能接待 · AI 客服 · 身份来自示例资料
+  - text: 已收到回复 本次需求 · 100 件 · 杭州 已退回原因：请补充礼盒颜色后重审 修改正文后需要重新确认。 已确认发送 · 示例
+  - time: 09/11 01:22
+  - text: 您好，我们计划采购 100 件保温杯，规格：500ml，316 内胆，哑光白色，激光 LOGO，独立礼盒，收货城市杭州，最晚交货要求 2026-10-02。请提供含税单价、加工费、包装费、运费、本批固定费用、起订量、交期起算条件（出货或到货）和报价有效期。请仅提供报价，本次咨询不构成采购承诺。 礼盒为白色。 AI 客服 · 示例回复
+  - time: 09/11 01:22
+  - text: 按您要求的规格：500ml，316 内胆，哑光白色，激光 LOGO，独立礼盒；数量 100 件，起订 50 件，送达杭州。单价 ¥32.5，加工 ¥3/件，包装 ¥1.5/件，本批固定费用 ¥0。运费待确认；税费口径待确认。交期：规格与样品确认完成后 7 天到货（示例测算前提：2026-09-11 确认）；报价有效至 2026-09-25。以上为供应商示例陈述，不表示已经下单。 授权缺项追问 · 示例
+  - time: 09/11 01:22
+  - text: 您好，关于刚才 100 件的同一规格询价，请补充确认：本批运费、是否含税及对应含税费用。其他已经确认的条件保持不变；本次仅询价，不构成采购承诺。 AI 客服 · 示例回复
+  - time: 09/11 01:22
+  - text: 按您要求的规格：500ml，316 内胆，哑光白色，激光 LOGO，独立礼盒；数量 100 件，起订 50 件，送达杭州。单价 ¥32.5，加工 ¥3/件，包装 ¥1.5/件，本批固定费用 ¥0。运费 ¥80；含税。交期：规格与样品确认完成后 7 天到货（示例测算前提：2026-09-11 确认）；报价有效至 2026-09-25。以上为供应商示例陈述，不表示已经下单。 沟通草稿（仅本地）
+  - textbox "沟通草稿（仅本地）":
+    - /placeholder: 写下需要供应商进一步说明的内容；保存为草稿，不会自动外发。
+  - text: 补问 1/3 轮 · 已授权缺项补问
+  - button "保存沟通草稿"
+  - complementary:
+    - heading "从本会话提取的报价" [level=3]
+    - text: 含税单价
+    - strong: ¥32.50
+    - text: 加工 / 件
+    - strong: ¥3.00
+    - text: 包装 / 件
+    - strong: ¥1.50
+    - text: 本批运费
+    - strong: ¥80.00
+    - text: 本批固定费
+    - strong: ¥0.00
+    - text: 税费口径
+    - strong: 含税
+    - text: 起订量
+    - strong: 50 件
+    - text: 报价有效至
+    - strong: 2026-09-25
+    - text: 本批预计总成本
+    - strong: ¥3,780.00
+    - text: 同口径 · 可比较
+    - button "查看原话与条件"
+    - link "前往报价比较":
+      - /url: "#quotes/AD-260911-SOW4F"
+    - text: 金额按本次 100 件核算。此处为示例，尚未核验供应商履约能力。
+- status: 已载入与本任务品类匹配的示例回复 请确认本次追问对象与范围。 追问已演示发送 已载入与本任务品类匹配的示例回复

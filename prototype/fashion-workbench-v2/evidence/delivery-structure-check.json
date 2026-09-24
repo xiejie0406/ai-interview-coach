@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-09-11T03:05:07.368Z",
+  "library": "PptxGenJS 4.0.1",
+  "slideCount": 36,
+  "editableTables": 143,
+  "mediaCount": 14,
+  "requirements": [
+    "1–4 independent alternative layouts",
+    "24,050.00 four-category quote",
+    "all size SKU text present",
+    "long names continued without dropping characters",
+    "editable text and tables",
+    "embedded PNG with source aspect ratio",
+    "actual OOXML table coordinates stay within slide",
+    "no internal sentinel in OOXML",
+    "no implicit sum in alternatives",
+    "CSV formula escaping",
+    "historical exports fixed after price update",
+    "revoked-image export blocked",
+    "unknown snapshot rejected",
+    "combined components retain all individual visual layouts",
+    "combined fee and payment occur once",
+    "explicit excluded-tax rows"
+  ],
+  "limitation": "Independent fixture validates generated OOXML and pure export logic. Does not prove core quote checks, browser download flow, or PowerPoint/WPS native rendering."
+}

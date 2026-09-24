@@ -1,0 +1,4 @@
+{
+  "command": "REQUEST_CANCEL",
+  "reasonCode": "USER_REQUESTED"
+}

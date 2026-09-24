@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "canonicalSource": "contracts/aden/schemas",
+  "immutableBanner": "GENERATED FROM contracts/aden — DO NOT EDIT",
+  "consumers": [
+    {
+      "id": "java-ruoyi-aden",
+      "language": "Java 17",
+      "mode": "runtime-schema-validation-and-explicit-mapping",
+      "workingDirectory": "platform-backend",
+      "command": "mvn -pl ruoyi-aden -am \"-Dtest=*ContractTest\" \"-Dsurefire.failIfNoSpecifiedTests=false\" test",
+      "generatedArtifacts": false,
+      "outputDirectory": null,
+      "tracked": false,
+      "mutable": false
+    },
+    {
+      "id": "typescript-aden-desktop",
+      "language": "TypeScript 5.7",
+      "mode": "generated-types-runtime-schema-validation-and-explicit-wire-mapping",
+      "workingDirectory": "aden-desktop",
+      "command": "npm run contracts:check",
+      "generatedArtifacts": true,
+      "outputDirectory": "aden-desktop/src/shared/generated",
+      "tracked": true,
+      "mutable": false
+    },
+    {
+      "id": "python-aden-runner",
+      "language": "Python 3.12 / Pydantic v2",
+      "mode": "runtime-schema-validation",
+      "workingDirectory": "aden-runner",
+      "command": "uv run --frozen aden-runner-contracts instance '../contracts/aden/schemas/current/runner.schema.json#/$defs/ClaimDeliveriesResponse' ../contracts/aden/examples/current/runner/claim-response-long-max-fence.json",
+      "generatedArtifacts": false,
+      "outputDirectory": null,
+      "tracked": false,
+      "mutable": false
+    },
+    {
+      "id": "python-aden-agent-runtime",
+      "language": "Python 3.12 / Pydantic v2",
+      "mode": "experimental-runtime-schema-validation-provider-disabled",
+      "workingDirectory": "aden-agent-runtime",
+      "command": "uv run --frozen aden-agent-contracts instance '../contracts/aden/schemas/experimental/agent-provider-disabled.schema.json#/$defs/Candidate' ../contracts/aden/examples/experimental/candidate-no-action.json",
+      "generatedArtifacts": false,
+      "outputDirectory": null,
+      "tracked": false,
+      "mutable": false
+    }
+  ],
+  "upgradeRules": {
+    "breakingCurrent": "raise-major-and-reapprove",
+    "compatibleCurrent": "raise-minor-and-update-all-consumers",
+    "documentationOrExampleOnly": "raise-patch",
+    "experimentalPromotion": "security-review-then-copy-to-current-and-publish-explicit-openapi-paths"
+  }
+}

@@ -80,6 +80,20 @@ public final class DefaultOpenVoiceSession implements OpenVoiceSession {
         var existing = repository.findExecution(principal.tenantId(), command.interviewId(), command.turnId());
         var execution = existing.orElseGet(() -> VoiceTurnExecution.idle(
                 idGenerator.nextResourceId(), principal.tenantId(), command.interviewId(), command.turnId()));
+        // HTTP 创建成功但握手未到达时没有 onClose 回调；票据过期后允许重建未开始的录音。
+        if (execution.state() == VoiceTurnState.LISTENING && execution.lastClientSequence() == 0) {
+            var previous = execution.inputArtifactId().flatMap(id -> repository.findArtifact(principal.tenantId(), id));
+            if (previous.isPresent() && !command.context().requestedAt().isBefore(previous.orElseThrow().createdAt().plus(ticketTtl))) {
+                transaction.required(() -> {
+                    var artifact = previous.orElseThrow();
+                    artifact.queueDeletion(artifact.version(), command.context().eventContext());
+                    repository.saveArtifact(artifact);
+                    domainEvents.append(artifact.pullDomainEvents());
+                    execution.degrade("VOICE_TICKET_EXPIRED", execution.version());
+                    repository.saveExecution(execution);
+                });
+            }
+        }
         if (execution.state() != VoiceTurnState.IDLE && execution.state() != VoiceTurnState.DEGRADED) {
             throw new DomainException(DomainErrorCode.SESSION_ALREADY_ACTIVE,
                     "voice execution is already active for current turn");

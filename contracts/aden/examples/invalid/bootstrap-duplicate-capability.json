@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "workspace": {
+    "workspaceId": "11111111-1111-4111-8111-111111111111",
+    "displayName": "Aden 合成工作空间",
+    "role": "OWNER",
+    "status": "ACTIVE",
+    "version": "1",
+    "createdAt": "2026-09-12T12:00:00Z"
+  },
+  "tasks": {"items": [], "nextCursor": null, "queryHash": "1111111111111111111111111111111111111111111111111111111111111111"},
+  "runners": [],
+  "capabilities": [
+    {"capabilityCode": "CORE", "status": "AVAILABLE", "nextGate": null, "externalActionsEnabled": false, "projectionVersion": "1"},
+    {"capabilityCode": "WX", "status": "GATED", "nextGate": "独立门禁", "externalActionsEnabled": false, "projectionVersion": "1"},
+    {"capabilityCode": "PUR", "status": "GATED", "nextGate": "独立门禁", "externalActionsEnabled": false, "projectionVersion": "1"},
+    {"capabilityCode": "PUR", "status": "GATED", "nextGate": "重复项", "externalActionsEnabled": false, "projectionVersion": "1"}
+  ],
+  "snapshotQueryHash": "2222222222222222222222222222222222222222222222222222222222222222",
+  "streamFilter": "workspace-all-v1",
+  "streamWatermark": "1",
+  "streamCursor": "aden-c1.ZHVwbGljYXRlLWNhcGFiaWxpdHk",
+  "generatedAt": "2026-09-12T12:00:03Z"
+}

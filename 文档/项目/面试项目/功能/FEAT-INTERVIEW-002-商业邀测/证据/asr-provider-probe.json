@@ -1,0 +1,9 @@
+{
+  "input": "Microsoft Huihui 合成虚构面试回答",
+  "stage": "handshake",
+  "httpStatus": 403,
+  "providerMessage": "",
+  "providerError": {
+    "error": "[resource_id=volc.seedasr.sauc.duration] requested resource not granted"
+  }
+}

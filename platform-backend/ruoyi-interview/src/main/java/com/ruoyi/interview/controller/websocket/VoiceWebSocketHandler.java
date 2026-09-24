@@ -233,6 +233,7 @@ public final class VoiceWebSocketHandler extends TextWebSocketHandler implements
                 String reasonCode = reasonCode(data, "reasonCode");
                 if (connection.capture != null) coordinator.abort(connection.capture,
                         reasonCode, correlation);
+                else coordinator.rejectResume(connection.ticket, reasonCode, correlation);
                 connection.lastClientSequence = sequence;
                 connection.completed = true;
                 send(session, connection, "voice.turn.state", Map.of("state", "CANCELLED",
@@ -260,9 +261,12 @@ public final class VoiceWebSocketHandler extends TextWebSocketHandler implements
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         Connection connection = connections.remove(session.getId());
-        if (connection != null && connection.capture != null && !connection.completed) {
-            try { coordinator.abort(connection.capture, "SOCKET_DISCONNECTED",
-                    new CorrelationId("voice-disconnect-" + session.getId())); }
+        if (connection != null && !connection.completed) {
+            try {
+                var correlation = new CorrelationId("voice-disconnect-" + session.getId());
+                if (connection.capture != null) coordinator.abort(connection.capture, "SOCKET_DISCONNECTED", correlation);
+                else coordinator.rejectResume(connection.ticket, "SOCKET_DISCONNECTED", correlation);
+            }
             catch (RuntimeException ignored) { /* cleanup failure is persisted by storage/domain where possible */ }
         }
         if (connection != null && connection.ttsStarted && !connection.ttsTerminal) {
@@ -296,7 +300,9 @@ public final class VoiceWebSocketHandler extends TextWebSocketHandler implements
             connection.ttsStarted = true;
             try {
                 send(socket, connection, "tts.state", nullableMap(
-                        "state", "STARTED", "outputArtifactId", null));
+                        "state", "STARTED", "outputArtifactId", null,
+                        "codec", coordinator.ttsCodec(),
+                        "sampleRate", coordinator.ttsSampleRate()));
                 var result = coordinator.synthesizeNextQuestion(connection.ticket, questionText,
                         (sequence, bytes, end) -> {
                             try {
@@ -422,6 +428,16 @@ public final class VoiceWebSocketHandler extends TextWebSocketHandler implements
                                                    String secondKey, Object secondValue) {
         LinkedHashMap<String, Object> values = new LinkedHashMap<>();
         values.put(firstKey, firstValue); values.put(secondKey, secondValue);
+        return values;
+    }
+
+    private static Map<String, Object> nullableMap(String firstKey, Object firstValue,
+                                                   String secondKey, Object secondValue,
+                                                   String thirdKey, Object thirdValue,
+                                                   String fourthKey, Object fourthValue) {
+        LinkedHashMap<String, Object> values = new LinkedHashMap<>();
+        values.put(firstKey, firstValue); values.put(secondKey, secondValue);
+        values.put(thirdKey, thirdValue); values.put(fourthKey, fourthValue);
         return values;
     }
     private static final class Connection {

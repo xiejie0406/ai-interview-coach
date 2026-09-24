@@ -8,6 +8,7 @@ import com.ruoyi.interview.infrastructure.voice.UnavailableVoiceSessionTicketAda
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.jackson.databind.ObjectMapper;
@@ -25,7 +26,7 @@ public class VoiceTicketConfiguration {
             VoiceRuntimeProperties properties,
             ObjectProvider<RedisConnectionFactory> connectionFactories,
             ObjectMapper objectMapper,
-            Clock clock) {
+            @Qualifier("interviewClock") Clock clock) {
         RedisConnectionFactory factory = connectionFactories.getIfAvailable();
         if (factory == null) {
             return new UnavailableVoiceSessionTicketAdapter();
@@ -37,7 +38,8 @@ public class VoiceTicketConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "interview.voice-runtime", name = "ticket-store",
             havingValue = "memory", matchIfMissing = true)
-    VoiceSessionTicketPort inMemoryVoiceSessionTicketPort(Clock clock) {
+    VoiceSessionTicketPort inMemoryVoiceSessionTicketPort(
+            @Qualifier("interviewClock") Clock clock) {
         return new InMemoryVoiceSessionTicketAdapter(clock);
     }
 }

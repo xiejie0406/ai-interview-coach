@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: aps-worker
+  main:
+    web-application-type: none
+
+# 默认配置不会轮询任务或触发求解；IMP-06 仍要求三个开关同时显式开启。
+aps:
+  enabled: ${APS_ENABLED:false}
+  reporting:
+    enabled: false
+  worker:
+    enabled: ${APS_WORKER_ENABLED:false}
+    polling-enabled: ${APS_WORKER_POLLING_ENABLED:false}
+    poll-interval-ms: ${APS_WORKER_POLL_INTERVAL_MS:1000}
+    stale-solving-timeout-ms: ${APS_WORKER_STALE_SOLVING_TIMEOUT_MS:300000}

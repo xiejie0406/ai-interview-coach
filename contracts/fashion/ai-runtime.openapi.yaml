@@ -1,0 +1,2201 @@
+openapi: 3.1.0
+info:
+  title: Fashion AI Runtime Internal API
+  description: AI 智能选品内部 Python 运行时；当前 Provider 未启用。
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      tags:
+      - runtime
+      summary: Get Health
+      operationId: getHealth
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /internal/v1/capabilities:
+    get:
+      tags:
+      - internal
+      summary: Get Capabilities
+      operationId: getCapabilities
+      security:
+      - FashionHmacV1: []
+      parameters:
+      - name: X-Fashion-Service-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$
+          title: X-Fashion-Service-Id
+      - name: X-Fashion-Key-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$
+          title: X-Fashion-Key-Id
+      - name: X-Fashion-Timestamp
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{10,12}$
+          title: X-Fashion-Timestamp
+      - name: X-Fashion-Nonce
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{15,127}$
+          title: X-Fashion-Nonce
+      - name: X-Fashion-Audience
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$
+          title: X-Fashion-Audience
+      - name: X-Fashion-Content-SHA256
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+          title: X-Fashion-Content-Sha256
+      - name: X-Request-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+          title: X-Request-Id
+      - name: X-Correlation-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$
+          title: X-Correlation-Id
+      - name: traceparent
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^00-[0-9a-f]{32}-[0-9a-f]{16}-0[01]$
+          title: Traceparent
+      - name: tracestate
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 512
+          - type: 'null'
+          title: Tracestate
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapabilitiesResponse'
+        '401':
+          description: SERVICE_AUTHENTICATION_FAILED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '403':
+          description: SERVICE_NOT_AUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          description: RATE_LIMITED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          description: REQUEST_VALIDATION_FAILED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /internal/v1/image-generation/submit:
+    post:
+      tags:
+      - internal
+      summary: Submit Image Generation
+      description: 当前只固定安全契约；真实适配器必须等生产试运行显式启用。
+      operationId: submitImageGeneration
+      security:
+      - FashionHmacV1: []
+      parameters:
+      - name: X-Fashion-Service-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$
+          title: X-Fashion-Service-Id
+      - name: X-Fashion-Key-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$
+          title: X-Fashion-Key-Id
+      - name: X-Fashion-Timestamp
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{10,12}$
+          title: X-Fashion-Timestamp
+      - name: X-Fashion-Nonce
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{15,127}$
+          title: X-Fashion-Nonce
+      - name: X-Fashion-Audience
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$
+          title: X-Fashion-Audience
+      - name: X-Fashion-Content-SHA256
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+          title: X-Fashion-Content-Sha256
+      - name: X-Request-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+          title: X-Request-Id
+      - name: X-Correlation-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$
+          title: X-Correlation-Id
+      - name: traceparent
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^00-[0-9a-f]{32}-[0-9a-f]{16}-0[01]$
+          title: Traceparent
+      - name: tracestate
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 512
+          - type: 'null'
+          title: Tracestate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageGenerationRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: SERVICE_AUTHENTICATION_FAILED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '403':
+          description: SERVICE_NOT_AUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '408':
+          description: 调用期限已过
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '413':
+          description: PAYLOAD_TOO_LARGE
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          description: 图片输入未通过隐私契约
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '503':
+          description: 图片 Provider 未启用
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /internal/v1/requirement-analysis:
+    post:
+      tags:
+      - internal
+      summary: Analyze Requirements
+      operationId: analyzeRequirements
+      security:
+      - FashionHmacV1: []
+      parameters:
+      - name: X-Fashion-Service-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$
+          title: X-Fashion-Service-Id
+      - name: X-Fashion-Key-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$
+          title: X-Fashion-Key-Id
+      - name: X-Fashion-Timestamp
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{10,12}$
+          title: X-Fashion-Timestamp
+      - name: X-Fashion-Nonce
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{15,127}$
+          title: X-Fashion-Nonce
+      - name: X-Fashion-Audience
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$
+          title: X-Fashion-Audience
+      - name: X-Fashion-Content-SHA256
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+          title: X-Fashion-Content-Sha256
+      - name: X-Request-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+          title: X-Request-Id
+      - name: X-Correlation-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$
+          title: X-Correlation-Id
+      - name: traceparent
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^00-[0-9a-f]{32}-[0-9a-f]{16}-0[01]$
+          title: Traceparent
+      - name: tracestate
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 512
+          - type: 'null'
+          title: Tracestate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequirementAnalysisRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequirementAnalysisResponse'
+        '401':
+          description: SERVICE_AUTHENTICATION_FAILED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '403':
+          description: SERVICE_NOT_AUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '408':
+          description: 调用期限已过
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '413':
+          description: PAYLOAD_TOO_LARGE
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          description: 请求未通过契约校验
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          description: RATE_LIMITED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '503':
+          description: AI Provider 未启用
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /internal/v1/product-attribute-suggestion:
+    post:
+      tags:
+      - internal
+      summary: Suggest Product Attributes
+      operationId: suggestProductAttributes
+      security:
+      - FashionHmacV1: []
+      parameters:
+      - name: X-Fashion-Service-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$
+          title: X-Fashion-Service-Id
+      - name: X-Fashion-Key-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$
+          title: X-Fashion-Key-Id
+      - name: X-Fashion-Timestamp
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{10,12}$
+          title: X-Fashion-Timestamp
+      - name: X-Fashion-Nonce
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{15,127}$
+          title: X-Fashion-Nonce
+      - name: X-Fashion-Audience
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$
+          title: X-Fashion-Audience
+      - name: X-Fashion-Content-SHA256
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+          title: X-Fashion-Content-Sha256
+      - name: X-Request-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+          title: X-Request-Id
+      - name: X-Correlation-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$
+          title: X-Correlation-Id
+      - name: traceparent
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^00-[0-9a-f]{32}-[0-9a-f]{16}-0[01]$
+          title: Traceparent
+      - name: tracestate
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 512
+          - type: 'null'
+          title: Tracestate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductAttributeSuggestionRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductAttributeSuggestionResponse'
+        '401':
+          description: SERVICE_AUTHENTICATION_FAILED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '403':
+          description: SERVICE_NOT_AUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '408':
+          description: 调用期限已过
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '413':
+          description: PAYLOAD_TOO_LARGE
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          description: 请求未通过契约校验
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          description: RATE_LIMITED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '503':
+          description: AI Provider 未启用
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+  /internal/v1/selection-styling:
+    post:
+      tags:
+      - internal
+      summary: Rank Selection Styling
+      operationId: rankSelectionStyling
+      security:
+      - FashionHmacV1: []
+      parameters:
+      - name: X-Fashion-Service-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$
+          title: X-Fashion-Service-Id
+      - name: X-Fashion-Key-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$
+          title: X-Fashion-Key-Id
+      - name: X-Fashion-Timestamp
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{10,12}$
+          title: X-Fashion-Timestamp
+      - name: X-Fashion-Nonce
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{15,127}$
+          title: X-Fashion-Nonce
+      - name: X-Fashion-Audience
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$
+          title: X-Fashion-Audience
+      - name: X-Fashion-Content-SHA256
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+          title: X-Fashion-Content-Sha256
+      - name: X-Request-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+          title: X-Request-Id
+      - name: X-Correlation-Id
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$
+          title: X-Correlation-Id
+      - name: traceparent
+        in: header
+        required: true
+        schema:
+          type: string
+          pattern: ^00-[0-9a-f]{32}-[0-9a-f]{16}-0[01]$
+          title: Traceparent
+      - name: tracestate
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 512
+          - type: 'null'
+          title: Tracestate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SelectionStylingRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SelectionStylingResponse'
+        '401':
+          description: SERVICE_AUTHENTICATION_FAILED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '403':
+          description: SERVICE_NOT_AUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '408':
+          description: 调用期限已过
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '413':
+          description: PAYLOAD_TOO_LARGE
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          description: 候选或输出未通过契约校验
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          description: RATE_LIMITED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '503':
+          description: AI Provider 未启用
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+components:
+  schemas:
+    BudgetConstraint:
+      properties:
+        currency:
+          type: string
+          const: CNY
+          title: Currency
+        basis:
+          type: string
+          enum:
+          - total
+          - per_set
+          - per_item
+          title: Basis
+        minimum_minor:
+          type: integer
+          exclusiveMinimum: 0.0
+          title: Minimum Minor
+        maximum_minor:
+          type: integer
+          exclusiveMinimum: 0.0
+          title: Maximum Minor
+        includes_fees:
+          type: boolean
+          title: Includes Fees
+      additionalProperties: false
+      type: object
+      required:
+      - currency
+      - basis
+      - minimum_minor
+      - maximum_minor
+      - includes_fees
+      title: BudgetConstraint
+      description: 以最小货币单位表达预算；要求 maximum_minor >= minimum_minor。
+    CapabilitiesResponse:
+      properties:
+        version:
+          type: string
+          const: '1.0'
+          title: Version
+        service:
+          type: string
+          const: fashion-ai-runtime
+          title: Service
+        provider:
+          $ref: '#/components/schemas/ProviderCapability'
+        operations:
+          items:
+            $ref: '#/components/schemas/CapabilityOperation'
+          type: array
+          title: Operations
+      additionalProperties: false
+      type: object
+      required:
+      - version
+      - service
+      - provider
+      - operations
+      title: CapabilitiesResponse
+    CapabilityOperation:
+      properties:
+        name:
+          type: string
+          enum:
+          - requirement-analysis
+          - product-attribute-suggestion
+          - selection-styling
+          - image-generation
+          title: Name
+        versions:
+          prefixItems:
+          - type: string
+            const: '1.0'
+          type: array
+          maxItems: 1
+          minItems: 1
+          title: Versions
+        status:
+          type: string
+          const: unavailable
+          title: Status
+        reason:
+          type: string
+          const: provider_disabled
+          title: Reason
+      additionalProperties: false
+      type: object
+      required:
+      - name
+      - versions
+      - status
+      - reason
+      title: CapabilityOperation
+    CategorySlot:
+      properties:
+        slot_index:
+          type: integer
+          maximum: 4.0
+          minimum: 1.0
+          title: Slot Index
+        category:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Category
+        required:
+          type: boolean
+          title: Required
+          default: true
+        notes:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Notes
+      additionalProperties: false
+      type: object
+      required:
+      - slot_index
+      - category
+      title: CategorySlot
+    CategoryTier:
+      properties:
+        category_count:
+          type: integer
+          maximum: 4.0
+          minimum: 1.0
+          title: Category Count
+        slots:
+          items:
+            $ref: '#/components/schemas/CategorySlot'
+          type: array
+          maxItems: 4
+          minItems: 1
+          title: Slots
+        candidate_count:
+          type: integer
+          maximum: 3.0
+          minimum: 1.0
+          title: Candidate Count
+      additionalProperties: false
+      type: object
+      required:
+      - category_count
+      - slots
+      - candidate_count
+      title: CategoryTier
+    ErrorDetail:
+      properties:
+        code:
+          type: string
+          enum:
+          - SERVICE_AUTHENTICATION_FAILED
+          - SERVICE_NOT_AUTHORIZED
+          - DEADLINE_EXCEEDED
+          - IDEMPOTENCY_CONFLICT
+          - VERSION_CONFLICT
+          - FENCING_CONFLICT
+          - LEASE_EXPIRED
+          - RUN_TERMINAL
+          - DELEGATION_EXPIRED
+          - PAYLOAD_TOO_LARGE
+          - REQUEST_VALIDATION_FAILED
+          - BUDGET_EXCEEDED
+          - RATE_LIMITED
+          - PROVIDER_DISABLED
+          - DEPENDENCY_UNAVAILABLE
+          - UPSTREAM_TIMEOUT
+          - INTERNAL_ERROR
+          title: Code
+        message:
+          type: string
+          maxLength: 160
+          minLength: 1
+          title: Message
+        retryable:
+          type: boolean
+          title: Retryable
+      additionalProperties: false
+      type: object
+      required:
+      - code
+      - message
+      - retryable
+      title: ErrorDetail
+    ErrorEnvelope:
+      properties:
+        version:
+          type: string
+          const: '1.0'
+          title: Version
+        request_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Request Id
+        correlation_id:
+          anyOf:
+          - type: string
+            maxLength: 100
+            minLength: 1
+            pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          - type: 'null'
+          title: Correlation Id
+        run_id:
+          anyOf:
+          - type: string
+            maxLength: 100
+            minLength: 1
+            pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          - type: 'null'
+          title: Run Id
+        trace_id:
+          anyOf:
+          - type: string
+            pattern: ^[a-f0-9]{32}$
+          - type: 'null'
+          title: Trace Id
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+      additionalProperties: false
+      type: object
+      required:
+      - version
+      - request_id
+      - correlation_id
+      - run_id
+      - trace_id
+      - error
+      title: ErrorEnvelope
+    FrozenSelectionCandidate:
+      properties:
+        candidate_ref:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Candidate Ref
+        category_code:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Category Code
+        source_ref:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Source Ref
+        style_ref:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Style Ref
+        color_code:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Color Code
+        color_name:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Color Name
+        product_name:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Product Name
+        season:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Season
+        tags:
+          items:
+            type: string
+            maxLength: 120
+            minLength: 1
+          type: array
+          maxItems: 50
+          title: Tags
+        conservative_unit_price_minor:
+          type: integer
+          minimum: 0.0
+          title: Conservative Unit Price Minor
+        total_available_qty:
+          type: integer
+          minimum: 1.0
+          title: Total Available Qty
+        visual_hash:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+          title: Visual Hash
+        variants:
+          items:
+            $ref: '#/components/schemas/SelectionVariant'
+          type: array
+          maxItems: 100
+          minItems: 1
+          title: Variants
+      additionalProperties: false
+      type: object
+      required:
+      - candidate_ref
+      - category_code
+      - source_ref
+      - style_ref
+      - color_code
+      - color_name
+      - product_name
+      - tags
+      - conservative_unit_price_minor
+      - total_available_qty
+      - visual_hash
+      - variants
+      title: FrozenSelectionCandidate
+    HealthResponse:
+      properties:
+        version:
+          type: string
+          const: '1.0'
+          title: Version
+        service:
+          type: string
+          const: fashion-ai-runtime
+          title: Service
+        service_version:
+          type: string
+          const: 0.1.0
+          title: Service Version
+        status:
+          type: string
+          const: ok
+          title: Status
+        provider:
+          $ref: '#/components/schemas/ProviderCapability'
+      additionalProperties: false
+      type: object
+      required:
+      - version
+      - service
+      - service_version
+      - status
+      - provider
+      title: HealthResponse
+    ImageGenerationInput:
+      properties:
+        quote_image_ref:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Quote Image Ref
+        image_type:
+          type: string
+          enum:
+          - model
+          - styling
+          - ecommerce
+          title: Image Type
+        requested_count:
+          type: integer
+          maximum: 4.0
+          minimum: 1.0
+          title: Requested Count
+        images:
+          items:
+            $ref: '#/components/schemas/ImageSlotInput'
+          type: array
+          maxItems: 4
+          minItems: 1
+          title: Images
+        parameters:
+          $ref: '#/components/schemas/ImageGenerationParameters'
+      additionalProperties: false
+      type: object
+      required:
+      - quote_image_ref
+      - image_type
+      - requested_count
+      - images
+      - parameters
+      title: ImageGenerationInput
+    ImageGenerationParameters:
+      properties:
+        aspect_ratio:
+          type: string
+          enum:
+          - '1:1'
+          - '3:4'
+          - '4:5'
+          - '16:9'
+          title: Aspect Ratio
+        model_presentation:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Model Presentation
+        scene:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Scene
+        pose:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Pose
+        prompt_version:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Prompt Version
+        background:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Background
+        shadow:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Shadow
+      additionalProperties: false
+      type: object
+      required:
+      - aspect_ratio
+      - prompt_version
+      title: ImageGenerationParameters
+    ImageGenerationRequest:
+      properties:
+        version:
+          type: string
+          const: '1.0'
+          title: Version
+        request_id:
+          type: string
+          format: uuid
+          title: Request Id
+        correlation_id:
+          anyOf:
+          - type: string
+            maxLength: 100
+            minLength: 1
+            pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          - type: 'null'
+          title: Correlation Id
+        run_id:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Run Id
+        idempotency_key:
+          type: string
+          maxLength: 128
+          minLength: 16
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Idempotency Key
+        deadline_at:
+          type: string
+          format: date-time
+          title: Deadline At
+        input:
+          $ref: '#/components/schemas/ImageGenerationInput'
+      additionalProperties: false
+      type: object
+      required:
+      - version
+      - request_id
+      - run_id
+      - idempotency_key
+      - deadline_at
+      - input
+      title: ImageGenerationRequest
+    ImageSlotInput:
+      properties:
+        slot_code:
+          type: string
+          pattern: ^SLOT-[1-4]$
+          title: Slot Code
+        image_ref:
+          type: string
+          maxLength: 512
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9/_.:-]*$
+          title: Image Ref
+        image_hash:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+          title: Image Hash
+      additionalProperties: false
+      type: object
+      required:
+      - slot_code
+      - image_ref
+      - image_hash
+      title: ImageSlotInput
+      description: 仅传给 Provider 的获许可图片引用；不含商品、客户、价格或库存。
+    KnownRequirements:
+      properties:
+        scheme_name:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Scheme Name
+        audience:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Audience
+        scene:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Scene
+        season:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Season
+        style:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Style
+        preferred_colors:
+          items:
+            type: string
+            maxLength: 120
+            minLength: 1
+          type: array
+          maxItems: 20
+          title: Preferred Colors
+        exclusions:
+          items:
+            type: string
+            maxLength: 120
+            minLength: 1
+          type: array
+          maxItems: 30
+          title: Exclusions
+        people_count:
+          anyOf:
+          - type: integer
+            maximum: 100000.0
+            minimum: 1.0
+          - type: 'null'
+          title: People Count
+        set_count:
+          anyOf:
+          - type: integer
+            maximum: 100000.0
+            minimum: 1.0
+          - type: 'null'
+          title: Set Count
+        delivery_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Delivery Date
+        size_requirements:
+          items:
+            $ref: '#/components/schemas/SizeRequirement'
+          type: array
+          maxItems: 100
+          title: Size Requirements
+        selection_mode:
+          anyOf:
+          - type: string
+            enum:
+            - independent
+            - progressive
+          - type: 'null'
+          title: Selection Mode
+        category_tiers:
+          items:
+            $ref: '#/components/schemas/CategoryTier'
+          type: array
+          maxItems: 4
+          title: Category Tiers
+        budget_constraints:
+          items:
+            $ref: '#/components/schemas/BudgetConstraint'
+          type: array
+          maxItems: 3
+          title: Budget Constraints
+      additionalProperties: false
+      type: object
+      title: KnownRequirements
+    ProductAttributeDraft:
+      properties:
+        status:
+          type: string
+          const: pending_human_confirmation
+          title: Status
+        product_ref:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Product Ref
+        category_code:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Category Code
+        color_code:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Color Code
+        color_name:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Color Name
+        season:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Season
+        style:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Style
+        scene:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Scene
+        audience:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Audience
+        observable_tags:
+          items:
+            type: string
+            maxLength: 120
+            minLength: 1
+          type: array
+          maxItems: 20
+          title: Observable Tags
+      additionalProperties: false
+      type: object
+      required:
+      - status
+      - product_ref
+      - observable_tags
+      title: ProductAttributeDraft
+    ProductAttributeInput:
+      properties:
+        product_ref:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Product Ref
+        product_row_version:
+          type: integer
+          minimum: 1.0
+          title: Product Row Version
+        current_attributes:
+          $ref: '#/components/schemas/ProductCurrentAttributes'
+      additionalProperties: false
+      type: object
+      required:
+      - product_ref
+      - product_row_version
+      - current_attributes
+      title: ProductAttributeInput
+    ProductAttributeSuggestionRequest:
+      properties:
+        version:
+          type: string
+          const: '1.0'
+          title: Version
+        request_id:
+          type: string
+          format: uuid
+          title: Request Id
+        correlation_id:
+          anyOf:
+          - type: string
+            maxLength: 100
+            minLength: 1
+            pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          - type: 'null'
+          title: Correlation Id
+        run_id:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Run Id
+        idempotency_key:
+          type: string
+          maxLength: 128
+          minLength: 16
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Idempotency Key
+        deadline_at:
+          type: string
+          format: date-time
+          title: Deadline At
+        input:
+          $ref: '#/components/schemas/ProductAttributeInput'
+      additionalProperties: false
+      type: object
+      required:
+      - version
+      - request_id
+      - run_id
+      - idempotency_key
+      - deadline_at
+      - input
+      title: ProductAttributeSuggestionRequest
+    ProductAttributeSuggestionResponse:
+      properties:
+        version:
+          type: string
+          const: '1.0'
+          title: Version
+        request_id:
+          type: string
+          format: uuid
+          title: Request Id
+        run_id:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Run Id
+        result:
+          $ref: '#/components/schemas/ProductAttributeSuggestionResult'
+      additionalProperties: false
+      type: object
+      required:
+      - version
+      - request_id
+      - run_id
+      - result
+      title: ProductAttributeSuggestionResponse
+    ProductAttributeSuggestionResult:
+      properties:
+        fact_scope:
+          type: string
+          const: product_attributes_only
+          title: Fact Scope
+        human_confirmation_required:
+          type: boolean
+          const: true
+          title: Human Confirmation Required
+        draft:
+          $ref: '#/components/schemas/ProductAttributeDraft'
+        ambiguities:
+          items:
+            type: string
+            maxLength: 120
+            minLength: 1
+          type: array
+          maxItems: 20
+          title: Ambiguities
+      additionalProperties: false
+      type: object
+      required:
+      - fact_scope
+      - human_confirmation_required
+      - draft
+      - ambiguities
+      title: ProductAttributeSuggestionResult
+    ProductCurrentAttributes:
+      properties:
+        source_ref:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Source Ref
+        sku_ref:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Sku Ref
+        name:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Name
+        category_code:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Category Code
+        color_code:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Color Code
+        color_name:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Color Name
+        season:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Season
+        tags:
+          items:
+            type: string
+            maxLength: 120
+            minLength: 1
+          type: array
+          maxItems: 50
+          title: Tags
+      additionalProperties: false
+      type: object
+      required:
+      - source_ref
+      - sku_ref
+      - name
+      - category_code
+      - color_code
+      - color_name
+      - tags
+      title: ProductCurrentAttributes
+      description: Java 冻结的当前商品事实；不接收价格、库存、客户或对象存储凭据。
+    ProviderCapability:
+      properties:
+        mode:
+          type: string
+          const: disabled
+          title: Mode
+        enabled:
+          type: boolean
+          const: false
+          title: Enabled
+      additionalProperties: false
+      type: object
+      required:
+      - mode
+      - enabled
+      title: ProviderCapability
+    RequirementAnalysisRequest:
+      properties:
+        version:
+          type: string
+          const: '1.0'
+          title: Version
+        request_id:
+          type: string
+          format: uuid
+          title: Request Id
+        correlation_id:
+          anyOf:
+          - type: string
+            maxLength: 100
+            minLength: 1
+            pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          - type: 'null'
+          title: Correlation Id
+        run_id:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Run Id
+        idempotency_key:
+          type: string
+          maxLength: 128
+          minLength: 16
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Idempotency Key
+        deadline_at:
+          type: string
+          format: date-time
+          title: Deadline At
+        input:
+          $ref: '#/components/schemas/RequirementInput'
+      additionalProperties: false
+      type: object
+      required:
+      - version
+      - request_id
+      - run_id
+      - idempotency_key
+      - deadline_at
+      - input
+      title: RequirementAnalysisRequest
+    RequirementAnalysisResponse:
+      properties:
+        version:
+          type: string
+          const: '1.0'
+          title: Version
+        request_id:
+          type: string
+          format: uuid
+          title: Request Id
+        run_id:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Run Id
+        result:
+          $ref: '#/components/schemas/RequirementAnalysisResult'
+      additionalProperties: false
+      type: object
+      required:
+      - version
+      - request_id
+      - run_id
+      - result
+      title: RequirementAnalysisResponse
+    RequirementAnalysisResult:
+      properties:
+        fact_scope:
+          type: string
+          const: requirements_only
+          title: Fact Scope
+        human_confirmation_required:
+          type: boolean
+          const: true
+          title: Human Confirmation Required
+        draft:
+          $ref: '#/components/schemas/RequirementDraft'
+        unresolved_questions:
+          items:
+            type: string
+            maxLength: 120
+            minLength: 1
+          type: array
+          maxItems: 20
+          title: Unresolved Questions
+      additionalProperties: false
+      type: object
+      required:
+      - fact_scope
+      - human_confirmation_required
+      - draft
+      - unresolved_questions
+      title: RequirementAnalysisResult
+      description: 未来交给 PydanticAI 校验的结构化输出边界。
+    RequirementDraft:
+      properties:
+        status:
+          type: string
+          const: pending_human_confirmation
+          title: Status
+        scheme_name:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Scheme Name
+        audience:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Audience
+        scene:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Scene
+        season:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Season
+        style:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Style
+        preferred_colors:
+          items:
+            type: string
+            maxLength: 120
+            minLength: 1
+          type: array
+          maxItems: 20
+          title: Preferred Colors
+        exclusions:
+          items:
+            type: string
+            maxLength: 120
+            minLength: 1
+          type: array
+          maxItems: 30
+          title: Exclusions
+        people_count:
+          anyOf:
+          - type: integer
+            maximum: 100000.0
+            minimum: 1.0
+          - type: 'null'
+          title: People Count
+        set_count:
+          anyOf:
+          - type: integer
+            maximum: 100000.0
+            minimum: 1.0
+          - type: 'null'
+          title: Set Count
+        delivery_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Delivery Date
+        size_requirements:
+          items:
+            $ref: '#/components/schemas/SizeRequirement'
+          type: array
+          maxItems: 100
+          title: Size Requirements
+        selection_mode:
+          anyOf:
+          - type: string
+            enum:
+            - independent
+            - progressive
+          - type: 'null'
+          title: Selection Mode
+        category_tiers:
+          items:
+            $ref: '#/components/schemas/CategoryTier'
+          type: array
+          maxItems: 4
+          title: Category Tiers
+        budget_constraints:
+          items:
+            $ref: '#/components/schemas/BudgetConstraint'
+          type: array
+          maxItems: 3
+          title: Budget Constraints
+      additionalProperties: false
+      type: object
+      required:
+      - status
+      - scheme_name
+      - audience
+      - scene
+      - season
+      - style
+      - preferred_colors
+      - exclusions
+      - people_count
+      - set_count
+      - delivery_date
+      - size_requirements
+      - selection_mode
+      - category_tiers
+      - budget_constraints
+      title: RequirementDraft
+      description: 仅供人工确认的需求草案，不包含客户归属或商品事实。
+    RequirementInput:
+      properties:
+        customer_ref:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Customer Ref
+        source_text:
+          type: string
+          maxLength: 2000
+          minLength: 8
+          title: Source Text
+        known_requirements:
+          $ref: '#/components/schemas/KnownRequirements'
+      additionalProperties: false
+      type: object
+      required:
+      - customer_ref
+      - source_text
+      title: RequirementInput
+      description: 客户归属只接收 Java 侧稳定引用，不接收联系人或内部备注。
+    SelectionComboDraft:
+      properties:
+        combo_key:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Combo Key
+        name:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Name
+        reason:
+          type: string
+          maxLength: 2000
+          minLength: 1
+          title: Reason
+        items:
+          items:
+            $ref: '#/components/schemas/SelectionComboItem'
+          type: array
+          maxItems: 4
+          minItems: 1
+          title: Items
+        conservative_unit_price_minor:
+          type: integer
+          minimum: 0.0
+          title: Conservative Unit Price Minor
+        combo_visual_hash:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+          title: Combo Visual Hash
+      additionalProperties: false
+      type: object
+      required:
+      - combo_key
+      - name
+      - reason
+      - items
+      - conservative_unit_price_minor
+      - combo_visual_hash
+      title: SelectionComboDraft
+    SelectionComboItem:
+      properties:
+        slot_index:
+          type: integer
+          maximum: 4.0
+          minimum: 1.0
+          title: Slot Index
+        category_code:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Category Code
+        candidate_ref:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Candidate Ref
+      additionalProperties: false
+      type: object
+      required:
+      - slot_index
+      - category_code
+      - candidate_ref
+      title: SelectionComboItem
+    SelectionInput:
+      properties:
+        quote_ref:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Quote Ref
+        quote_row_version:
+          type: integer
+          minimum: 1.0
+          title: Quote Row Version
+        selection_mode:
+          type: string
+          enum:
+          - independent
+          - progressive
+          title: Selection Mode
+        requested_qty:
+          type: integer
+          maximum: 100000.0
+          minimum: 1.0
+          title: Requested Qty
+        budget_maximum_per_set_minor:
+          anyOf:
+          - type: integer
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Budget Maximum Per Set Minor
+        requirements:
+          $ref: '#/components/schemas/KnownRequirements'
+        tiers:
+          items:
+            $ref: '#/components/schemas/CategoryTier'
+          type: array
+          maxItems: 4
+          minItems: 1
+          title: Tiers
+        frozen_candidates:
+          items:
+            $ref: '#/components/schemas/FrozenSelectionCandidate'
+          type: array
+          maxItems: 200
+          minItems: 1
+          title: Frozen Candidates
+        locks:
+          items:
+            $ref: '#/components/schemas/SelectionLock'
+          type: array
+          maxItems: 4
+          title: Locks
+        candidate_set_hash:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+          title: Candidate Set Hash
+      additionalProperties: false
+      type: object
+      required:
+      - quote_ref
+      - quote_row_version
+      - selection_mode
+      - requested_qty
+      - requirements
+      - tiers
+      - frozen_candidates
+      - candidate_set_hash
+      title: SelectionInput
+    SelectionLock:
+      properties:
+        slot_index:
+          type: integer
+          maximum: 4.0
+          minimum: 1.0
+          title: Slot Index
+        category_code:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Category Code
+        candidate_ref:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Candidate Ref
+        candidate_visual_hash:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+          title: Candidate Visual Hash
+      additionalProperties: false
+      type: object
+      required:
+      - slot_index
+      - category_code
+      - candidate_ref
+      - candidate_visual_hash
+      title: SelectionLock
+    SelectionStylingRequest:
+      properties:
+        version:
+          type: string
+          const: '1.0'
+          title: Version
+        request_id:
+          type: string
+          format: uuid
+          title: Request Id
+        correlation_id:
+          anyOf:
+          - type: string
+            maxLength: 100
+            minLength: 1
+            pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          - type: 'null'
+          title: Correlation Id
+        run_id:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Run Id
+        idempotency_key:
+          type: string
+          maxLength: 128
+          minLength: 16
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Idempotency Key
+        deadline_at:
+          type: string
+          format: date-time
+          title: Deadline At
+        input:
+          $ref: '#/components/schemas/SelectionInput'
+      additionalProperties: false
+      type: object
+      required:
+      - version
+      - request_id
+      - run_id
+      - idempotency_key
+      - deadline_at
+      - input
+      title: SelectionStylingRequest
+    SelectionStylingResponse:
+      properties:
+        version:
+          type: string
+          const: '1.0'
+          title: Version
+        request_id:
+          type: string
+          format: uuid
+          title: Request Id
+        run_id:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Run Id
+        result:
+          $ref: '#/components/schemas/SelectionStylingResult'
+      additionalProperties: false
+      type: object
+      required:
+      - version
+      - request_id
+      - run_id
+      - result
+      title: SelectionStylingResponse
+    SelectionStylingResult:
+      properties:
+        fact_scope:
+          type: string
+          const: frozen_candidates_only
+          title: Fact Scope
+        human_confirmation_required:
+          type: boolean
+          const: true
+          title: Human Confirmation Required
+        quote_ref:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Quote Ref
+        quote_row_version:
+          type: integer
+          minimum: 1.0
+          title: Quote Row Version
+        candidate_set_hash:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+          title: Candidate Set Hash
+        tiers:
+          items:
+            $ref: '#/components/schemas/SelectionTierResult'
+          type: array
+          maxItems: 4
+          minItems: 1
+          title: Tiers
+      additionalProperties: false
+      type: object
+      required:
+      - fact_scope
+      - human_confirmation_required
+      - quote_ref
+      - quote_row_version
+      - candidate_set_hash
+      - tiers
+      title: SelectionStylingResult
+    SelectionTierResult:
+      properties:
+        category_count:
+          type: integer
+          maximum: 4.0
+          minimum: 1.0
+          title: Category Count
+        requested_candidate_count:
+          type: integer
+          maximum: 3.0
+          minimum: 1.0
+          title: Requested Candidate Count
+        combinations:
+          items:
+            $ref: '#/components/schemas/SelectionComboDraft'
+          type: array
+          maxItems: 3
+          title: Combinations
+        shortage_reasons:
+          items:
+            type: string
+            maxLength: 120
+            minLength: 1
+          type: array
+          maxItems: 20
+          title: Shortage Reasons
+      additionalProperties: false
+      type: object
+      required:
+      - category_count
+      - requested_candidate_count
+      - combinations
+      - shortage_reasons
+      title: SelectionTierResult
+    SelectionVariant:
+      properties:
+        product_ref:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Product Ref
+        product_row_version:
+          type: integer
+          minimum: 1.0
+          title: Product Row Version
+        sku_ref:
+          type: string
+          maxLength: 100
+          minLength: 1
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          title: Sku Ref
+        size_code:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Size Code
+        unit_price_minor:
+          type: integer
+          minimum: 0.0
+          title: Unit Price Minor
+        available_qty:
+          type: integer
+          minimum: 0.0
+          title: Available Qty
+      additionalProperties: false
+      type: object
+      required:
+      - product_ref
+      - product_row_version
+      - sku_ref
+      - size_code
+      - unit_price_minor
+      - available_qty
+      title: SelectionVariant
+      description: 候选颜色款内的真实 SKU；引用和版本均来自 Java 冻结快照。
+    SizeRequirement:
+      properties:
+        category:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Category
+        size_label:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Size Label
+        quantity:
+          type: integer
+          maximum: 100000.0
+          minimum: 1.0
+          title: Quantity
+        notes:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Notes
+      additionalProperties: false
+      type: object
+      required:
+      - size_label
+      - quantity
+      title: SizeRequirement
+  securitySchemes:
+    FashionHmacV1:
+      type: apiKey
+      description: Java→Python HMAC-SHA256 v1。除签名头外还必须携带 X-Fashion-Service-Id、X-Fashion-Key-Id、X-Fashion-Timestamp、X-Fashion-Nonce、X-Fashion-Audience、X-Fashion-Content-SHA256、X-Request-Id、X-Correlation-Id
+        和 traceparent；tracestate 可选。Canonical 精确为 `FASHION-HMAC-SHA256\n{METHOD_UPPER}\n{RAW_PATH}\n{SERVICE_ID}\n{AUDIENCE}\n{TIMESTAMP_UNIX_SECONDS}\n{NONCE}\n{LOWERCASE_BODY_SHA256}`，末尾无换行；当前禁止
+        query。
+      in: header
+      name: X-Fashion-Signature

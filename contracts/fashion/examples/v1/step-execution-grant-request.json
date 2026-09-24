@@ -1,0 +1,16 @@
+{
+  "contract_version": "1.0",
+  "request_id": "2f8b98f7-f762-45bd-ae89-2501191c2303",
+  "correlation_id": "quote.q-20260912-001",
+  "run_id": "run-20260912-001",
+  "run_attempt": 0,
+  "call_key": "product-search-01",
+  "attempt_no": 1,
+  "step_type": "tool",
+  "idempotency_key": "run-20260912-001.product-search-01",
+  "request_digest": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "deadline_at": "2026-09-12T10:30:00+08:00",
+  "execution_lease_id": "lease-20260912-001",
+  "fencing_token": 7,
+  "external_request_key": null
+}

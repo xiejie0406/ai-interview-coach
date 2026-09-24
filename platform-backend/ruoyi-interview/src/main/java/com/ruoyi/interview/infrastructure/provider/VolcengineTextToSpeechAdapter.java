@@ -40,7 +40,7 @@ public final class VolcengineTextToSpeechAdapter implements TextToSpeechPort, Pr
 
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
-    private final String apiKey;
+    private final VolcengineSpeechCredentials credentials;
     private final String modelProfile;
     private final String resourceId;
     private final String defaultVoice;
@@ -48,13 +48,17 @@ public final class VolcengineTextToSpeechAdapter implements TextToSpeechPort, Pr
     private final int sampleRate;
 
     public VolcengineTextToSpeechAdapter(HttpClient httpClient, ObjectMapper objectMapper,
-                                         String apiKey, String modelProfile, String defaultVoice,
-                                         URI endpoint, int sampleRate) {
+                                         String authMode, String apiKey, String appId,
+                                         String accessToken, String modelProfile,
+                                         String configuredResourceId, String defaultVoice, URI endpoint,
+                                         int sampleRate) {
         this.httpClient = Objects.requireNonNull(httpClient, "httpClient");
         this.objectMapper = Objects.requireNonNull(objectMapper, "objectMapper");
-        this.apiKey = VolcengineSpeechProfiles.normalized(apiKey);
+        this.credentials = VolcengineSpeechCredentials.from(
+                authMode, apiKey, appId, accessToken);
         this.modelProfile = VolcengineSpeechProfiles.normalized(modelProfile);
-        this.resourceId = VolcengineSpeechProfiles.ttsResourceId(modelProfile);
+        this.resourceId = VolcengineSpeechProfiles.configuredResourceId(
+                configuredResourceId, VolcengineSpeechProfiles.ttsResourceId(modelProfile));
         this.defaultVoice = VolcengineSpeechProfiles.normalized(defaultVoice);
         this.endpoint = validHttpEndpoint(endpoint);
         this.sampleRate = sampleRate;
@@ -62,6 +66,16 @@ public final class VolcengineTextToSpeechAdapter implements TextToSpeechPort, Pr
 
     @Override
     public Result synthesize(Request request, AudioSink sink, InvocationContext context) {
+        Result result = synthesizeInternal(request, sink, context);
+        observation = Map.of("status", result instanceof Success ? "PASS" : "FAIL",
+                "observedAt", java.time.Instant.now().toString(), "reasonCode",
+                result instanceof Failure failure ? failure.failure().errorClass() : "AVAILABLE");
+        return result;
+    }
+    private volatile Map<String,String> observation = Map.of("status", "NOT_CHECKED");
+    @Override public Map<String,String> lastObservation() { return observation; }
+
+    private Result synthesizeInternal(Request request, AudioSink sink, InvocationContext context) {
         Objects.requireNonNull(request, "request");
         Objects.requireNonNull(sink, "sink");
         Objects.requireNonNull(context, "context");
@@ -89,16 +103,16 @@ public final class VolcengineTextToSpeechAdapter implements TextToSpeechPort, Pr
                     Optional.empty(), requestIdHash);
         }
 
-        HttpRequest httpRequest = HttpRequest.newBuilder(endpoint)
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(endpoint)
                 .timeout(context.timeBudget().duration())
-                .header("X-Api-Key", apiKey)
                 .header("X-Api-Resource-Id", resourceId)
                 .header("X-Api-Request-Id", requestId)
                 .header("X-Control-Require-Usage-Tokens-Return", "*")
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofByteArray(requestBody))
-                .build();
+                .POST(HttpRequest.BodyPublishers.ofByteArray(requestBody));
+        credentials.forEachHeader(requestBuilder::header);
+        HttpRequest httpRequest = requestBuilder.build();
         try {
             HttpResponse<InputStream> response = httpClient.send(
                     httpRequest, HttpResponse.BodyHandlers.ofInputStream());
@@ -109,7 +123,7 @@ public final class VolcengineTextToSpeechAdapter implements TextToSpeechPort, Pr
                 return httpFailure(response.statusCode(), retryAfter(response), requestIdHash);
             }
             try (InputStream body = response.body()) {
-                return decodeStream(body, sink, requestIdHash);
+                return decodeStream(body, sink, requestIdHash, request.codec());
             }
         } catch (java.net.http.HttpTimeoutException exception) {
             return failure("PROVIDER_TIMEOUT", RetryDisposition.SAFE_BACKOFF,
@@ -129,10 +143,13 @@ public final class VolcengineTextToSpeechAdapter implements TextToSpeechPort, Pr
 
     @Override public String adapterId() { return ADAPTER_ID; }
     @Override public boolean available() {
-        return apiKey != null && resourceId != null && defaultVoice != null
+        return credentials.available() && resourceId != null && defaultVoice != null
                 && endpoint != null && sampleRate > 0;
     }
-    @Override public String reasonCode() { return available() ? "AVAILABLE" : NOT_CONFIGURED; }
+    @Override public String reasonCode() {
+        return available() ? "AVAILABLE"
+                : credentials.available() ? NOT_CONFIGURED : credentials.reasonCode();
+    }
 
     private byte[] requestBody(Request request, String voice) throws JacksonException {
         Map<String, Object> audioParams = new LinkedHashMap<>();
@@ -146,13 +163,15 @@ public final class VolcengineTextToSpeechAdapter implements TextToSpeechPort, Pr
         return objectMapper.writeValueAsBytes(Map.of("req_params", reqParams));
     }
 
-    private Result decodeStream(InputStream input, AudioSink sink, Optional<String> requestIdHash)
+    private Result decodeStream(InputStream input, AudioSink sink, Optional<String> requestIdHash, String codec)
             throws IOException {
         long sequence = 0;
         long totalBytes = 0;
         long durationMillis = 0;
         BigDecimal billedCharacters = null;
         byte[] pending = null;
+        boolean completed = false;
+        var audio = new java.io.ByteArrayOutputStream();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -161,6 +180,7 @@ public final class VolcengineTextToSpeechAdapter implements TextToSpeechPort, Pr
                 }
                 Map<?, ?> envelope = objectMapper.readValue(line, Map.class);
                 int code = integer(envelope.get("code"), -1);
+                if (code == 20000000) { completed = true; break; }
                 if (code != 0) {
                     return failure("TTS_PROVIDER_ERROR_" + code,
                             VolcengineSpeechSupport.dispositionForProviderCode(code),
@@ -177,6 +197,7 @@ public final class VolcengineTextToSpeechAdapter implements TextToSpeechPort, Pr
                         sink.accept(++sequence, pending, false);
                     }
                     pending = current;
+                    audio.writeBytes(current);
                     totalBytes += current.length;
                 }
                 durationMillis = Math.max(durationMillis, durationMillis(envelope));
@@ -186,7 +207,8 @@ public final class VolcengineTextToSpeechAdapter implements TextToSpeechPort, Pr
             return failure("PROVIDER_BAD_RESPONSE", RetryDisposition.NOT_RETRYABLE,
                     Optional.empty(), requestIdHash);
         }
-        if (pending == null || totalBytes <= 0 || durationMillis <= 0) {
+        if (durationMillis <= 0) durationMillis = AudioContainerDuration.millis(audio.toByteArray(), codec, sampleRate);
+        if (!completed || pending == null || totalBytes <= 0 || durationMillis <= 0) {
             return failure("PROVIDER_BAD_RESPONSE", RetryDisposition.NOT_RETRYABLE,
                     Optional.empty(), requestIdHash);
         }

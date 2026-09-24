@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.aden.infrastructure.persistence.mapper.AdenProjectionMapper">
+  <select id="selectWorkspaceWatermark" resultType="java.lang.Long">
+    select last_event_seq from aden_workspace where workspace_id=#{workspaceId} and workspace_status='ACTIVE'
+  </select>
+  <select id="selectTasks" resultType="com.ruoyi.aden.infrastructure.persistence.mapper.AdenProjectionMapper$TaskRow">
+    select task_id taskId,workspace_id workspaceId,task_type taskType,required_capability capabilityCode,
+           title,task_state state,version,error_code reasonCode,created_at createdAt,updated_at updatedAt,
+           correlation_id correlationId
+      from aden_task
+     where workspace_id=#{workspaceId}
+    <if test="capability != null">and required_capability=#{capability}</if>
+    <if test="beforeUpdatedAt != null">
+      and (updated_at &lt; #{beforeUpdatedAt} or (updated_at=#{beforeUpdatedAt} and task_id &lt; #{beforeTaskId}))
+    </if>
+     order by updated_at desc,task_id desc limit #{limit}
+  </select>
+  <select id="selectTask" resultType="com.ruoyi.aden.infrastructure.persistence.mapper.AdenProjectionMapper$TaskRow">
+    select task_id taskId,workspace_id workspaceId,task_type taskType,required_capability capabilityCode,
+           title,task_state state,version,error_code reasonCode,created_at createdAt,updated_at updatedAt,
+           correlation_id correlationId
+      from aden_task where workspace_id=#{workspaceId} and task_id=#{taskId}
+  </select>
+  <select id="selectSteps" resultType="com.ruoyi.aden.infrastructure.persistence.mapper.AdenProjectionMapper$StepRow">
+    select step_id stepId,task_id taskId,step_no ordinal,step_state state,attempt_no attemptNo,version,
+           coalesce(cast(json_unquote(json_extract(output_json,'$.progressPercent')) as unsigned),0) progressPercent
+      from aden_task_step where workspace_id=#{workspaceId} and task_id=#{taskId}
+     order by step_no,attempt_no,step_id
+  </select>
+  <select id="selectRunners" resultType="com.ruoyi.aden.infrastructure.persistence.mapper.AdenProjectionMapper$RunnerRow">
+    select runner_id runnerId,runner_name displayName,runner_presence presence,
+           capabilities_json capabilitiesJson,current_session_epoch currentSessionEpoch,last_seen_at lastSeenAt
+      from aden_runner where workspace_id=#{workspaceId} order by created_at,runner_id limit #{limit}
+  </select>
+  <select id="selectAudit" resultType="com.ruoyi.aden.infrastructure.persistence.mapper.AdenProjectionMapper$AuditRow">
+    select audit_event_id auditEventId,workspace_id workspaceId,action_code actionCode,outcome,
+           actor_type actorType,actor_id actorId,occurred_at occurredAt,correlation_id correlationId
+      from aden_audit_event where workspace_id=#{workspaceId}
+    <if test="beforeOccurredAt != null">
+      and (occurred_at &lt; #{beforeOccurredAt} or (occurred_at=#{beforeOccurredAt} and audit_event_id &lt; #{beforeAuditId}))
+    </if>
+     order by occurred_at desc,audit_event_id desc limit #{limit}
+  </select>
+  <select id="selectEvents" resultType="com.ruoyi.aden.infrastructure.persistence.mapper.AdenProjectionMapper$EventRow">
+    select event_id eventId,workspace_id workspaceId,event_seq sequence,aggregate_type aggregateType,
+           aggregate_id aggregateId,aggregate_version aggregateVersion,event_type eventType,
+           payload_json payloadJson,occurred_at occurredAt,correlation_id correlationId
+      from aden_event where workspace_id=#{workspaceId} and event_seq &gt; #{afterSequence}
+     order by event_seq asc limit #{limit}
+  </select>
+  <select id="selectOldestEventSequence" resultType="java.lang.Long">
+    select min(event_seq) from aden_event where workspace_id=#{workspaceId}
+  </select>
+</mapper>

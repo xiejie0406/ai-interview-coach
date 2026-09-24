@@ -81,8 +81,9 @@ public class ProviderConfiguration {
         ProviderProperties.VolcengineSpeech speech = providerProperties.getVolcengineSpeech();
         ProviderProperties.Asr asr = speech.getAsr();
         return new VolcengineSpeechToTextAdapter(
-                providerHttpClient(), objectMapper, artifactSource, speech.getApiKey(),
-                asr.getModel(), URI.create(asr.getEndpoint()));
+                providerHttpClient(), objectMapper, artifactSource, speech.getAuthMode(),
+                speech.getApiKey(), speech.getAppId(), speech.getAccessToken(),
+                asr.getModel(), asr.getResourceId(), URI.create(asr.getEndpoint()));
     }
 
     @Bean
@@ -97,8 +98,10 @@ public class ProviderConfiguration {
         ProviderProperties.VolcengineSpeech speech = providerProperties.getVolcengineSpeech();
         ProviderProperties.Tts tts = speech.getTts();
         return new VolcengineTextToSpeechAdapter(
-                providerHttpClient(), objectMapper, speech.getApiKey(), tts.getModel(),
-                tts.getVoice(), URI.create(tts.getEndpoint()), tts.getSampleRate());
+                providerHttpClient(), objectMapper, speech.getAuthMode(), speech.getApiKey(),
+                speech.getAppId(), speech.getAccessToken(), tts.getModel(),
+                tts.getResourceId(), tts.getVoice(), URI.create(tts.getEndpoint()),
+                tts.getSampleRate());
     }
 
     @Bean

@@ -1,0 +1,43 @@
+/* 定向规则验证：只读入代码，不访问服务、账号或业务文件。 */
+'use strict';
+const assert = require('node:assert/strict');
+const IO = require('./file-io.js');
+const clone = x => JSON.parse(JSON.stringify(x));
+const beforeTime = '2026-08-01T01:00:00.000Z', currentTime = '2026-08-02T01:00:00.000Z';
+function state() { return { productVersion: 1, priceVersion: 1, stockVersion: 1, priceAsOf: beforeTime, stockAsOf: beforeTime, batches: [], products: [{ id: 'p1', source: '供应商A', warehouse: '主仓', style: 'TS1', name: '纯棉上衣', category: '上衣', color: '白色', unit: '件', price: 8000, status: 'active', sizes: [{ sku: 'TS1-W-M', size: 'M', stock: 10, price: 8000 }, { sku: 'TS1-W-L', size: 'L', stock: 20, price: 8000 }] }, { id: 'p2', source: '供应商B', warehouse: '主仓', style: 'TS2', name: '其他来源上衣', category: '上衣', color: '黑色', unit: '件', price: 9000, status: 'active', sizes: [{ sku: 'TS2-B-M', size: 'M', stock: 30, price: 9000 }] }] }; }
+const scope = { source: '供应商A', warehouse: '主仓', category: '', includeDrafts: true, priceTable: '批发价' };
+const priceRows = () => [{ source: '供应商A', sku: 'TS1-W-M', warehouse: '主仓', unit: '件', priceTable: '批发价', currency: 'CNY', tax: '含税', price: '81.25', _row: 2 }, { source: '供应商A', sku: 'TS1-W-L', warehouse: '主仓', unit: '件', priceTable: '批发价', currency: 'CNY', tax: '含税', price: '82.90', _row: 3 }];
+const stocks = () => priceRows().map((r, i) => ({ ...r, stock: String(i * 5) }));
+let checks = 0;
+function test(name, fn) { fn(); checks++; console.log('PASS ' + name); }
+function batch(s, kind, rows, sc = scope) { return { ...IO.validate(s, kind, rows, sc, currentTime), id: 'batch-' + kind + '-' + checks }; }
+test('CSV quoted comma, embedded newline and escaped quotes', () => assert.deepEqual(IO.parseCSV('\uFEFFSKU,名称\r\na,"棉,\n\"\"白\"\""'), [['SKU', '名称'], ['a', '棉,\n"白"']]));
+test('CSV rejects unclosed quote / characters after closing quote', () => { assert.throws(() => IO.parseCSV('a,"b')); assert.throws(() => IO.parseCSV('a,"b"c')); });
+test('money precision and integer inventory are strict', () => { assert.equal(IO.cents('19.99'), 1999); assert.equal(IO.integer('0'), 0); for (const x of ['', '19.995', '-2', '1e2', '01']) assert.throws(() => IO.cents(x)); for (const x of ['', '1.1', '-1', '3e4']) assert.throws(() => IO.integer(x)); });
+test('CSV export neutralizes formula text', () => assert.match(IO.csv([['=1+1', '@cmd']]), /'=1\+1/));
+test('full update fails on missing SKU and leaves input untouched', () => { const s = state(), initial = clone(s), b = batch(s, 'price', priceRows().slice(0, 1)); assert.equal(b.valid, false); assert.equal(b.coverage, 50); assert.throws(() => IO.apply(s, b)); assert.deepEqual(s, initial); });
+test('full update rejects repeated/unknown SKU, blank, invalid currency and unit', () => { for (const mutate of [r => r.push(clone(r[0])), r => r[0].sku = 'unknown', r => r[0].price = '', r => r[0].currency = 'USD', r => r[0].unit = '双', r => r[0].price = '0']) { const rows = priceRows(); mutate(rows); assert.equal(batch(state(), 'price', rows).valid, false); } });
+test('atomic valid price applies all rows and keeps other source and stock', () => { const s = state(), b = batch(s, 'price', priceRows()); assert.equal(b.valid, true); IO.apply(s, b); assert.deepEqual(s.products[0].sizes.map(s => s.price), [8125, 8290]); assert.deepEqual(s.products[0].sizes.map(s => s.stock), [10, 20]); assert.equal(s.products[1].sizes[0].price, 9000); assert.equal(s.priceVersion, 2); assert.equal(s.stockVersion, 1); assert.equal(s.priceAsOf, beforeTime); assert.equal(s.dataVersions[0].asOf, currentTime); assert.throws(() => IO.apply(s, b)); });
+test('explicit zero stock works, blank and old time do not', () => { const s = state(), b = batch(s, 'stock', stocks()); IO.apply(s, b); assert.deepEqual(s.products[0].sizes.map(s => s.stock), [0, 5]); const bad = stocks(); bad[0].stock = ''; assert.equal(batch(state(), 'stock', bad).valid, false); assert.equal(IO.validate(s, 'stock', stocks(), scope, beforeTime).valid, false); });
+test('same-scope concurrent change blocks but price and stock batches remain independent', () => { const s = state(), p = batch(s, 'price', priceRows()), i = batch(s, 'stock', stocks()), p2 = { ...batch(s, 'price', priceRows()), id: 'second' }; IO.apply(s, p); IO.apply(s, i); assert.equal(s.stockVersion, 2); assert.throws(() => IO.apply(s, p2), /变化/); });
+test('catalog version changes force revalidation', () => { const s = state(), b = batch(s, 'price', priceRows()); s.productVersion++; assert.throws(() => IO.apply(s, b), /变化/); });
+test('restore preserves old time, other data and records its own version', () => { const s = state(), b = batch(s, 'price', priceRows()); IO.apply(s, b); s.products[0].sizes[0].stock = 99; IO.restore(s, b.id); assert.deepEqual(s.products[0].sizes.map(s => s.price), [8000, 8000]); assert.equal(s.products[0].sizes[0].stock, 99); assert.equal(s.products[0].sizes[0].priceAsOf, beforeTime); assert.equal(s.priceVersion, 3); assert.equal(s.dataVersions[0].restoredFrom, b.id); });
+test('restore refuses partial SKU coverage after catalog changes', () => { const s = state(), b = batch(s, 'stock', stocks()); IO.apply(s, b); s.products[0].sizes.push({ sku: 'NEW', size: 'XL', stock: 1 }); const original = clone(s); assert.throws(() => IO.restore(s, b.id), /SKU/); assert.deepEqual(s, original); });
+test('customer price table applies independently without fallback', () => { const s = state(), sc = { ...scope, priceTable: '团购协议价' }, rows = priceRows().map(r => ({ ...r, priceTable: '团购协议价' })), b = batch(s, 'price', rows, sc); assert.equal(b.valid, true); assert.equal(b.changes[0].before, null); IO.apply(s, b); assert.equal(s.products[0].sizes[0].priceTables['团购协议价'], 8125); assert.equal(s.products[0].sizes[0].price, 8000); IO.restore(s, b.id); assert.equal(s.products[0].sizes[0].priceTables['团购协议价'], null); });
+test('product import does not overwrite price/stock and duplicate file never duplicates SKU', () => { const s = state(), rows = [{ source: '供应商A', sku: 'TS1-W-M', name: '更新商品名', price: '1', stock: '999', _row: 2 }], b = batch(s, 'product', rows); assert.equal(b.valid, true); IO.apply(s, b); assert.equal(s.products[0].name, '更新商品名'); assert.equal(s.products[0].sizes[0].price, 8000); assert.equal(s.products[0].sizes[0].stock, 10); const second = { ...batch(s, 'product', rows), id: 'repeat-file-new-batch' }; IO.apply(s, second); assert.equal(s.products[0].sizes.length, 2); });
+test('new metadata rows create one draft with independent sizes and unknown commerce', () => { const s = state(), rows = ['M', 'L'].map((size, i) => ({ source: '供应商A', sku: 'NEW-' + size, style: 'NEW', name: '新上衣', category: '上衣', color: '白色', size, unit: '件', warehouse: '主仓', _row: i + 2 })), b = batch(s, 'product', rows); assert.equal(b.valid, true); IO.apply(s, b); const p = s.products[2]; assert.equal(p.status, 'draft'); assert.equal(p.sizes.length, 2); assert.equal(p.sizes[0].stock, null); assert.equal(IO.scopeRows(s, { ...scope, includeDrafts: true }).length, 4); assert.equal(IO.scopeRows(s, { ...scope, includeDrafts: false }).length, 2); });
+test('same color metadata conflicts, duplicate sizes and invalid JD links fail', () => { const base = { source: '供应商A', style: 'N', name: '测试', category: '上衣', color: '白色', unit: '件', warehouse: '主仓' }; const rows = [{ ...base, sku: 'NM', size: 'M' }, { ...base, sku: 'NL', size: 'L', category: '鞋' }]; assert.equal(batch(state(), 'product', rows).valid, false); assert.throws(() => IO.validJD('12345', 'https://item.jd.com/54321.html')); assert.throws(() => IO.validJD('', 'https://jd.com.evil.test/12345')); IO.validJD('12345', 'https://item.jd.com/12345.html'); });
+console.log(`Catalog domain checks: ${checks} passed.`);
+test('tax basis is validated, versioned and restored with the values', () => {
+  const s = state(), excluded = { ...scope, taxMode: 'excluded' };
+  assert.equal(batch(s, 'price', priceRows(), excluded).valid, false);
+  const rows = priceRows().map(r => ({ ...r, tax: '未税' }));
+  const b = batch(s, 'price', rows, excluded); assert.equal(b.valid, true); IO.apply(s, b);
+  assert.equal(s.products[0].sizes[0].priceTaxMode, 'excluded');
+  IO.restore(s, b.id); assert.equal(s.products[0].sizes[0].priceTaxMode, 'included');
+  const sc = { ...excluded, priceTable: '未税团购价' };
+  const second = { ...batch(s, 'price', rows.map(r => ({ ...r, priceTable: sc.priceTable })), sc), id: 'untaxed-customer-table' }; IO.apply(s, second);
+  assert.equal(s.products[0].sizes[0].priceTableTaxModes[sc.priceTable], 'excluded');
+  assert.equal(s.products[0].sizes[0].priceTaxMode, 'included');
+});
+console.log(`Final catalog domain checks: ${checks} passed.`);

@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Aden experimental Agent DTOs (provider disabled)",
+  "description": "Experimental only. This file is not referenced by current Operator or Runner OpenAPI.",
+  "$defs": {
+    "RunSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "runSpecId", "runSpecVersion", "agentFamily", "providerMode", "deadlineAt", "maxCandidateBytes", "toolManifestHash"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "runSpecId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+        "runSpecVersion": {"$ref": "../current/common.schema.json#/$defs/CanonicalInt64String"},
+        "agentFamily": {"const": "SYNTHETIC_CORE"},
+        "providerMode": {"const": "provider_disabled"},
+        "deadlineAt": {"$ref": "../current/common.schema.json#/$defs/UtcDateTime"},
+        "maxCandidateBytes": {"type": "integer", "minimum": 256, "maximum": 1048576},
+        "toolManifestHash": {"$ref": "../current/common.schema.json#/$defs/Sha256"}
+      }
+    },
+    "ContextFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["factId", "name", "value", "sourceRef", "sourceVersion"],
+      "properties": {
+        "factId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+        "name": {"type": "string", "pattern": "^[a-z][a-z0-9_.-]{1,63}$"},
+        "value": {"type": ["string", "boolean", "integer", "null"]},
+        "sourceRef": {"type": "string", "minLength": 1, "maxLength": 200},
+        "sourceVersion": {"$ref": "../current/common.schema.json#/$defs/CanonicalInt64String"}
+      }
+    },
+    "ContextView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "contextViewId", "workspaceId", "taskId", "contextVersion", "facts", "contextHash", "createdAt"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "contextViewId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+        "workspaceId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+        "taskId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+        "contextVersion": {"$ref": "../current/common.schema.json#/$defs/CanonicalInt64String"},
+        "facts": {"type": "array", "maxItems": 128, "items": {"$ref": "#/$defs/ContextFact"}},
+        "contextHash": {"$ref": "../current/common.schema.json#/$defs/Sha256"},
+        "createdAt": {"$ref": "../current/common.schema.json#/$defs/UtcDateTime"}
+      }
+    },
+    "ToolDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "effect", "inputSchemaRef", "outputSchemaRef", "maxCalls"],
+      "properties": {
+        "name": {"type": "string", "pattern": "^[a-z][a-z0-9_.-]{2,63}$"},
+        "effect": {"type": "string", "enum": ["read", "proposal"]},
+        "inputSchemaRef": {"type": "string", "pattern": "^schema:[a-z0-9][a-z0-9._/-]{2,127}$"},
+        "outputSchemaRef": {"type": "string", "pattern": "^schema:[a-z0-9][a-z0-9._/-]{2,127}$"},
+        "maxCalls": {"type": "integer", "minimum": 0, "maximum": 32}
+      }
+    },
+    "ToolManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "manifestId", "manifestVersion", "providerMode", "tools", "manifestHash"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "manifestId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+        "manifestVersion": {"$ref": "../current/common.schema.json#/$defs/CanonicalInt64String"},
+        "providerMode": {"const": "provider_disabled"},
+        "tools": {"type": "array", "maxItems": 32, "items": {"$ref": "#/$defs/ToolDefinition"}},
+        "manifestHash": {"$ref": "../current/common.schema.json#/$defs/Sha256"}
+      }
+    },
+    "AgentJob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "jobId", "attemptId", "workspaceId", "taskId", "jobVersion", "fencingToken", "leaseUntil", "runSpec", "contextView", "toolManifest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "jobId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+        "attemptId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+        "workspaceId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+        "taskId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+        "jobVersion": {"$ref": "../current/common.schema.json#/$defs/CanonicalInt64String"},
+        "fencingToken": {"$ref": "../current/common.schema.json#/$defs/CanonicalInt64String"},
+        "leaseUntil": {"$ref": "../current/common.schema.json#/$defs/UtcDateTime"},
+        "runSpec": {"$ref": "#/$defs/RunSpec"},
+        "contextView": {"$ref": "#/$defs/ContextView"},
+        "toolManifest": {"$ref": "#/$defs/ToolManifest"}
+      }
+    },
+    "EvidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["factId", "sourceRef", "sourceVersion"],
+      "properties": {
+        "factId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+        "sourceRef": {"type": "string", "minLength": 1, "maxLength": 200},
+        "sourceVersion": {"$ref": "../current/common.schema.json#/$defs/CanonicalInt64String"}
+      }
+    },
+    "Candidate": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schemaVersion", "candidateId", "jobId", "attemptId", "fencingToken", "kind", "reasonCode", "evidence", "resultHash", "createdAt"],
+          "properties": {
+            "schemaVersion": {"const": 1},
+            "candidateId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+            "jobId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+            "attemptId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+            "fencingToken": {"$ref": "../current/common.schema.json#/$defs/CanonicalInt64String"},
+            "kind": {"const": "NO_ACTION"},
+            "reasonCode": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$"},
+            "evidence": {"type": "array", "maxItems": 32, "items": {"$ref": "#/$defs/EvidenceRef"}},
+            "resultHash": {"$ref": "../current/common.schema.json#/$defs/Sha256"},
+            "createdAt": {"$ref": "../current/common.schema.json#/$defs/UtcDateTime"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schemaVersion", "candidateId", "jobId", "attemptId", "fencingToken", "kind", "proposalType", "summary", "evidence", "resultHash", "createdAt"],
+          "properties": {
+            "schemaVersion": {"const": 1},
+            "candidateId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+            "jobId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+            "attemptId": {"$ref": "../current/common.schema.json#/$defs/Uuid"},
+            "fencingToken": {"$ref": "../current/common.schema.json#/$defs/CanonicalInt64String"},
+            "kind": {"const": "PROPOSAL"},
+            "proposalType": {"const": "SYNTHETIC_SUMMARY"},
+            "summary": {"type": "string", "minLength": 1, "maxLength": 1000},
+            "evidence": {"type": "array", "minItems": 1, "maxItems": 32, "items": {"$ref": "#/$defs/EvidenceRef"}},
+            "resultHash": {"$ref": "../current/common.schema.json#/$defs/Sha256"},
+            "createdAt": {"$ref": "../current/common.schema.json#/$defs/UtcDateTime"}
+          }
+        }
+      ]
+    }
+  }
+}

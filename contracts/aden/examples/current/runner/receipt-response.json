@@ -1,0 +1,12 @@
+{
+  "receiptId": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+  "disposition": "ACCEPTED",
+  "deliveryId": "66666666-6666-4666-8666-666666666666",
+  "deliveryState": "COMPLETED",
+  "taskId": "22222222-2222-4222-8222-222222222222",
+  "taskState": "SUCCEEDED",
+  "taskVersion": "9007199254740992",
+  "lastReceiptSequence": "2",
+  "acceptedAt": "2026-09-12T12:00:21Z",
+  "correlationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+}

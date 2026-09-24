@@ -1,0 +1,67 @@
+{
+  "at": "2026-09-10T17:24:18.633Z",
+  "browser": "152.0.7977.83",
+  "results": [
+    {
+      "label": "同炉设备条显示整批200件",
+      "result": "Pass",
+      "detail": {
+        "text": "H1 · 同炉热处理\nO-100 200件"
+      }
+    },
+    {
+      "label": "订单交期入口打开对应详情",
+      "result": "Pass",
+      "detail": {
+        "title": "O-100 · 远航装备"
+      }
+    },
+    {
+      "label": "连续转移三段各显示20件",
+      "result": "Pass",
+      "detail": {
+        "labels": [
+          "T 流转件 · 后序按20件转移批加工\nO-400 20件",
+          "T 流转件 · 后序按20件转移批加工\nO-400 20件",
+          "T 流转件 · 后序按20件转移批加工\nO-400 20件"
+        ]
+      }
+    },
+    {
+      "label": "最终桌面和窄屏工作台截图",
+      "result": "Pass",
+      "detail": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "icons": 0
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "icons": 0
+        }
+      ]
+    },
+    {
+      "label": "已执行任务抽屉图标正常渲染",
+      "result": "Pass",
+      "detail": {
+        "ok": true,
+        "message": "A10 状态已更新"
+      }
+    },
+    {
+      "label": "三项目入口连接排程V2并保持其他项目入口",
+      "result": "Fail",
+      "error": "服装入口变化"
+    },
+    {
+      "label": "最终差异运行无页面异常",
+      "result": "Pass",
+      "detail": {
+        "errors": []
+      }
+    }
+  ]
+}

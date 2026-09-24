@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "1.0",
+  "contractType": "SOLVER_INPUT",
+  "requestId": "19191919-1919-4919-8919-191919191919",
+  "planVersionId": "20212121-2121-4121-8121-212121212121",
+  "capturedAt": "2026-09-15T00:00:00.000Z",
+  "definitionRevision": 7,
+  "executionRevision": 4,
+  "inputHash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "hashAlgorithm": "SHA-256",
+  "canonicalization": "JCS-RFC8785",
+  "modelVersion": "aps-cpsat-v1",
+  "scope": {
+    "siteCode": "SITE_01",
+    "workshopIds": ["22232323-2323-4323-8323-232323232323"]
+  },
+  "horizon": {
+    "startAt": "2026-09-15T00:00:00.000Z",
+    "detailEndAt": "2026-09-16T00:00:00.000Z",
+    "endAt": "2026-09-17T00:00:00.000Z",
+    "planningAnchorAt": "2026-09-15T00:00:00.000Z",
+    "timeUnitSeconds": 60,
+    "displayTimeZone": "Asia/Shanghai"
+  },
+  "baseVersion": null,
+  "parameters": {
+    "direction": "FORWARD",
+    "maxSolveSeconds": 30,
+    "randomSeed": 1,
+    "solverSearchThreads": 1,
+    "absoluteGapLimit": 0,
+    "relativeGapLimit": 0
+  },
+  "resources": [],
+  "availabilityWindows": [],
+  "tasks": [],
+  "dependencies": [],
+  "materialSupplies": [],
+  "materialDemands": [],
+  "sharedBatchCandidates": [],
+  "locks": [],
+  "actualOccupancies": [
+    {
+      "occupancyId": "24242424-2424-4424-8424-242424242424",
+      "planJobId": "29292929-2929-4929-8929-292929292929",
+      "executionRunId": "30313131-3131-4131-8131-313131313131",
+      "sourcePlanSegmentId": null,
+      "resourceId": "25252525-2525-4525-8525-252525252525",
+      "occupiedResourceRole": "MACHINE",
+      "taskId": "26262626-2626-4626-8626-262626262626",
+      "activityType": "RUN",
+      "startAt": "2026-09-14T23:30:00.000Z",
+      "endAt": null,
+      "currentPhase": {
+        "operationSpecId": "27272727-2727-4727-8727-272727272727",
+        "phaseId": "28282828-2828-4828-8828-282828282828",
+        "phaseType": "RUN"
+      },
+      "remainingDurationSeconds": 1800,
+      "remainingQuantity": null,
+      "remainingQuantityUomCode": null,
+      "releaseAt": null,
+      "releaseConfidence": "TRUSTED"
+    }
+  ]
+}

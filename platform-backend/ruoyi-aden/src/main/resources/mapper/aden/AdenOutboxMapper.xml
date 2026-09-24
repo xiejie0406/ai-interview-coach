@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.aden.infrastructure.persistence.mapper.AdenOutboxMapper">
+    <resultMap id="outboxMessage" type="com.ruoyi.aden.infrastructure.persistence.mapper.AdenOutboxRow">
+        <id property="outboxId" column="outbox_id"/>
+        <result property="workspaceId" column="workspace_id"/>
+        <result property="eventId" column="event_id"/>
+        <result property="eventSequence" column="event_seq"/>
+        <result property="eventType" column="event_type"/>
+        <result property="payloadJson" column="payload_json"/>
+        <result property="correlationId" column="correlation_id"/>
+        <result property="consumer" column="consumer"/>
+        <result property="outboxState" column="outbox_state"/>
+        <result property="attempts" column="attempts"/>
+        <result property="claimToken" column="claim_token"/>
+        <result property="claimedUntil" column="claimed_until"/>
+    </resultMap>
+
+    <select id="selectReadyForUpdate" resultMap="outboxMessage">
+        select o.workspace_id, o.outbox_id, o.event_id, e.event_seq, e.event_type,
+               e.payload_json, e.correlation_id, o.consumer, o.outbox_state,
+               o.attempts, o.claim_token, o.claimed_until
+          from aden_outbox o
+          join aden_event e
+            on e.workspace_id = o.workspace_id
+           and e.event_id = o.event_id
+         where (o.outbox_state = 'PENDING' and o.available_at &lt;= #{now})
+            or (o.outbox_state = 'CLAIMED' and o.claimed_until &lt;= #{now})
+         order by o.available_at, o.workspace_id, o.outbox_id
+         limit #{limit}
+         for update skip locked
+    </select>
+
+    <update id="claim">
+        update aden_outbox
+           set outbox_state = 'CLAIMED', attempts = attempts + 1,
+               claim_token = #{claimToken}, claimed_until = #{claimedUntil}, updated_at = #{now}
+         where workspace_id = #{workspaceId}
+           and outbox_id = #{outboxId}
+           and ((outbox_state = 'PENDING' and available_at &lt;= #{now})
+             or (outbox_state = 'CLAIMED' and claimed_until &lt;= #{now}))
+    </update>
+
+    <select id="selectClaimed" resultMap="outboxMessage">
+        select o.workspace_id, o.outbox_id, o.event_id, e.event_seq, e.event_type,
+               e.payload_json, e.correlation_id, o.consumer, o.outbox_state,
+               o.attempts, o.claim_token, o.claimed_until
+          from aden_outbox o
+          join aden_event e
+            on e.workspace_id = o.workspace_id
+           and e.event_id = o.event_id
+         where o.workspace_id = #{workspaceId}
+           and o.outbox_id = #{outboxId}
+           and o.outbox_state = 'CLAIMED'
+           and o.claim_token = #{claimToken}
+    </select>
+
+    <update id="markPublished">
+        update aden_outbox
+           set outbox_state = 'PUBLISHED', claim_token = null, claimed_until = null,
+               last_error = null, published_at = #{publishedAt}, updated_at = #{publishedAt}
+         where workspace_id = #{workspaceId} and outbox_id = #{outboxId}
+           and outbox_state = 'CLAIMED' and claim_token = #{claimToken}
+    </update>
+
+    <update id="markRetry">
+        update aden_outbox
+           set outbox_state = 'PENDING', claim_token = null, claimed_until = null,
+               last_error = #{error}, available_at = #{nextAvailableAt}, updated_at = #{updatedAt}
+         where workspace_id = #{workspaceId} and outbox_id = #{outboxId}
+           and outbox_state = 'CLAIMED' and claim_token = #{claimToken}
+    </update>
+
+    <update id="markDead">
+        update aden_outbox
+           set outbox_state = 'DEAD', claim_token = null, claimed_until = null,
+               last_error = #{error}, updated_at = #{updatedAt}
+         where workspace_id = #{workspaceId} and outbox_id = #{outboxId}
+           and outbox_state = 'CLAIMED' and claim_token = #{claimToken}
+    </update>
+</mapper>

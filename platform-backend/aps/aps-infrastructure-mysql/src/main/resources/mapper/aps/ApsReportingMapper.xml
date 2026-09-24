@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.aps.infrastructure.mysql.mapper.ApsReportingMapper">
+
+    <sql id="taskIdentityColumns">
+        w.id workshop_id,w.workshop_code,w.workshop_name,
+        c.id work_center_id,c.center_code work_center_code,c.center_name work_center_name,
+        os.id operation_spec_id,os.operation_code,os.operation_name,
+        o.id order_id,o.order_no,ol.id order_line_id,ol.line_no,
+        i.id item_id,i.item_code,i.item_name,
+        pl.id production_lot_id,pl.lot_no,t.id task_id,t.task_code,t.task_name,t.status task_status,
+        t.uom_code,COALESCE(ol.promised_at,o.promised_at) promised_at
+    </sql>
+
+    <sql id="taskIdentityJoins">
+        JOIN aps_task t ON t.id=m.task_id
+        JOIN aps_operation_spec os ON os.id=t.operation_spec_id
+        JOIN aps_production_lot pl ON pl.id=t.production_lot_id
+        JOIN aps_order_line ol ON ol.id=pl.order_line_id
+        JOIN aps_order o ON o.id=ol.order_id
+        JOIN aps_item i ON i.id=ol.item_id
+        LEFT JOIN aps_work_center c ON c.id=t.work_center_id
+        LEFT JOIN aps_workshop w ON w.id=c.workshop_id
+    </sql>
+
+    <sql id="scopeFilter">
+        AND (#{allScope}=TRUE OR w.manager_user_id=#{actorUserId})
+        <if test="workshopId != null">AND w.id=#{workshopId}</if>
+        <if test="workCenterId != null">AND c.id=#{workCenterId}</if>
+    </sql>
+
+    <select id="findDailyBaseline" resultType="map">
+        SELECT id,version_name,published_at,daily_baseline_date
+        FROM aps_plan_version WHERE daily_baseline_date=#{businessDate}
+    </select>
+
+    <select id="findCurrentPublished" resultType="map">
+        SELECT id,version_name,published_at,daily_baseline_date
+        FROM aps_plan_version WHERE status='PUBLISHED' AND is_current=1
+    </select>
+
+    <select id="listPlanSegmentFacts" resultType="map">
+        SELECT <include refid="taskIdentityColumns"/>,j.plan_version_id,j.id plan_job_id,
+               s.id plan_segment_id,a.id allocation_id,a.allocation_role,a.resource_id,
+               s.start_at,s.end_at,s.release_at,s.release_qty,
+               m.planned_qty member_qty,j.planned_qty job_qty
+        FROM aps_plan_job j
+        JOIN aps_plan_job_member m ON m.plan_job_id=j.id
+        <include refid="taskIdentityJoins"/>
+        JOIN aps_plan_segment s ON s.plan_job_id=j.id
+        LEFT JOIN aps_plan_allocation a ON a.plan_segment_id=s.id
+        WHERE j.plan_version_id=#{planVersionId}
+          AND s.start_at &lt; #{toAt} AND s.end_at &gt; #{fromAt}
+        <include refid="scopeFilter"/>
+        ORDER BY w.workshop_code,c.center_code,o.order_no,ol.line_no,t.task_code,s.segment_no,a.allocation_role,a.seat_no
+    </select>
+
+    <select id="listActualOccupancyFacts" resultType="map">
+        SELECT <include refid="taskIdentityColumns"/>,ao.id occupancy_id,ao.resource_id,r.resource_type,
+               ao.start_at,ao.end_at,m.planned_qty member_qty,j.planned_qty job_qty
+        FROM aps_actual_occupancy ao
+        JOIN aps_execution_run er ON er.id=ao.execution_run_id
+        JOIN aps_plan_job j ON j.id=er.plan_job_id
+        JOIN aps_plan_job_member m ON m.plan_job_id=j.id
+        <include refid="taskIdentityJoins"/>
+        JOIN aps_resource r ON r.id=ao.resource_id
+        WHERE ao.status IN ('ACTIVE','COMPLETED','CORRECTION')
+          AND NOT EXISTS (SELECT 1 FROM aps_actual_occupancy newer WHERE newer.correction_of_id=ao.id)
+          AND ao.start_at &lt; #{toAt} AND COALESCE(ao.end_at,#{toAt}) &gt; #{fromAt}
+        <include refid="scopeFilter"/>
+        ORDER BY ao.start_at,ao.id,m.member_no
+    </select>
+
+    <select id="listProductionReportFacts" resultType="map">
+        SELECT <include refid="taskIdentityColumns"/>,COALESCE(correction.id,p.id) report_id,
+               COALESCE(correction.reported_at,p.reported_at) occurred_at,
+               COALESCE(correction.processed_qty,p.processed_qty) processed_qty,
+               COALESCE(correction.rejected_qty,p.rejected_qty) rejected_qty,
+               COALESCE(correction.scrap_qty,p.scrap_qty) scrap_qty,
+               COALESCE(correction.transferred_qty,p.transferred_qty) transferred_qty
+        FROM aps_production_report p
+        LEFT JOIN aps_production_report correction ON correction.correction_of_id=p.id
+        JOIN aps_plan_job_member m ON m.id=p.plan_job_member_id
+        JOIN aps_plan_job j ON j.id=m.plan_job_id
+        <include refid="taskIdentityJoins"/>
+        WHERE p.report_type&lt;&gt;'CORRECTION'
+          AND COALESCE(correction.reported_at,p.reported_at)&gt;=#{fromAt}
+          AND COALESCE(correction.reported_at,p.reported_at)&lt;#{toAt}
+        <include refid="scopeFilter"/>
+        ORDER BY occurred_at,report_id
+    </select>
+
+    <select id="listQuantityFacts" resultType="map">
+        SELECT <include refid="taskIdentityColumns"/>,qe.id event_id,qe.event_type,
+               original.event_type original_event_type,qe.from_bucket,qe.to_bucket,
+               qe.occurred_at,qe.quantity
+        FROM aps_quantity_event qe
+        JOIN aps_output_lot output ON output.id=qe.output_lot_id
+        JOIN aps_task t0 ON t0.id=output.source_task_id
+        JOIN aps_plan_job_member m ON m.task_id=t0.id
+        JOIN aps_plan_job j ON j.id=m.plan_job_id AND j.id=(
+            SELECT j2.id FROM aps_plan_job_member m2 JOIN aps_plan_job j2 ON j2.id=m2.plan_job_id
+            WHERE m2.task_id=t0.id ORDER BY j2.created_at DESC,j2.id DESC LIMIT 1)
+        <include refid="taskIdentityJoins"/>
+        LEFT JOIN aps_quantity_event original ON original.id=qe.reversal_of_id
+        WHERE qe.occurred_at&gt;=#{fromAt} AND qe.occurred_at&lt;#{toAt}
+        <include refid="scopeFilter"/>
+        ORDER BY qe.occurred_at,qe.id
+    </select>
+
+    <select id="listPeople" resultType="map">
+        SELECT r.id resource_id,r.resource_code,r.resource_name,r.team_name,
+               w.id workshop_id,w.workshop_code,w.workshop_name,
+               c.id work_center_id,c.center_code work_center_code,c.center_name work_center_name,
+               rs.skill_code,rs.valid_from skill_valid_from,rs.valid_to skill_valid_to
+        FROM aps_resource r
+        JOIN aps_workshop w ON w.id=r.workshop_id
+        LEFT JOIN aps_work_center c ON c.id=r.work_center_id
+        LEFT JOIN aps_resource_skill rs ON rs.resource_id=r.id AND rs.status='ACTIVE'
+          AND (rs.valid_from IS NULL OR rs.valid_from&lt;#{toAt})
+          AND (rs.valid_to IS NULL OR rs.valid_to&gt;#{fromAt})
+        WHERE r.resource_type='PERSON' AND r.status='ACTIVE'
+          AND (#{allScope}=TRUE OR w.manager_user_id=#{actorUserId})
+        <if test="workshopId != null">AND w.id=#{workshopId}</if>
+        <if test="workCenterId != null">AND c.id=#{workCenterId}</if>
+        ORDER BY w.workshop_code,c.center_code,r.resource_code,rs.skill_code,rs.valid_from
+    </select>
+
+    <select id="listAvailability" resultType="map">
+        SELECT a.resource_id,a.window_type,a.start_at,a.end_at,a.capacity_ratio
+        FROM aps_resource_availability a
+        JOIN aps_resource r ON r.id=a.resource_id
+        JOIN aps_workshop w ON w.id=r.workshop_id
+        LEFT JOIN aps_work_center c ON c.id=r.work_center_id
+        WHERE r.resource_type='PERSON' AND r.status='ACTIVE'
+          AND a.start_at&lt;#{toAt} AND a.end_at&gt;#{fromAt}
+          AND (#{allScope}=TRUE OR w.manager_user_id=#{actorUserId})
+        <if test="workshopId != null">AND w.id=#{workshopId}</if>
+        <if test="workCenterId != null">AND c.id=#{workCenterId}</if>
+        ORDER BY a.resource_id,a.start_at,a.end_at,a.window_type
+    </select>
+
+    <select id="listPlannedLabor" resultType="map">
+        SELECT s.id segment_id,a.id allocation_id,a.resource_id,
+               COALESCE(rr.required_skill_code,'UNSPECIFIED') skill_code,
+               s.start_at,s.end_at
+        FROM aps_plan_segment s
+        JOIN aps_plan_job j ON j.id=s.plan_job_id
+        JOIN aps_plan_allocation a ON a.plan_segment_id=s.id AND a.allocation_role='PERSON'
+        JOIN aps_resource_requirement rr ON rr.id=a.resource_requirement_id
+        JOIN aps_resource r ON r.id=a.resource_id
+        JOIN aps_workshop w ON w.id=r.workshop_id
+        LEFT JOIN aps_work_center c ON c.id=r.work_center_id
+        WHERE j.plan_version_id=#{planVersionId}
+          AND s.start_at&lt;#{toAt} AND s.end_at&gt;#{fromAt}
+          AND (#{allScope}=TRUE OR w.manager_user_id=#{actorUserId})
+        <if test="workshopId != null">AND w.id=#{workshopId}</if>
+        <if test="workCenterId != null">AND c.id=#{workCenterId}</if>
+        <if test="skillCode != null">AND rr.required_skill_code=#{skillCode}</if>
+        ORDER BY s.start_at,s.id,a.seat_no
+    </select>
+
+    <select id="listUnplannedLabor" resultType="map">
+        SELECT t.id task_id,COALESCE(rr.required_skill_code,t.required_skill_code,'UNSPECIFIED') skill_code,
+               1 required_people,
+               CAST(SUM((ph.fixed_seconds + ph.seconds_per_unit*t.task_qty)*rr.seat_count) AS SIGNED) required_seconds
+        FROM aps_task t
+        LEFT JOIN aps_work_center c ON c.id=t.work_center_id
+        LEFT JOIN aps_workshop w ON w.id=c.workshop_id
+        JOIN aps_operation_phase ph ON ph.operation_spec_id=t.operation_spec_id
+        JOIN aps_resource_requirement rr ON rr.operation_phase_id=ph.id AND rr.resource_type='PERSON'
+            AND rr.optional_flag=0
+        WHERE t.status NOT IN ('COMPLETED','CANCELLED')
+          AND (#{planVersionId} IS NULL OR NOT EXISTS (
+              SELECT 1 FROM aps_plan_job_member pm JOIN aps_plan_job pj ON pj.id=pm.plan_job_id
+              WHERE pm.task_id=t.id AND pj.plan_version_id=#{planVersionId}))
+          AND (#{allScope}=TRUE OR w.manager_user_id=#{actorUserId})
+        <if test="workshopId != null">AND w.id=#{workshopId}</if>
+        <if test="workCenterId != null">AND c.id=#{workCenterId}</if>
+        <if test="skillCode != null">AND COALESCE(rr.required_skill_code,t.required_skill_code)=#{skillCode}</if>
+        GROUP BY t.id,COALESCE(rr.required_skill_code,t.required_skill_code,'UNSPECIFIED')
+        ORDER BY skill_code,t.id
+    </select>
+
+    <select id="listOrderTaskFacts" resultType="map">
+        SELECT o.id order_id,o.order_no,o.status order_status,o.promised_at order_promised_at,
+               ol.id order_line_id,ol.line_no,ol.status line_status,ol.promised_at line_promised_at,
+               i.id item_id,i.item_code,i.item_name,ol.demand_qty,ol.uom_code,
+               t.id task_id,t.task_code,t.status task_status,
+               NOT EXISTS (SELECT 1 FROM aps_route_edge edge
+                    WHERE edge.route_version_id=t.route_version_id
+                      AND edge.predecessor_node_id=t.route_node_id) terminal_task,
+               planned.planned_end_at,
+               CASE WHEN terminal_release.task_id IS NULL THEN 0 ELSE terminal_release.released_qty END terminal_released_qty,
+               terminal_release.released_at terminal_released_at,
+               (SELECT COUNT(*) FROM aps_material_demand md WHERE md.target_task_id=t.id
+                    AND md.material_status NOT IN ('AVAILABLE','CONSUMED','CANCELLED')) unavailable_material_count,
+               (SELECT COUNT(*) FROM aps_output_lot out_lot WHERE out_lot.source_task_id=t.id
+                    AND out_lot.quality_status IN ('PENDING','HOLD','REJECTED')) quality_hold_count,
+               (t.work_center_id IS NULL) missing_resource,
+               (t.setup_seconds+t.run_seconds+t.unload_seconds+t.wait_seconds+t.transport_seconds=0) missing_duration,
+               (SELECT COUNT(*)
+                  FROM aps_production_lot hidden_pl
+                  JOIN aps_task hidden_t ON hidden_t.production_lot_id=hidden_pl.id
+                       AND hidden_t.status&lt;&gt;'CANCELLED'
+                  LEFT JOIN aps_work_center hidden_c ON hidden_c.id=hidden_t.work_center_id
+                  LEFT JOIN aps_workshop hidden_w ON hidden_w.id=hidden_c.workshop_id
+                 WHERE hidden_pl.order_line_id=ol.id AND #{allScope}=FALSE
+                   AND (hidden_w.manager_user_id IS NULL OR hidden_w.manager_user_id&lt;&gt;#{actorUserId})
+               ) hidden_scope_task_count
+        FROM aps_order o
+        JOIN aps_order_line ol ON ol.order_id=o.id
+        JOIN aps_item i ON i.id=ol.item_id
+        JOIN aps_production_lot pl ON pl.order_line_id=ol.id AND pl.status&lt;&gt;'CANCELLED'
+        JOIN aps_task t ON t.production_lot_id=pl.id AND t.status&lt;&gt;'CANCELLED'
+        LEFT JOIN aps_work_center c ON c.id=t.work_center_id
+        LEFT JOIN aps_workshop w ON w.id=c.workshop_id
+        LEFT JOIN (
+            SELECT pm.task_id,MAX(pj.planned_end_at) planned_end_at
+            FROM aps_plan_job_member pm JOIN aps_plan_job pj ON pj.id=pm.plan_job_id
+            WHERE #{planVersionId} IS NOT NULL AND pj.plan_version_id=#{planVersionId}
+            GROUP BY pm.task_id
+        ) planned ON planned.task_id=t.id
+        LEFT JOIN (
+            SELECT per_lot.source_task_id task_id,SUM(per_lot.released_qty) released_qty,
+                   MAX(per_lot.released_at) released_at
+            FROM (
+                SELECT out_lot.id,out_lot.source_task_id,
+                       CASE WHEN out_lot.quality_status IN ('RELEASED','CLOSED')
+                                  AND out_lot.disposition_type&lt;&gt;'REWORK'
+                            THEN out_lot.total_qty-out_lot.scrapped_qty ELSE 0 END released_qty,
+                       MAX(CASE WHEN qe.event_type='QUALITY_RELEASE' THEN qe.occurred_at END) released_at
+                FROM aps_output_lot out_lot
+                LEFT JOIN aps_quantity_event qe ON qe.output_lot_id=out_lot.id
+                GROUP BY out_lot.id,out_lot.source_task_id,out_lot.quality_status,
+                         out_lot.disposition_type,out_lot.total_qty,out_lot.scrapped_qty
+            ) per_lot
+            GROUP BY per_lot.source_task_id
+        ) terminal_release ON terminal_release.task_id=t.id
+        WHERE (#{orderId} IS NULL OR o.id=#{orderId})
+          AND (#{allScope}=TRUE OR w.manager_user_id=#{actorUserId})
+        ORDER BY o.order_no,ol.line_no,t.task_code
+    </select>
+</mapper>

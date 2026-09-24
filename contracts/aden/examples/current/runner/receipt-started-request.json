@@ -1,0 +1,9 @@
+{
+  "receiptId": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+  "sessionEpoch": "9007199254740992",
+  "fencingToken": "9007199254740992",
+  "receiptSequence": "1",
+  "kind": "STARTED",
+  "observedAt": "2026-09-12T12:00:10Z",
+  "data": {"startedAt": "2026-09-12T12:00:10Z"}
+}

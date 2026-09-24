@@ -2,6 +2,8 @@ package com.ruoyi.interview.infrastructure.provider;
 
 /** 火山控制台展示名/项目 profile 到官方 Resource ID 的最小映射。 */
 final class VolcengineSpeechProfiles {
+    private static final int MAX_RESOURCE_ID_LENGTH = 128;
+
     private VolcengineSpeechProfiles() {
     }
 
@@ -30,6 +32,18 @@ final class VolcengineSpeechProfiles {
 
     static String normalized(String value) {
         return value == null || value.isBlank() ? null : value.trim();
+    }
+
+    static String configuredResourceId(String configured, String fallback) {
+        String value = normalized(configured);
+        if (value == null) {
+            return fallback;
+        }
+        if (value.length() > MAX_RESOURCE_ID_LENGTH
+                || !value.matches("[A-Za-z0-9._-]+")) {
+            return null;
+        }
+        return value;
     }
 }
 

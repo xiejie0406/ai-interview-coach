@@ -1,0 +1,719 @@
+{
+  "runId": "2026-09-10T17-22-10-051Z",
+  "startedAt": "2026-09-10T17-22-10-051Z",
+  "command": "C:\\Users\\admin\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs",
+  "exitCode": 0,
+  "environment": {
+    "node": "v24.19.0",
+    "playwright": "1.62.1",
+    "executablePath": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    "base": "http://127.0.0.1:8789/02-agent-desktop-execution/sourcing-v2/",
+    "locale": "zh-CN",
+    "timezone": "Asia/Shanghai",
+    "mode": "独立无登录态 Chrome，仅本地原型 UI；不是真实平台或生产验收",
+    "sourceFilesAtStart": {
+      "app.js": {
+        "sha256": "5ae370004422816329088f41d1673abd35d104dd7011bfb3e4992d943ec6f09c",
+        "modifiedAt": "2026-09-10T17:18:26.447Z"
+      },
+      "data.js": {
+        "sha256": "3fdacfe7220de067f74c62146aa42b4b5e7bc0ac6fb26f943bff4f70e4ae6a39",
+        "modifiedAt": "2026-09-10T17:18:26.445Z"
+      },
+      "style.css": {
+        "sha256": "8f653cf932be9df003f4b76a89dcb6b049e5cb22bf8bc9fc25af7708e7c599e8",
+        "modifiedAt": "2026-09-10T17:17:34.914Z"
+      },
+      "index.html": {
+        "sha256": "ee240d6828bbbe7cde9cd9fc3b368652bf9c15939a26348d1bb6dcb90ab65ddd",
+        "modifiedAt": "2026-09-10T17:03:29.018Z"
+      }
+    },
+    "chromium": "152.0.7977.83",
+    "sourceFilesAtEnd": {
+      "app.js": {
+        "sha256": "5ae370004422816329088f41d1673abd35d104dd7011bfb3e4992d943ec6f09c",
+        "modifiedAt": "2026-09-10T17:18:26.447Z"
+      },
+      "data.js": {
+        "sha256": "3fdacfe7220de067f74c62146aa42b4b5e7bc0ac6fb26f943bff4f70e4ae6a39",
+        "modifiedAt": "2026-09-10T17:18:26.445Z"
+      },
+      "style.css": {
+        "sha256": "8f653cf932be9df003f4b76a89dcb6b049e5cb22bf8bc9fc25af7708e7c599e8",
+        "modifiedAt": "2026-09-10T17:17:34.914Z"
+      },
+      "index.html": {
+        "sha256": "ee240d6828bbbe7cde9cd9fc3b368652bf9c15939a26348d1bb6dcb90ab65ddd",
+        "modifiedAt": "2026-09-10T17:03:29.018Z"
+      }
+    }
+  },
+  "summary": {
+    "passed": 37,
+    "failed": 0
+  },
+  "results": [
+    {
+      "label": "金额 / 独立 VM 精确金额与所有比较约束（非浏览器）",
+      "status": "Pass",
+      "elapsedMs": 5,
+      "detail": {
+        "cost": 19850,
+        "packagingPrecision": 350,
+        "variants": [
+          {
+            "field": "shipping",
+            "value": null,
+            "reasons": [
+              "运费待确认"
+            ],
+            "total": null
+          },
+          {
+            "field": "taxBasis",
+            "value": null,
+            "reasons": [
+              "税费口径待确认"
+            ],
+            "total": null
+          },
+          {
+            "field": "currency",
+            "value": "USD",
+            "reasons": [
+              "币种不一致",
+              "金额精度或比较口径待核验"
+            ],
+            "total": null
+          },
+          {
+            "field": "quantity",
+            "value": 999,
+            "reasons": [
+              "数量口径不一致",
+              "金额精度或比较口径待核验"
+            ],
+            "total": null
+          },
+          {
+            "field": "unit",
+            "value": "米",
+            "reasons": [
+              "计量单位不一致",
+              "金额精度或比较口径待核验"
+            ],
+            "total": null
+          },
+          {
+            "field": "destination",
+            "value": "北京",
+            "reasons": [
+              "收货地不一致",
+              "金额精度或比较口径待核验"
+            ],
+            "total": null
+          },
+          {
+            "field": "specification",
+            "value": "其他规格",
+            "reasons": [
+              "规格条件不一致",
+              "金额精度或比较口径待核验"
+            ],
+            "total": null
+          },
+          {
+            "field": "moq",
+            "value": 1001,
+            "reasons": [
+              "未达到起订量"
+            ],
+            "total": 19850
+          },
+          {
+            "field": "validUntil",
+            "value": "2020-01-01",
+            "reasons": [
+              "报价已过期"
+            ],
+            "total": 19850
+          },
+          {
+            "field": "leadStartDate",
+            "value": null,
+            "reasons": [
+              "交期起算或运输条件待确认"
+            ],
+            "total": 19850
+          },
+          {
+            "field": "leadMilestone",
+            "value": "出货",
+            "reasons": [
+              "交期起算或运输条件待确认"
+            ],
+            "total": 19850
+          }
+        ],
+        "arrival": {
+          "valid": false,
+          "reasons": [
+            "预计到货超过最晚交货要求"
+          ],
+          "total": 19850,
+          "expectedArrival": "2026-09-19"
+        }
+      }
+    },
+    {
+      "label": "布局 1440 dashboard",
+      "status": "Pass",
+      "elapsedMs": 799,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440,
+        "headingTop": 121,
+        "topbarBottom": 70
+      }
+    },
+    {
+      "label": "布局 1440 tasks",
+      "status": "Pass",
+      "elapsedMs": 183,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440,
+        "headingTop": 121,
+        "topbarBottom": 70
+      }
+    },
+    {
+      "label": "布局 1440 new",
+      "status": "Pass",
+      "elapsedMs": 742,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440,
+        "headingTop": 121,
+        "topbarBottom": 70
+      }
+    },
+    {
+      "label": "布局 1440 candidates/AD-260911-001",
+      "status": "Pass",
+      "elapsedMs": 174,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440,
+        "headingTop": 121,
+        "topbarBottom": 70
+      }
+    },
+    {
+      "label": "布局 1440 conversations/AD-260911-001",
+      "status": "Pass",
+      "elapsedMs": 384,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440,
+        "headingTop": 121,
+        "topbarBottom": 70
+      }
+    },
+    {
+      "label": "布局 1440 quotes/AD-260911-001",
+      "status": "Pass",
+      "elapsedMs": 326,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440,
+        "headingTop": 121,
+        "topbarBottom": 70
+      }
+    },
+    {
+      "label": "布局 1440 suppliers",
+      "status": "Pass",
+      "elapsedMs": 177,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440,
+        "headingTop": 121,
+        "topbarBottom": 70
+      }
+    },
+    {
+      "label": "布局 1440 connections",
+      "status": "Pass",
+      "elapsedMs": 178,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440,
+        "headingTop": 121,
+        "topbarBottom": 70
+      }
+    },
+    {
+      "label": "布局 1440 rules",
+      "status": "Pass",
+      "elapsedMs": 175,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440,
+        "headingTop": 121,
+        "topbarBottom": 70
+      }
+    },
+    {
+      "label": "布局 1440 activity",
+      "status": "Pass",
+      "elapsedMs": 156,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440,
+        "headingTop": 121,
+        "topbarBottom": 70
+      }
+    },
+    {
+      "label": "布局 1440 task/AD-260911-003",
+      "status": "Pass",
+      "elapsedMs": 166,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440,
+        "headingTop": 121,
+        "topbarBottom": 70
+      }
+    },
+    {
+      "label": "布局 375 dashboard",
+      "status": "Pass",
+      "elapsedMs": 421,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375,
+        "headingTop": 108,
+        "topbarBottom": 65
+      }
+    },
+    {
+      "label": "布局 375 tasks",
+      "status": "Pass",
+      "elapsedMs": 155,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375,
+        "headingTop": 108,
+        "topbarBottom": 65
+      }
+    },
+    {
+      "label": "布局 375 new",
+      "status": "Pass",
+      "elapsedMs": 298,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375,
+        "headingTop": 108,
+        "topbarBottom": 65
+      }
+    },
+    {
+      "label": "布局 375 candidates/AD-260911-001",
+      "status": "Pass",
+      "elapsedMs": 169,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375,
+        "headingTop": 108,
+        "topbarBottom": 65
+      }
+    },
+    {
+      "label": "布局 375 conversations/AD-260911-001",
+      "status": "Pass",
+      "elapsedMs": 299,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375,
+        "headingTop": 108,
+        "topbarBottom": 65
+      }
+    },
+    {
+      "label": "布局 375 quotes/AD-260911-001",
+      "status": "Pass",
+      "elapsedMs": 302,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375,
+        "headingTop": 108,
+        "topbarBottom": 65
+      }
+    },
+    {
+      "label": "布局 375 suppliers",
+      "status": "Pass",
+      "elapsedMs": 165,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375,
+        "headingTop": 108,
+        "topbarBottom": 65
+      }
+    },
+    {
+      "label": "布局 375 connections",
+      "status": "Pass",
+      "elapsedMs": 167,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375,
+        "headingTop": 108,
+        "topbarBottom": 65
+      }
+    },
+    {
+      "label": "布局 375 rules",
+      "status": "Pass",
+      "elapsedMs": 165,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375,
+        "headingTop": 108,
+        "topbarBottom": 65
+      }
+    },
+    {
+      "label": "布局 375 activity",
+      "status": "Pass",
+      "elapsedMs": 152,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375,
+        "headingTop": 108,
+        "topbarBottom": 65
+      }
+    },
+    {
+      "label": "布局 375 task/AD-260911-003",
+      "status": "Pass",
+      "elapsedMs": 164,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375,
+        "headingTop": 108,
+        "topbarBottom": 65
+      }
+    },
+    {
+      "label": "表单 / 必填、数量校验、草稿与刷新",
+      "status": "Pass",
+      "elapsedMs": 875,
+      "detail": {
+        "draft": "QA 包装袋草稿",
+        "quantity": 1000,
+        "persistedAfterRefresh": true
+      }
+    },
+    {
+      "label": "闭环 / 保温杯采集、退回重审、AI缺项追问、报价选择与快照",
+      "status": "Pass",
+      "elapsedMs": 6412,
+      "detail": {
+        "task": "AD-260911-SOW4F",
+        "candidates": 3,
+        "validQuotes": 2,
+        "savedTotal": 3760,
+        "csv": "qa-2026-09-10T17-22-10-051Z-selection.csv",
+        "quoteCsv": "qa-2026-09-10T17-22-10-051Z-quotes.csv",
+        "taskIsolation": true
+      }
+    },
+    {
+      "label": "品类 / 包装袋与部分结果确认",
+      "status": "Pass",
+      "elapsedMs": 3337,
+      "detail": {
+        "category": "包装袋",
+        "validQuotes": 1,
+        "targetQuotes": 3,
+        "total": 845,
+        "outcome": "部分结果"
+      }
+    },
+    {
+      "label": "未知品类 / 空状态、手工来源、安全文本与低单价精度",
+      "status": "Pass",
+      "elapsedMs": 3822,
+      "detail": {
+        "task": "AD-260911-SP51Y",
+        "unknownCategory": true,
+        "manualCandidate": "<img src=x onerror=alert(1)> 垫片厂",
+        "preciseTotal": 350,
+        "csv": "qa-2026-09-10T17-22-10-051Z-manual-precision.csv"
+      }
+    },
+    {
+      "label": "控制 / 暂停、接管、交还、停止与任务隔离",
+      "status": "Pass",
+      "elapsedMs": 4253,
+      "detail": {
+        "paused": true,
+        "takeover": true,
+        "handbackRetainedOneMessage": true,
+        "stoppedTerminalAfterRefresh": true
+      }
+    },
+    {
+      "label": "异常 / 发送未知、回查已发与未发、不盲重试",
+      "status": "Pass",
+      "elapsedMs": 2073,
+      "detail": {
+        "firstAttempt": "人工回查未发送",
+        "secondAttempt": "示例回查已发送",
+        "recordsAfterReload": 2
+      }
+    },
+    {
+      "label": "环境 / 离线与登录失效恢复、只读说明",
+      "status": "Pass",
+      "elapsedMs": 2231,
+      "detail": {
+        "offline": "恢复演示在线后核验任务",
+        "auth": "完成演示登录核验后恢复",
+        "readonly": "显式本地能力修复",
+        "realConnections": 0
+      }
+    },
+    {
+      "label": "人工 / AI模板循环、订金要求与询价截止",
+      "status": "Pass",
+      "elapsedMs": 869,
+      "detail": {
+        "loop": "人工处理",
+        "deposit": "保留原话且未承诺",
+        "timeout": "保留既有报价"
+      }
+    },
+    {
+      "label": "检索 / 空状态、规则仅影响新任务、键盘弹窗",
+      "status": "Pass",
+      "elapsedMs": 1105,
+      "detail": {
+        "taskSearchEmpty": true,
+        "supplierSearchEmpty": true,
+        "newDefaultOnly": true,
+        "escapeClosed": true
+      }
+    },
+    {
+      "label": "报价 / 可见费用缺项、币种、MOQ、预算、有效期与交期条件",
+      "status": "Pass",
+      "elapsedMs": 3438,
+      "detail": [
+        {
+          "input": {
+            "shipping": ""
+          },
+          "visibleReason": "运费待确认"
+        },
+        {
+          "input": {
+            "shipping": 60,
+            "currency": "USD"
+          },
+          "visibleReason": "币种不一致"
+        },
+        {
+          "input": {
+            "currency": "CNY",
+            "moq": 1000
+          },
+          "visibleReason": "未达到起订量"
+        },
+        {
+          "input": {
+            "moq": 100,
+            "unitPrice": 100
+          },
+          "visibleReason": "超过含税到货预算上限"
+        },
+        {
+          "input": {
+            "unitPrice": 25.2,
+            "validUntil": "2020-01-01"
+          },
+          "visibleReason": "报价已过期"
+        },
+        {
+          "input": {
+            "validUntil": "2027-01-01",
+            "leadMilestone": "出货",
+            "transitDays": ""
+          },
+          "visibleReason": "交期起算或运输条件待确认"
+        },
+        {
+          "input": {
+            "transitDays": 30
+          },
+          "visibleReason": "预计到货超过最晚交货要求"
+        },
+        {
+          "input": {
+            "transitDays": 2,
+            "quantity": 299
+          },
+          "visibleReason": "数量口径不一致"
+        }
+      ]
+    },
+    {
+      "label": "自然语言 / 明确字段提取、原文保留与未知不补造",
+      "status": "Pass",
+      "elapsedMs": 1041,
+      "detail": {
+        "known": {
+          "quantity": 300,
+          "budget": 30,
+          "destination": "杭州"
+        },
+        "unknownRetained": "帮我找些实验器材，总预算200元，差不多下周交付。",
+        "missingFieldsRemainEmpty": true
+      }
+    },
+    {
+      "label": "直开 / file协议加载、草稿保存与刷新",
+      "status": "Pass",
+      "elapsedMs": 1324,
+      "detail": {
+        "url": "file:///D:/2025Ai/26-05-23/java-workspace/prototype/business-suite-v1/02-agent-desktop-execution/sourcing-v2/index.html",
+        "title": "新建采购任务 · Aden",
+        "persistedAfterRefresh": true
+      }
+    },
+    {
+      "label": "运行时 / JavaScript 与外部请求",
+      "status": "Pass",
+      "elapsedMs": 1,
+      "detail": {
+        "pagesVisited": 93,
+        "runtimeErrors": [],
+        "blockedRequests": []
+      }
+    },
+    {
+      "label": "受验版本 / 源码哈希稳定",
+      "status": "Pass",
+      "elapsedMs": 2,
+      "detail": {
+        "app.js": {
+          "sha256": "5ae370004422816329088f41d1673abd35d104dd7011bfb3e4992d943ec6f09c",
+          "modifiedAt": "2026-09-10T17:18:26.447Z"
+        },
+        "data.js": {
+          "sha256": "3fdacfe7220de067f74c62146aa42b4b5e7bc0ac6fb26f943bff4f70e4ae6a39",
+          "modifiedAt": "2026-09-10T17:18:26.445Z"
+        },
+        "style.css": {
+          "sha256": "8f653cf932be9df003f4b76a89dcb6b049e5cb22bf8bc9fc25af7708e7c599e8",
+          "modifiedAt": "2026-09-10T17:17:34.914Z"
+        },
+        "index.html": {
+          "sha256": "ee240d6828bbbe7cde9cd9fc3b368652bf9c15939a26348d1bb6dcb90ab65ddd",
+          "modifiedAt": "2026-09-10T17:03:29.018Z"
+        }
+      }
+    }
+  ],
+  "screenshots": [
+    {
+      "name": "dashboard-1440",
+      "file": "qa-2026-09-10T17-22-10-051Z-dashboard-1440.png"
+    },
+    {
+      "name": "new-1440",
+      "file": "qa-2026-09-10T17-22-10-051Z-new-1440.png"
+    },
+    {
+      "name": "conversations-1440",
+      "file": "qa-2026-09-10T17-22-10-051Z-conversations-1440.png"
+    },
+    {
+      "name": "quotes-1440",
+      "file": "qa-2026-09-10T17-22-10-051Z-quotes-1440.png"
+    },
+    {
+      "name": "dashboard-375",
+      "file": "qa-2026-09-10T17-22-10-051Z-dashboard-375.png"
+    },
+    {
+      "name": "new-375",
+      "file": "qa-2026-09-10T17-22-10-051Z-new-375.png"
+    },
+    {
+      "name": "conversations-375",
+      "file": "qa-2026-09-10T17-22-10-051Z-conversations-375.png"
+    },
+    {
+      "name": "quotes-375",
+      "file": "qa-2026-09-10T17-22-10-051Z-quotes-375.png"
+    },
+    {
+      "name": "chat-complete",
+      "file": "qa-2026-09-10T17-22-10-051Z-chat-complete.png"
+    },
+    {
+      "name": "quotes-ready",
+      "file": "qa-2026-09-10T17-22-10-051Z-quotes-ready.png"
+    },
+    {
+      "name": "unknown-empty",
+      "file": "qa-2026-09-10T17-22-10-051Z-unknown-empty.png"
+    },
+    {
+      "name": "unknown-send",
+      "file": "qa-2026-09-10T17-22-10-051Z-unknown-send.png"
+    },
+    {
+      "name": "natural-unknown",
+      "file": "qa-2026-09-10T17-22-10-051Z-natural-unknown.png"
+    },
+    {
+      "name": "file-direct-new",
+      "file": "qa-2026-09-10T17-22-10-051Z-file-direct-new.png"
+    }
+  ],
+  "runtimeErrors": [],
+  "blockedRequests": [],
+  "limitations": [
+    "只验证本地演示数据和状态迁移；不验证真实商品采集、客服发送或回复获取。",
+    "生产 AC-18 跨空间服务端权限、AC-19 外部提示注入防护、AC-20 删除与备份数据生命周期未验证。",
+    "未验证原生 Windows Runner、网络在途发送、模型准确率、平台许可、性能 SLA。"
+  ]
+}

@@ -1,0 +1,98 @@
+- link "跳到主要内容":
+  - /url: "#main"
+- complementary "主导航":
+  - link "Aden. 采购执行中心":
+    - /url: "#dashboard"
+  - text: 采 品牌采购工作空间
+  - navigation:
+    - text: 采购工作台
+    - link "工作台":
+      - /url: "#dashboard"
+    - link "采购任务 3":
+      - /url: "#tasks"
+    - link "商品候选池":
+      - /url: "#candidates/AD-260911-001"
+    - link "供应商会话":
+      - /url: "#conversations/AD-260911-001"
+    - link "报价对比":
+      - /url: "#quotes/AD-260911-001"
+    - link "供应商库":
+      - /url: "#suppliers"
+    - text: 管理与设置
+    - link "执行电脑与连接":
+      - /url: "#connections"
+    - link "采购规则":
+      - /url: "#rules"
+    - link "活动日志":
+      - /url: "#activity"
+  - strong: 演示执行环境
+  - text: 真实平台未接入 · 仅本地保存
+  - link "查看环境状态":
+    - /url: "#connections"
+  - text: LC
+  - strong: 林采 · 采购负责人
+  - text: 示例身份
+- banner:
+  - text: 采购工作空间
+  - strong: 工作台
+  - text: 已保存在本地 交互原型 · 示例数据
+- main:
+  - text: SOURCING WORKSPACE
+  - heading "让采购，向前一步" [level=1]
+  - paragraph: 从找到合适商品，到拿到可比较的报价。
+  - button "新建采购任务"
+  - text: 进行中的采购 3项 每个需求都有独立执行计划 已收集商品 6款 保留规格条件与页面来源 收到供应商报价 3份 1 份符合当前比较条件 待您处理 2项 复核外发内容与报价缺项
+  - heading "正在推进的采购" [level=2]
+  - link "全部任务":
+    - /url: "#tasks"
+  - article:
+    - link "秋季品牌活动 · 定制 T 恤采购":
+      - /url: "#task/AD-260911-001"
+    - text: 待比较 300 件 2026-10-02 前交货 1688 / 供应商网站
+    - strong: "3"
+    - text: 候选
+    - strong: "3"
+    - text: 报价
+    - link "查看 秋季品牌活动 · 定制 T 恤采购":
+      - /url: "#task/AD-260911-001"
+  - article:
+    - link "门店补货 · 牛皮纸包装袋":
+      - /url: "#task/AD-260911-002"
+    - text: 待筛选 1,000 件 2026-10-02 前交货 1688 / 供应商网站
+    - strong: "3"
+    - text: 候选
+    - strong: "0"
+    - text: 报价
+    - link "查看 门店补货 · 牛皮纸包装袋":
+      - /url: "#task/AD-260911-002"
+  - article:
+    - link "客户礼赠 · 定制保温杯":
+      - /url: "#task/AD-260911-003"
+    - text: 待复核计划 100 件 2026-10-02 前交货 1688 / 供应商网站
+    - strong: "0"
+    - text: 候选
+    - strong: "0"
+    - text: 报价
+    - link "查看 客户礼赠 · 定制保温杯":
+      - /url: "#task/AD-260911-003"
+  - text: 发现商品 采集信息与来源 联系供应商 人工 / AI 客服 核验报价 缺失字段继续追问 形成建议 同口径总成本比较
+  - complementary:
+    - heading "需要您看一眼" [level=2]
+    - text: 2 项
+    - heading "运费待确认" [level=3]
+    - paragraph: 织序服饰工厂 · 定制 T 恤
+    - link "查看并处理":
+      - /url: "#conversations/AD-260911-001/AD-260911-001:conv:s-t1"
+    - heading "未达到起订量" [level=3]
+    - paragraph: 原本纺织 · 定制 T 恤
+    - link "查看并处理":
+      - /url: "#conversations/AD-260911-001/AD-260911-001:conv:s-t3"
+    - heading "最近动态" [level=2]
+    - link:
+      - /url: "#activity"
+    - text: 示例任务已采集 3 个候选，已取得 3 份回复，其中 1 份费用待确认。
+    - time: 09/11 01:05
+    - text: 示例采集完成，等待选择供应商。
+    - time: 09/11 01:05
+    - text: 采购计划已整理，等待复核后启动。
+    - time: 09/11 01:05

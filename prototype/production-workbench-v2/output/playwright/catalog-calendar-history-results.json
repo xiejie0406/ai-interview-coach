@@ -1,0 +1,36 @@
+{
+  "at": "2026-09-10T17:27:45.152Z",
+  "results": [
+    {
+      "label": "已执行人机时的历史日历保护与未来变更",
+      "result": "Pass",
+      "detail": {
+        "fixture": "前置产出预置；H1通过Engine.report实际开工和报工完成；日历变更经真实UI",
+        "personMinutesBefore": 60,
+        "machineMinutesBefore": 180,
+        "historicalLeaveBlocked": "不能改写已有生产活动的历史日历：A20，9/14 13:00。请将变更限定在尚无活动记录的未来时段。",
+        "future": {
+          "unavailable": [
+            [
+              1500,
+              1560
+            ]
+          ],
+          "revision": 1,
+          "personMinutes": 60
+        },
+        "historicalShiftBlocked": true,
+        "historicalMaintenanceBlocked": true,
+        "machineMinutesAfter": 180
+      }
+    },
+    {
+      "label": "主数据流程浏览器异常",
+      "result": "Pass",
+      "detail": {
+        "errors": []
+      }
+    }
+  ],
+  "errors": []
+}

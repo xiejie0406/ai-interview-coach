@@ -80,6 +80,13 @@ public final class LocalFileObjectStorageAdapter
                     throw new IllegalStateException("音频 Artifact 已存在，禁止覆盖");
                 }
                 Files.move(upload.temporary, target, StandardCopyOption.ATOMIC_MOVE);
+                try {
+                    Files.writeString(target.resolveSibling(target.getFileName() + ".codec"), upload.request.codec(),
+                            StandardOpenOption.CREATE_NEW);
+                } catch (IOException metadataFailure) {
+                    Files.deleteIfExists(target);
+                    throw metadataFailure;
+                }
                 String hash = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
                         .digest(Files.readAllBytes(target)));
                 metadata.put(key(handle.tenantId(), handle.artifactId()),
@@ -115,6 +122,7 @@ public final class LocalFileObjectStorageAdapter
         requireWithinRoot(path);
         try {
             Files.deleteIfExists(path);
+            Files.deleteIfExists(path.resolveSibling(path.getFileName() + ".codec"));
             return new DeleteResult(true, Optional.empty(), Optional.empty());
         } catch (IOException exception) {
             return new DeleteResult(false, Optional.empty(), Optional.of("LOCAL_AUDIO_DELETE_FAILED"));
@@ -129,8 +137,14 @@ public final class LocalFileObjectStorageAdapter
         requireWithinRoot(path);
         try {
             byte[] bytes = Files.readAllBytes(path);
-            String codec = item == null ? "audio/webm;codecs=opus" : item.codec;
-            return new AudioContent(bytes, format(codec), codec, 48_000, 16, 1);
+            Path codecPath = path.resolveSibling(path.getFileName() + ".codec");
+            String codec = item != null ? item.codec : Files.exists(codecPath)
+                    ? Files.readString(codecPath).trim() : "audio/webm;codecs=opus";
+            int sampleRate = 48_000;
+            if ("audio/wav".equals(codec) && bytes.length >= 44) {
+                sampleRate = java.nio.ByteBuffer.wrap(bytes).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt(24);
+            }
+            return new AudioContent(bytes, format(codec), codec, sampleRate, 16, 1);
         } catch (IOException exception) {
             throw new IllegalStateException("本地音频不存在", exception);
         }

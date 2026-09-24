@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "configurationVersion": "1.0.0",
+  "bindingPrefix": "aden",
+  "bindingModel": "Spring Boot external configuration with relaxed environment-variable binding",
+  "defaultProfile": "productionDefault",
+  "faultTestProfile": "testValue",
+  "settings": [
+    {
+      "id": "runnerSessionTtl",
+      "externalKey": "aden.runner.session.ttl-seconds",
+      "type": "integer",
+      "unit": "seconds",
+      "productionDefault": 900,
+      "testValue": 6,
+      "minimum": 3,
+      "maximum": 86400,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "runnerSessionHeartbeatInterval",
+      "externalKey": "aden.runner.session.heartbeat-interval-seconds",
+      "type": "integer",
+      "unit": "seconds",
+      "productionDefault": 15,
+      "testValue": 1,
+      "minimum": 1,
+      "maximum": 300,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "runnerDeliveryLeaseTtl",
+      "externalKey": "aden.runner.delivery.lease-ttl-seconds",
+      "type": "integer",
+      "unit": "seconds",
+      "productionDefault": 60,
+      "testValue": 3,
+      "minimum": 2,
+      "maximum": 3600,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "runnerClaimMaxBatchSize",
+      "externalKey": "aden.runner.claim.max-batch-size",
+      "type": "integer",
+      "unit": "items",
+      "productionDefault": 8,
+      "testValue": 2,
+      "minimum": 1,
+      "maximum": 16,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "runnerSessionMaxCapacity",
+      "externalKey": "aden.runner.session.max-capacity",
+      "type": "integer",
+      "unit": "items",
+      "productionDefault": 32,
+      "testValue": 2,
+      "minimum": 1,
+      "maximum": 32,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "sseHeartbeatInterval",
+      "externalKey": "aden.stream.heartbeat-interval-seconds",
+      "type": "integer",
+      "unit": "seconds",
+      "productionDefault": 15,
+      "testValue": 1,
+      "minimum": 1,
+      "maximum": 60,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "sseConnectionTtl",
+      "externalKey": "aden.stream.connection-ttl-seconds",
+      "type": "integer",
+      "unit": "seconds",
+      "productionDefault": 300,
+      "testValue": 5,
+      "minimum": 3,
+      "maximum": 300,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "sseReplayBatchSize",
+      "externalKey": "aden.stream.replay-batch-size",
+      "type": "integer",
+      "unit": "items",
+      "productionDefault": 100,
+      "testValue": 3,
+      "minimum": 1,
+      "maximum": 1000,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "ssePerConnectionQueueCapacity",
+      "externalKey": "aden.stream.per-connection-queue-capacity",
+      "type": "integer",
+      "unit": "items",
+      "productionDefault": 256,
+      "testValue": 4,
+      "minimum": 1,
+      "maximum": 4096,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "sseSendTimeout",
+      "externalKey": "aden.stream.send-timeout-seconds",
+      "type": "integer",
+      "unit": "seconds",
+      "productionDefault": 10,
+      "testValue": 1,
+      "minimum": 1,
+      "maximum": 60,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "outboxClaimTtl",
+      "externalKey": "aden.outbox.claim-ttl-seconds",
+      "type": "integer",
+      "unit": "seconds",
+      "productionDefault": 30,
+      "testValue": 2,
+      "minimum": 1,
+      "maximum": 300,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "outboxRetryInitialDelay",
+      "externalKey": "aden.outbox.retry.initial-delay-milliseconds",
+      "type": "integer",
+      "unit": "milliseconds",
+      "productionDefault": 1000,
+      "testValue": 10,
+      "minimum": 10,
+      "maximum": 60000,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "outboxRetryMaxDelay",
+      "externalKey": "aden.outbox.retry.max-delay-milliseconds",
+      "type": "integer",
+      "unit": "milliseconds",
+      "productionDefault": 60000,
+      "testValue": 50,
+      "minimum": 10,
+      "maximum": 3600000,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "outboxRetryMaxAttempts",
+      "externalKey": "aden.outbox.retry.max-attempts",
+      "type": "integer",
+      "unit": "attempts",
+      "productionDefault": 10,
+      "testValue": 3,
+      "minimum": 1,
+      "maximum": 100,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "idempotencyInProgressTtl",
+      "externalKey": "aden.idempotency.in-progress-ttl-seconds",
+      "type": "integer",
+      "unit": "seconds",
+      "productionDefault": 120,
+      "testValue": 5,
+      "minimum": 1,
+      "maximum": 3600,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "idempotencyRetention",
+      "externalKey": "aden.idempotency.retention-seconds",
+      "type": "integer",
+      "unit": "seconds",
+      "productionDefault": 604800,
+      "testValue": 10,
+      "minimum": 5,
+      "maximum": 2678400,
+      "externallyConfigurable": true
+    },
+    {
+      "id": "eventRetention",
+      "externalKey": "aden.event.retention-seconds",
+      "type": "integer",
+      "unit": "seconds",
+      "productionDefault": 604800,
+      "testValue": 30,
+      "minimum": 10,
+      "maximum": 2678400,
+      "externallyConfigurable": true
+    }
+  ],
+  "invariants": [
+    "runnerSessionTtl >= 3 * runnerSessionHeartbeatInterval",
+    "runnerDeliveryLeaseTtl >= 2 * runnerSessionHeartbeatInterval",
+    "sseConnectionTtl >= 3 * sseHeartbeatInterval",
+    "sseSendTimeout < sseConnectionTtl",
+    "outboxRetryMaxDelay >= outboxRetryInitialDelay",
+    "idempotencyRetention >= runnerDeliveryLeaseTtl",
+    "eventRetention >= sseConnectionTtl"
+  ]
+}

@@ -1,0 +1,37 @@
+<template>
+  <div class="app-container">
+    <el-alert title="Agent 版本发布后不可修改；运行任务固定引用版本和配置哈希。Provider Secret 不在此页面展示或保存。" type="info" :closable="false" show-icon class="mb20" />
+    <div class="toolbar mb8"><el-button type="primary" plain icon="Plus" v-hasPermi="['fashion:ai:agent:edit']" @click="agentVisible=true">新增 Agent</el-button><el-button icon="Refresh" @click="loadAgents">刷新</el-button></div>
+    <el-row :gutter="20">
+      <el-col :span="9"><el-table v-loading="loading" :data="agents" highlight-current-row @current-change="selectAgent"><el-table-column label="Agent" min-width="160"><template #default="{row}"><strong>{{row.name}}</strong><br><code>{{row.agentCode}}</code></template></el-table-column><el-table-column prop="agentType" label="类型" width="110" /><el-table-column label="当前版本" width="100"><template #default="{row}">{{row.currentVersionId?'已发布':'未发布'}}</template></el-table-column></el-table></el-col>
+      <el-col :span="15"><el-card shadow="never"><template #header><div class="header"><span>{{selected?.name??'请选择 Agent'}}</span><el-button :disabled="!selected" type="primary" plain v-hasPermi="['fashion:ai:agent:edit']" @click="versionVisible=true">新建版本</el-button></div></template><el-table :data="versions" empty-text="暂无版本"><el-table-column prop="versionNo" label="版本" width="70" /><el-table-column label="模型" min-width="150"><template #default="{row}">{{row.providerCode}} / {{row.modelName}}</template></el-table-column><el-table-column prop="configHash" label="配置哈希" min-width="150" show-overflow-tooltip /><el-table-column label="状态" width="90"><template #default="{row}"><el-tag :type="row.status==='published'?'success':'info'">{{row.status}}</el-tag></template></el-table-column><el-table-column label="操作" width="90"><template #default="{row}"><el-button v-if="row.status==='draft'" link type="primary" v-hasPermi="['fashion:ai:agent:publish']" @click="publish(row)">发布</el-button></template></el-table-column></el-table></el-card></el-col>
+    </el-row>
+
+    <el-dialog v-model="agentVisible" title="新增 Agent" width="560px"><el-form :model="agentForm" label-width="100px"><el-form-item label="编码" required><el-input v-model="agentForm.agentCode" /></el-form-item><el-form-item label="名称" required><el-input v-model="agentForm.name" /></el-form-item><el-form-item label="类型" required><el-select v-model="agentForm.agentType" style="width:100%"><el-option v-for="t in agentTypes" :key="t" :label="t" :value="t" /></el-select></el-form-item><el-form-item label="说明"><el-input v-model="agentForm.description" type="textarea" /></el-form-item></el-form><template #footer><el-button @click="agentVisible=false">取消</el-button><el-button type="primary" :loading="saving" @click="saveAgent">保存</el-button></template></el-dialog>
+
+    <el-dialog v-model="versionVisible" title="新建不可变 Agent 版本" width="820px"><el-form :model="versionForm" label-width="110px"><el-row :gutter="16"><el-col :span="12"><el-form-item label="Provider" required><el-input v-model="versionForm.providerCode" placeholder="openai" /></el-form-item></el-col><el-col :span="12"><el-form-item label="模型" required><el-input v-model="versionForm.modelName" /></el-form-item></el-col></el-row><el-form-item label="系统指令" required><el-input v-model="versionForm.systemInstruction" type="textarea" :rows="5" maxlength="20000" show-word-limit /></el-form-item><el-row :gutter="16"><el-col :span="12"><el-form-item label="最大步骤"><el-input-number v-model="versionForm.maxSteps" :min="1" :max="50" /></el-form-item></el-col><el-col :span="12"><el-form-item label="超时秒数"><el-input-number v-model="versionForm.timeoutSeconds" :min="1" :max="600" /></el-form-item></el-col></el-row><el-form-item label="模型配置 JSON"><el-input v-model="json.modelConfig" type="textarea" :rows="3" /></el-form-item><el-form-item label="输出 Schema"><el-input v-model="json.outputSchema" type="textarea" :rows="5" /></el-form-item><el-collapse><el-collapse-item title="高级 JSON 配置" name="advanced"><el-form-item label="工具"><el-input v-model="json.tools" type="textarea" :rows="2" /></el-form-item><el-form-item label="转交"><el-input v-model="json.handoffs" type="textarea" :rows="2" /></el-form-item><el-form-item label="输入 Schema"><el-input v-model="json.inputSchema" type="textarea" :rows="3" /></el-form-item><el-form-item label="护栏"><el-input v-model="json.guardrails" type="textarea" :rows="3" /></el-form-item></el-collapse-item></el-collapse></el-form><template #footer><el-button @click="versionVisible=false">取消</el-button><el-button type="primary" :loading="saving" @click="saveVersion">保存草稿版本</el-button></template></el-dialog>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { onMounted, reactive, ref } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { createAgent, createAgentVersion, listAgents, listAgentVersions, publishAgentVersion, type AgentVersionBody } from '@/api/fashion/agent'
+import type { FashionAgent, FashionAgentVersion } from '@/api/fashion/types'
+
+const agentTypes=['orchestrator','requirement','selection','styling','quotation','image']
+const loading=ref(false),saving=ref(false),agentVisible=ref(false),versionVisible=ref(false),agents=ref<FashionAgent[]>([]),versions=ref<FashionAgentVersion[]>([]),selected=ref<FashionAgent>()
+const agentForm=reactive({agentCode:'',name:'',agentType:'requirement',description:''})
+const versionForm=reactive({providerCode:'openai',modelName:'',systemInstruction:'',maxSteps:4,timeoutSeconds:120})
+const json=reactive({modelConfig:'{}',tools:'[]',handoffs:'[]',inputSchema:'{"type":"object"}',outputSchema:'{"type":"object"}',guardrails:'{}'})
+async function loadAgents(){loading.value=true;try{const r=await listAgents();agents.value=r.data;if(selected.value){selected.value=agents.value.find(a=>a.id===selected.value?.id);if(selected.value)await loadVersions()}}finally{loading.value=false}}
+async function selectAgent(row:FashionAgent|undefined){selected.value=row;versions.value=[];if(row)await loadVersions()}
+async function loadVersions(){if(!selected.value)return;const r=await listAgentVersions(selected.value.id);versions.value=r.data}
+async function saveAgent(){saving.value=true;try{await createAgent(agentForm);ElMessage.success('Agent 已创建');agentVisible.value=false;Object.assign(agentForm,{agentCode:'',name:'',agentType:'requirement',description:''});await loadAgents()}finally{saving.value=false}}
+function parse(name:string,value:string){try{return JSON.parse(value)}catch{throw new Error(`${name} 不是合法 JSON`)}}
+async function saveVersion(){if(!selected.value)return;saving.value=true;try{const body:AgentVersionBody={...versionForm,modelConfig:parse('模型配置',json.modelConfig),tools:parse('工具',json.tools),handoffs:parse('转交',json.handoffs),inputSchema:parse('输入 Schema',json.inputSchema),outputSchema:parse('输出 Schema',json.outputSchema),guardrails:parse('护栏',json.guardrails)};await createAgentVersion(selected.value.id,body);ElMessage.success('Agent 草稿版本已创建');versionVisible.value=false;await loadVersions()}finally{saving.value=false}}
+async function publish(row:FashionAgentVersion){if(!selected.value)return;await ElMessageBox.confirm(`发布 V${row.versionNo} 后，旧版本会退役；已有 Run 仍固定引用原版本。`,'发布 Agent 版本',{type:'warning'});await publishAgentVersion(selected.value.id,row.id,row.rowVersion);ElMessage.success('Agent 版本已发布');await loadAgents();await loadVersions()}
+onMounted(loadAgents)
+</script>
+
+<style scoped>.toolbar,.header{display:flex;align-items:center;gap:8px}.header{justify-content:space-between}</style>

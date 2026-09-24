@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0",
+  "contractType": "VALIDATION_RESULT",
+  "requestId": "10101010-1010-4010-8010-101010101010",
+  "planVersionId": "20202020-2020-4020-8020-202020202020",
+  "validatedAt": "2026-09-15T00:00:01.000Z",
+  "validatorVersion": "aps-validator-v1",
+  "validationScope": "INPUT",
+  "definitionRevision": 8,
+  "executionRevision": 3,
+  "inputHash": "a8750dc76d016e84c85ca6172d80208f1147225c2dfca03e5fb97111e7a12497",
+  "candidateHash": null,
+  "validationStatus": "FAIL",
+  "publishable": false,
+  "problems": [
+    {
+      "schemaVersion": "1.0",
+      "contractType": "APS_PROBLEM",
+      "problemId": "d0d0d0d0-d0d0-40d0-80d0-d0d0d0d0d0d0",
+      "reasonCode": "UNSUPPORTED_SYNC_RULE",
+      "constraintCode": "APS-BR-35",
+      "severity": "ERROR",
+      "title": "当前版本不支持同时开始规则",
+      "detail": "依赖关系已保留在输入快照中，但不会被改写或送入求解器。",
+      "retryable": false,
+      "objectRefs": [
+        {
+          "objectType": "DEPENDENCY",
+          "objectId": "c0c0c0c0-c0c0-40c0-80c0-c0c0c0c0c0c0",
+          "field": "relationType"
+        }
+      ],
+      "timeRange": null,
+      "measurements": {
+        "sourceRelationType": "SAME_START"
+      }
+    }
+  ]
+}

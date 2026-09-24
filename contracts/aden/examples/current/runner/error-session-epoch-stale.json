@@ -1,0 +1,9 @@
+{
+  "code": 409,
+  "msg": "认证后 Runner Session 已被新代际取代",
+  "data": null,
+  "errorCode": "ADEN_SESSION_EPOCH_STALE",
+  "retryable": false,
+  "correlationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "details": {"principalEpoch": "1", "currentEpoch": "2"}
+}

@@ -1,0 +1,10 @@
+{
+  "taskType": "SYNTHETIC_CORE",
+  "capabilityCode": "CORE",
+  "title": "合成执行闭环样例",
+  "input": {
+    "fixtureId": "fixture:core-success-v1",
+    "instruction": "仅处理固定合成数据并返回确定性结果。",
+    "expectedOutcome": "SUCCEED"
+  }
+}

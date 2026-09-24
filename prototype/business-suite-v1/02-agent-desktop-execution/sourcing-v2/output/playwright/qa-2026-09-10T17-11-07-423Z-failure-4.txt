@@ -1,0 +1,100 @@
+- link "跳到主要内容":
+  - /url: "#main"
+- complementary "主导航":
+  - link "Aden. 采购执行中心":
+    - /url: "#dashboard"
+  - text: 采 品牌采购工作空间
+  - navigation:
+    - text: 采购工作台
+    - link "工作台":
+      - /url: "#dashboard"
+    - link "采购任务 3":
+      - /url: "#tasks"
+    - link "商品候选池":
+      - /url: "#candidates/AD-260911-003"
+    - link "供应商会话":
+      - /url: "#conversations/AD-260911-003"
+    - link "报价对比":
+      - /url: "#quotes/AD-260911-003"
+    - link "供应商库":
+      - /url: "#suppliers"
+    - text: 管理与设置
+    - link "执行电脑与连接":
+      - /url: "#connections"
+    - link "采购规则":
+      - /url: "#rules"
+    - link "活动日志":
+      - /url: "#activity"
+  - strong: 演示执行环境
+  - text: 真实平台未接入 · 仅本地保存
+  - link "查看环境状态":
+    - /url: "#connections"
+  - text: LC
+  - strong: 林采 · 采购负责人
+  - text: 示例身份
+- banner:
+  - text: 采购工作空间
+  - strong: 任务详情
+  - text: 已保存在本地 交互原型 · 示例数据
+- main:
+  - text: SOURCING TASK
+  - heading "客户礼赠 · 定制保温杯" [level=1]
+  - paragraph: AD-260911-003 · 保温杯 · 09/11 01:11 创建
+  - link "查看报价与建议":
+    - /url: "#quotes/AD-260911-003"
+  - heading "已暂停" [level=3]
+  - paragraph: 任务已暂停，请先恢复。
+  - button "核验并恢复"
+  - text: 1 复核计划 2 采集商品 3 联系供应商 4 比较报价
+  - heading "已经整理好的采购计划" [level=2]
+  - text: 已暂停
+  - term: 商品品类
+  - definition: 保温杯
+  - term: 数量
+  - definition: 100 件
+  - term: 含税到货单件上限
+  - definition: ¥45.00
+  - term: 询价截止
+  - definition: 2026-09-18
+  - term: 最晚交貨
+  - definition: 2026-10-02
+  - term: 收货城市
+  - definition: 杭州
+  - term: 采集来源
+  - definition: 1688 / 供应商网站
+  - term: 最多联系
+  - definition: 3 家候选
+  - term: 自动补问
+  - definition: 已授权 · 最多 2 轮
+  - term: 共同规格条件
+  - definition: 500ml，316 内胆，哑光白色，激光 LOGO，独立礼盒
+  - text: 每位供应商首次收到的询价，都由您复核接收对象与正文。到货成本上限只保留在内部。
+  - button "核验并恢复"
+  - button "人工接管"
+  - button "停止本次执行"
+  - heading "任务运行记录" [level=2]
+  - text: 只记录本任务 采购人员暂停任务；后续排队动作停止，已有发送及未决回执保留。
+  - time: 09/11 01:11
+  - text: 采购计划已整理，等待复核后启动。
+  - time: 09/11 01:11
+  - complementary:
+    - heading "本次采购进展" [level=2]
+    - text: 商品候选
+    - strong: 0 款
+    - text: 已联系供应商
+    - strong: 0 家
+    - text: 收到报价
+    - strong: 0 份
+    - text: 可参与推荐
+    - strong: 0 份
+    - link "商品候选池":
+      - /url: "#candidates/AD-260911-003"
+    - link "供应商会话":
+      - /url: "#conversations/AD-260911-003"
+    - link "报价对比":
+      - /url: "#quotes/AD-260911-003"
+    - heading "演示情景" [level=2]
+    - text: 本地模拟
+    - paragraph: 演示离线、登录失效与发送未知时的恢复流程，不会影响任何真实平台。
+    - button "选择异常情景"
+- status

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>序程 APS · 生产排程</title>
+  <link rel="stylesheet" href="../shared/base.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#schedule"><span class="brand-mark"><i data-lucide="factory"></i></span><span class="brand-name">序程 <small>APS</small></span></a>
+      <div class="factory-switch"><span class="factory-dot"></span><div><strong>华东精密 · 苏州工厂</strong><small>机加工车间 / 计划组</small></div><i data-lucide="chevrons-up-down"></i></div>
+      <div class="nav-label">生产计划</div>
+      <nav class="nav-group" id="navigation" aria-label="业务导航"></nav>
+      <div class="sidebar-footer"><div class="connected"><span></span>演示工作区 · 本地保存</div><a href="../index.html" target="_top"><i data-lucide="arrow-left"></i>三个项目</a></div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <div class="topbar-left"><button class="btn icon-btn ghost mobile-menu" id="menu-button" data-toggle-nav title="打开导航" aria-label="打开导航"><i data-lucide="menu"></i></button><span class="breadcrumb">生产计划 <span>/</span> <strong id="breadcrumb-current">排程工作台</strong></span></div>
+        <div class="topbar-right"><span class="prototype-label">交互原型 · 示例数据</span><span class="today">2026 年 9 月 10 日</span><span class="avatar" title="计划员 林悦">林</span></div>
+      </header>
+      <main class="content" id="content"></main>
+    </div>
+  </div>
+  <script src="../shared/lucide.min.js"></script>
+  <script src="../shared/ui.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

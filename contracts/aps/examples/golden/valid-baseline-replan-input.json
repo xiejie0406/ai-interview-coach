@@ -1,0 +1,121 @@
+{
+  "schemaVersion": "1.0",
+  "contractType": "SOLVER_INPUT",
+  "requestId": "31313131-3131-4131-8131-313131313131",
+  "planVersionId": "32323232-3232-4232-8232-323232323232",
+  "capturedAt": "2026-09-15T00:00:00.000Z",
+  "definitionRevision": 7,
+  "executionRevision": 3,
+  "inputHash": "3cc77a0986f317398742b1a21dc70ba03d97949b4781e79997961e48ee8dc5ab",
+  "hashAlgorithm": "SHA-256",
+  "canonicalization": "JCS-RFC8785",
+  "modelVersion": "aps-cpsat-v1",
+  "scope": {
+    "siteCode": "SITE_01",
+    "workshopIds": ["33333333-3333-4333-8333-333333333333"]
+  },
+  "horizon": {
+    "startAt": "2026-09-15T00:00:00.000Z",
+    "detailEndAt": "2026-09-16T00:00:00.000Z",
+    "endAt": "2026-09-17T00:00:00.000Z",
+    "planningAnchorAt": "2026-09-15T00:00:00.000Z",
+    "timeUnitSeconds": 60,
+    "displayTimeZone": "Asia/Shanghai"
+  },
+  "baseVersion": {
+    "planVersionId": "30303030-3030-4030-8030-303030303030",
+    "inputHash": "1111111111111111111111111111111111111111111111111111111111111111",
+    "freezeEndAt": "2026-09-15T02:00:00.000Z",
+    "jobs": [
+      {
+        "baselineJobId": "34343434-3434-4434-8434-343434343434",
+        "memberTaskIds": ["77777777-7777-4777-8777-777777777777"],
+        "startAt": "2026-09-15T01:00:00.000Z",
+        "endAt": "2026-09-15T01:10:00.000Z",
+        "resourceIds": ["44444444-4444-4444-8444-444444444444"]
+      }
+    ]
+  },
+  "parameters": {
+    "direction": "FORWARD",
+    "maxSolveSeconds": 30,
+    "randomSeed": 1,
+    "solverSearchThreads": 1,
+    "absoluteGapLimit": 0,
+    "relativeGapLimit": 0
+  },
+  "resources": [
+    {
+      "resourceId": "44444444-4444-4444-8444-444444444444",
+      "resourceType": "PERSON",
+      "workCenterId": "55555555-5555-4555-8555-555555555555",
+      "exclusive": true,
+      "capacity": "1",
+      "capacityUomCode": null,
+      "skills": [
+        {
+          "skillId": "19191919-1919-4919-8919-191919191919",
+          "skillCode": "ASSEMBLY",
+          "skillLevel": 3,
+          "validFrom": "2026-01-01T00:00:00.000Z",
+          "validTo": null,
+          "status": "ACTIVE"
+        }
+      ]
+    }
+  ],
+  "availabilityWindows": [
+    {
+      "availabilityId": "66666666-6666-4666-8666-666666666666",
+      "resourceId": "44444444-4444-4444-8444-444444444444",
+      "startAt": "2026-09-15T01:00:00.000Z",
+      "endAt": "2026-09-15T09:00:00.000Z",
+      "capacity": "1"
+    }
+  ],
+  "tasks": [
+    {
+      "taskId": "77777777-7777-4777-8777-777777777777",
+      "orderLineId": "88888888-8888-4888-8888-888888888888",
+      "operationSpecId": "99999999-9999-4999-8999-999999999999",
+      "workCenterId": "55555555-5555-4555-8555-555555555555",
+      "planningClass": "MANDATORY_DETAIL",
+      "quantity": "10",
+      "uomCode": "PCS",
+      "earliestStartAt": "2026-09-15T01:00:00.000Z",
+      "promisedAt": "2026-09-15T09:00:00.000Z",
+      "phases": [
+        {
+          "phaseId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+          "phaseType": "RUN",
+          "sequenceNo": 1,
+          "fixedSeconds": 0,
+          "secondsPerUnit": "60",
+          "interruptible": false,
+          "maxSegments": 1,
+          "minSegmentSeconds": 0,
+          "resumeSetupSeconds": 0,
+          "segmentResourcePolicy": "SAME_RESOURCES",
+          "requirements": [
+            {
+              "requirementId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+              "resourceType": "PERSON",
+              "seatCount": 1,
+              "capacityDemand": "1",
+              "requiredSkillCode": "ASSEMBLY",
+              "minimumSkillLevel": 3,
+              "holdOnPause": false,
+              "candidateResourceIds": ["44444444-4444-4444-8444-444444444444"]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "dependencies": [],
+  "materialSupplies": [],
+  "materialDemands": [],
+  "sharedBatchCandidates": [],
+  "locks": [],
+  "actualOccupancies": []
+}

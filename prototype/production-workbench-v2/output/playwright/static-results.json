@@ -1,0 +1,109 @@
+{
+  "at": "2026-09-10T17:37:24.549Z",
+  "results": [
+    {
+      "check": "syntax app.js",
+      "result": "Pass",
+      "detail": ""
+    },
+    {
+      "check": "syntax catalog.js",
+      "result": "Pass",
+      "detail": ""
+    },
+    {
+      "check": "syntax engine-check.cjs",
+      "result": "Pass",
+      "detail": ""
+    },
+    {
+      "check": "syntax engine.js",
+      "result": "Pass",
+      "detail": ""
+    },
+    {
+      "check": "syntax operations.js",
+      "result": "Pass",
+      "detail": ""
+    },
+    {
+      "check": "syntax verify-catalog.cjs",
+      "result": "Pass",
+      "detail": ""
+    },
+    {
+      "check": "syntax verify-final.cjs",
+      "result": "Pass",
+      "detail": ""
+    },
+    {
+      "check": "syntax verify-operations.cjs",
+      "result": "Pass",
+      "detail": ""
+    },
+    {
+      "check": "syntax verify-workbench.cjs",
+      "result": "Pass",
+      "detail": ""
+    },
+    {
+      "check": "syntax verify.cjs",
+      "result": "Pass",
+      "detail": ""
+    },
+    {
+      "check": "links prototype\\production-workbench-v2\\contract.md",
+      "result": "Pass",
+      "detail": []
+    },
+    {
+      "check": "links prototype\\production-workbench-v2\\README.md",
+      "result": "Pass",
+      "detail": []
+    },
+    {
+      "check": "links prototype\\production-workbench-v2\\verification.md",
+      "result": "Pass",
+      "detail": []
+    },
+    {
+      "check": "links docs\\product\\projects\\01-production-scheduling\\prd.md",
+      "result": "Pass",
+      "detail": []
+    },
+    {
+      "check": "links docs\\research\\projects\\01-production-scheduling\\workflow-resource-research.md",
+      "result": "Pass",
+      "detail": []
+    },
+    {
+      "check": "HTML local assets",
+      "result": "Pass",
+      "detail": []
+    },
+    {
+      "check": "REQ unique definitions",
+      "result": "Pass",
+      "detail": {
+        "count": 10,
+        "expected": 10
+      }
+    },
+    {
+      "check": "BR unique definitions",
+      "result": "Pass",
+      "detail": {
+        "count": 48,
+        "expected": 48
+      }
+    },
+    {
+      "check": "AC unique definitions",
+      "result": "Pass",
+      "detail": {
+        "count": 24,
+        "expected": 24
+      }
+    }
+  ]
+}

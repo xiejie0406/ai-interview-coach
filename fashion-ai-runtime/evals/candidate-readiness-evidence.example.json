@@ -1,0 +1,133 @@
+{
+  "schema_version": "1.0",
+  "authorization_manifest_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "technical_gates": [
+    {
+      "gate_id": "migration_16_tables",
+      "result": "not_run",
+      "evidence_ref": null,
+      "evidence_file": null,
+      "evidence_sha256": null,
+      "executed_by": null,
+      "executed_at": null
+    },
+    {
+      "gate_id": "capacity_and_concurrency",
+      "result": "not_run",
+      "evidence_ref": null,
+      "evidence_file": null,
+      "evidence_sha256": null,
+      "executed_by": null,
+      "executed_at": null
+    },
+    {
+      "gate_id": "security_and_authorization",
+      "result": "not_run",
+      "evidence_ref": null,
+      "evidence_file": null,
+      "evidence_sha256": null,
+      "executed_by": null,
+      "executed_at": null
+    },
+    {
+      "gate_id": "recovery_rpo_rto",
+      "result": "not_run",
+      "evidence_ref": null,
+      "evidence_file": null,
+      "evidence_sha256": null,
+      "executed_by": null,
+      "executed_at": null
+    },
+    {
+      "gate_id": "worker_and_provider_faults",
+      "result": "not_run",
+      "evidence_ref": null,
+      "evidence_file": null,
+      "evidence_sha256": null,
+      "executed_by": null,
+      "executed_at": null
+    },
+    {
+      "gate_id": "observability_and_retention",
+      "result": "not_run",
+      "evidence_ref": null,
+      "evidence_file": null,
+      "evidence_sha256": null,
+      "executed_by": null,
+      "executed_at": null
+    },
+    {
+      "gate_id": "desktop_compatibility",
+      "result": "not_run",
+      "evidence_ref": null,
+      "evidence_file": null,
+      "evidence_sha256": null,
+      "executed_by": null,
+      "executed_at": null
+    }
+  ],
+  "uat_scenarios": [
+    {
+      "gate_id": "UAT-01",
+      "result": "not_run",
+      "evidence_ref": null,
+      "evidence_file": null,
+      "evidence_sha256": null,
+      "executed_by": null,
+      "executed_at": null
+    },
+    {
+      "gate_id": "UAT-02",
+      "result": "not_run",
+      "evidence_ref": null,
+      "evidence_file": null,
+      "evidence_sha256": null,
+      "executed_by": null,
+      "executed_at": null
+    },
+    {
+      "gate_id": "UAT-03",
+      "result": "not_run",
+      "evidence_ref": null,
+      "evidence_file": null,
+      "evidence_sha256": null,
+      "executed_by": null,
+      "executed_at": null
+    },
+    {
+      "gate_id": "UAT-04",
+      "result": "not_run",
+      "evidence_ref": null,
+      "evidence_file": null,
+      "evidence_sha256": null,
+      "executed_by": null,
+      "executed_at": null
+    },
+    {
+      "gate_id": "UAT-05",
+      "result": "not_run",
+      "evidence_ref": null,
+      "evidence_file": null,
+      "evidence_sha256": null,
+      "executed_by": null,
+      "executed_at": null
+    },
+    {
+      "gate_id": "UAT-06",
+      "result": "not_run",
+      "evidence_ref": null,
+      "evidence_file": null,
+      "evidence_sha256": null,
+      "executed_by": null,
+      "executed_at": null
+    }
+  ],
+  "uat_decision": {
+    "decision": "not_run",
+    "decided_by": null,
+    "business_role": null,
+    "decided_at": null,
+    "conditions": []
+  },
+  "release_authorized": false
+}

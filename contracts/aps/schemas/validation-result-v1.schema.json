@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aps.local/contracts/schemas/validation-result-v1.schema.json",
+  "title": "APS ValidationResult v1",
+  "description": "独立确定性校验结果；PASS 是候选发布的必要条件，不是充分授权。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contractType",
+    "requestId",
+    "planVersionId",
+    "validatedAt",
+    "validatorVersion",
+    "validationScope",
+    "definitionRevision",
+    "executionRevision",
+    "inputHash",
+    "candidateHash",
+    "validationStatus",
+    "publishable",
+    "problems"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "contractType": { "const": "VALIDATION_RESULT" },
+    "requestId": { "$ref": "#/$defs/uuid" },
+    "planVersionId": { "$ref": "#/$defs/uuid" },
+    "validatedAt": { "$ref": "#/$defs/utcInstant" },
+    "validatorVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]*$"
+    },
+    "validationScope": { "enum": ["INPUT", "PLAN_CANDIDATE", "PUBLISH_PRECHECK"] },
+    "definitionRevision": { "$ref": "#/$defs/revision" },
+    "executionRevision": { "$ref": "#/$defs/revision" },
+    "inputHash": { "$ref": "#/$defs/sha256" },
+    "candidateHash": {
+      "oneOf": [
+        { "$ref": "#/$defs/sha256" },
+        { "type": "null" }
+      ]
+    },
+    "validationStatus": { "enum": ["PASS", "FAIL"] },
+    "publishable": { "type": "boolean" },
+    "problems": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": { "$ref": "problem-v1.schema.json" }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "validationStatus": { "const": "PASS" } } },
+      "then": {
+        "properties": {
+          "problems": {
+            "not": {
+              "contains": {
+                "type": "object",
+                "properties": { "severity": { "const": "ERROR" } },
+                "required": ["severity"]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "validationStatus": { "const": "FAIL" } } },
+      "then": {
+        "properties": {
+          "publishable": { "const": false },
+          "problems": {
+            "minItems": 1,
+            "contains": {
+              "type": "object",
+              "properties": { "severity": { "const": "ERROR" } },
+              "required": ["severity"]
+            },
+            "minContains": 1
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "validationScope": { "const": "INPUT" } } },
+      "then": {
+        "properties": {
+          "candidateHash": { "type": "null" },
+          "publishable": { "const": false }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "validationScope": { "const": "PLAN_CANDIDATE" } } },
+      "then": {
+        "properties": {
+          "candidateHash": { "$ref": "#/$defs/sha256" },
+          "publishable": { "const": false }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "validationScope": { "const": "PUBLISH_PRECHECK" } } },
+      "then": {
+        "properties": {
+          "candidateHash": { "$ref": "#/$defs/sha256" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "validationScope": { "const": "PUBLISH_PRECHECK" },
+          "validationStatus": { "const": "PASS" }
+        }
+      },
+      "then": { "properties": { "publishable": { "const": true } } }
+    }
+  ],
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    },
+    "utcInstant": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    },
+    "revision": { "type": "integer", "minimum": 0 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

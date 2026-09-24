@@ -1,0 +1,400 @@
+{
+  "runId": "2026-09-10T17-09-01-312Z",
+  "startedAt": "2026-09-10T17-09-01-312Z",
+  "command": "C:\\Users\\admin\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs",
+  "exitCode": 1,
+  "environment": {
+    "node": "v24.19.0",
+    "playwright": "1.62.1",
+    "executablePath": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    "base": "http://127.0.0.1:8789/02-agent-desktop-execution/sourcing-v2/",
+    "locale": "zh-CN",
+    "timezone": "Asia/Shanghai",
+    "mode": "独立无登录态 Chrome，仅本地原型 UI；不是真实平台或生产验收",
+    "chromium": "152.0.7977.83"
+  },
+  "summary": {
+    "passed": 23,
+    "failed": 1
+  },
+  "results": [
+    {
+      "label": "金额 / 独立 VM 精确金额与所有比较约束（非浏览器）",
+      "status": "Pass",
+      "elapsedMs": 4,
+      "detail": {
+        "cost": 19850,
+        "packagingPrecision": 350,
+        "variants": [
+          {
+            "field": "shipping",
+            "value": null,
+            "reasons": [
+              "运费待确认"
+            ],
+            "total": null
+          },
+          {
+            "field": "taxBasis",
+            "value": null,
+            "reasons": [
+              "税费口径待确认"
+            ],
+            "total": null
+          },
+          {
+            "field": "currency",
+            "value": "USD",
+            "reasons": [
+              "币种不一致",
+              "金额精度或比较口径待核验"
+            ],
+            "total": null
+          },
+          {
+            "field": "quantity",
+            "value": 999,
+            "reasons": [
+              "数量口径不一致",
+              "金额精度或比较口径待核验"
+            ],
+            "total": null
+          },
+          {
+            "field": "unit",
+            "value": "米",
+            "reasons": [
+              "计量单位不一致",
+              "金额精度或比较口径待核验"
+            ],
+            "total": null
+          },
+          {
+            "field": "destination",
+            "value": "北京",
+            "reasons": [
+              "收货地不一致",
+              "金额精度或比较口径待核验"
+            ],
+            "total": null
+          },
+          {
+            "field": "specification",
+            "value": "其他规格",
+            "reasons": [
+              "规格条件不一致",
+              "金额精度或比较口径待核验"
+            ],
+            "total": null
+          },
+          {
+            "field": "moq",
+            "value": 1001,
+            "reasons": [
+              "未达到起订量"
+            ],
+            "total": 19850
+          },
+          {
+            "field": "validUntil",
+            "value": "2020-01-01",
+            "reasons": [
+              "报价已过期"
+            ],
+            "total": 19850
+          },
+          {
+            "field": "leadStartDate",
+            "value": null,
+            "reasons": [
+              "交期起算或运输条件待确认"
+            ],
+            "total": 19850
+          },
+          {
+            "field": "leadMilestone",
+            "value": "出货",
+            "reasons": [
+              "交期起算或运输条件待确认"
+            ],
+            "total": 19850
+          }
+        ],
+        "arrival": {
+          "valid": false,
+          "reasons": [
+            "预计到货超过最晚交货要求"
+          ],
+          "total": 19850,
+          "expectedArrival": "2026-09-19"
+        }
+      }
+    },
+    {
+      "label": "布局 1440 dashboard",
+      "status": "Pass",
+      "elapsedMs": 1443,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      }
+    },
+    {
+      "label": "布局 1440 tasks",
+      "status": "Pass",
+      "elapsedMs": 226,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      }
+    },
+    {
+      "label": "布局 1440 new",
+      "status": "Pass",
+      "elapsedMs": 610,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      }
+    },
+    {
+      "label": "布局 1440 candidates/AD-260911-001",
+      "status": "Pass",
+      "elapsedMs": 197,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      }
+    },
+    {
+      "label": "布局 1440 conversations/AD-260911-001",
+      "status": "Pass",
+      "elapsedMs": 384,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      }
+    },
+    {
+      "label": "布局 1440 quotes/AD-260911-001",
+      "status": "Pass",
+      "elapsedMs": 284,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      }
+    },
+    {
+      "label": "布局 1440 suppliers",
+      "status": "Pass",
+      "elapsedMs": 175,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      }
+    },
+    {
+      "label": "布局 1440 connections",
+      "status": "Pass",
+      "elapsedMs": 197,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      }
+    },
+    {
+      "label": "布局 1440 rules",
+      "status": "Pass",
+      "elapsedMs": 189,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      }
+    },
+    {
+      "label": "布局 1440 activity",
+      "status": "Pass",
+      "elapsedMs": 152,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      }
+    },
+    {
+      "label": "布局 1440 task/AD-260911-003",
+      "status": "Pass",
+      "elapsedMs": 225,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440,
+        "body": 1440
+      }
+    },
+    {
+      "label": "布局 375 dashboard",
+      "status": "Pass",
+      "elapsedMs": 435,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375
+      }
+    },
+    {
+      "label": "布局 375 tasks",
+      "status": "Pass",
+      "elapsedMs": 173,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375
+      }
+    },
+    {
+      "label": "布局 375 new",
+      "status": "Pass",
+      "elapsedMs": 300,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375
+      }
+    },
+    {
+      "label": "布局 375 candidates/AD-260911-001",
+      "status": "Pass",
+      "elapsedMs": 184,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375
+      }
+    },
+    {
+      "label": "布局 375 conversations/AD-260911-001",
+      "status": "Pass",
+      "elapsedMs": 303,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375
+      }
+    },
+    {
+      "label": "布局 375 quotes/AD-260911-001",
+      "status": "Pass",
+      "elapsedMs": 288,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375
+      }
+    },
+    {
+      "label": "布局 375 suppliers",
+      "status": "Pass",
+      "elapsedMs": 184,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375
+      }
+    },
+    {
+      "label": "布局 375 connections",
+      "status": "Pass",
+      "elapsedMs": 180,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375
+      }
+    },
+    {
+      "label": "布局 375 rules",
+      "status": "Pass",
+      "elapsedMs": 174,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375
+      }
+    },
+    {
+      "label": "布局 375 activity",
+      "status": "Pass",
+      "elapsedMs": 171,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375
+      }
+    },
+    {
+      "label": "布局 375 task/AD-260911-003",
+      "status": "Pass",
+      "elapsedMs": 195,
+      "detail": {
+        "viewport": 375,
+        "document": 375,
+        "body": 375
+      }
+    },
+    {
+      "label": "验证执行器",
+      "status": "Fail",
+      "error": "Error: ENOENT: no such file or directory, open 'D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\output\\playwright\\qa-2026-09-10T17-09-01-312Z-表单 \\ 必填、数量校验、草稿与刷新-initial.txt'\n    at Object.writeFileSync (node:fs:2483:20)\n    at snapshot (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs:23:6)\n    at async suite (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs:54:36)\n    at async flows (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs:126:3)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs:212:203"
+    }
+  ],
+  "screenshots": [
+    {
+      "name": "dashboard-1440",
+      "file": "qa-2026-09-10T17-09-01-312Z-dashboard-1440.png"
+    },
+    {
+      "name": "new-1440",
+      "file": "qa-2026-09-10T17-09-01-312Z-new-1440.png"
+    },
+    {
+      "name": "conversations-1440",
+      "file": "qa-2026-09-10T17-09-01-312Z-conversations-1440.png"
+    },
+    {
+      "name": "quotes-1440",
+      "file": "qa-2026-09-10T17-09-01-312Z-quotes-1440.png"
+    },
+    {
+      "name": "dashboard-375",
+      "file": "qa-2026-09-10T17-09-01-312Z-dashboard-375.png"
+    },
+    {
+      "name": "new-375",
+      "file": "qa-2026-09-10T17-09-01-312Z-new-375.png"
+    },
+    {
+      "name": "conversations-375",
+      "file": "qa-2026-09-10T17-09-01-312Z-conversations-375.png"
+    },
+    {
+      "name": "quotes-375",
+      "file": "qa-2026-09-10T17-09-01-312Z-quotes-375.png"
+    }
+  ],
+  "runtimeErrors": [],
+  "blockedRequests": [],
+  "limitations": [
+    "只验证本地演示数据和状态迁移；不验证真实商品采集、客服发送或回复获取。",
+    "生产 AC-18 跨空间服务端权限、AC-19 外部提示注入防护、AC-20 删除与备份数据生命周期未验证。",
+    "未验证原生 Windows Runner、网络在途发送、模型准确率、平台许可、性能 SLA。"
+  ]
+}

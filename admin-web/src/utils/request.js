@@ -6,6 +6,7 @@ import { tansParams, blobValidate } from '@/utils/ruoyi'
 import cache from '@/plugins/cache'
 import { saveAs } from 'file-saver'
 import useUserStore from '@/store/modules/user'
+import { rejectBusinessError } from '@/utils/structuredBusinessError'
 
 let downloadLoadingInstance
 // 是否显示重新登录
@@ -94,16 +95,16 @@ service.interceptors.response.use(res => {
         isRelogin.show = false
       })
     }
-      return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
+      return rejectBusinessError(res, msg, '无效的会话，或者会话已过期，请重新登录。')
     } else if (code === 500) {
       ElMessage({ message: msg, type: 'error' })
-      return Promise.reject(new Error(msg))
+      return rejectBusinessError(res, msg, new Error(msg))
     } else if (code === 601) {
       ElMessage({ message: msg, type: 'warning' })
-      return Promise.reject(new Error(msg))
+      return rejectBusinessError(res, msg, new Error(msg))
     } else if (code !== 200) {
       ElNotification.error({ title: msg })
-      return Promise.reject('error')
+      return rejectBusinessError(res, msg, 'error')
     } else {
       return  Promise.resolve(res.data)
     }

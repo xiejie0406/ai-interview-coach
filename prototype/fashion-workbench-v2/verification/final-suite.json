@@ -1,0 +1,46 @@
+{
+  "checkedAt": "2026-09-11T03:05:27.072Z",
+  "sourceHashes": {
+    "core.js": "b9eef4fe429ab1a1d23691d27d18491f1a206f2404f1fa1fbdd92f08e195e24f",
+    "app.js": "e4db96d3a3fc7054858d0f7e3ff517d771c86b766af159172bfb9a1dc8318bd0",
+    "advanced.js": "69bee6b308bdb26b382e2593567ad6c9cc6d56b78fb17b9bdda922d4be6fde5c",
+    "catalog.js": "4dffada5aae0d55b233ef2e5d74f5575892c55913090d02561b6883a145a1fed",
+    "file-io.js": "ff9b0f40c7a89a2df93c6102d5a6626dcb0fb6deb900a3fa2b769e40216bb04f",
+    "delivery.js": "8c3bec98eb944f8d6a749521eac3a9111fd245344af62b8d280c2a03fd015ac9",
+    "style.css": "e0a6f8847d1598c39b727fb5731a87aa2fc4186a505173dc16c85cbb2b2e75b2",
+    "index.html": "d0f48ca8a438f0539e46082480bed4b9d43a287063c2c60eb30cd8d1b81ce0a0"
+  },
+  "stable": true,
+  "results": [
+    {
+      "script": "core-test.cjs",
+      "exitCode": 0,
+      "output": "core.js SHA256 b9eef4fe429ab1a1d23691d27d18491f1a206f2404f1fa1fbdd92f08e195e24f\nNode v24.15.0; 固定业务时间 2026-09-11T04:00:00.000Z; 仅内存存储和虚构数据\nPASS CORE-01 [AC20] 金额精度和非法输入\nPASS CORE-02 [AC11] 100套四品类含税报价为24050元\nPASS CORE-03 [AC20] 19.99元3件优惠7.5%加0.99元为56.46元\nPASS CORE-04 [AC20] 百分率舍入与独立整数分参照一致\nPASS CORE-05 [AC23] 未税折后商品和应税运费税基为105元\nPASS CORE-06 [AC23] 含税模式不重复加税\nPASS CORE-07 [AC23] 已含税或不再加税的运费不进入未税税基\nPASS CORE-08 [AC20/23] 优惠率及税率超过两位百分数小数必须拒绝\nPASS CORE-09 [AC25] 商品单价为零即使有运费也不能正式报价\nPASS CORE-10 [AC25] 100%商品折扣不能由有运费及负责人例外绕过\nPASS CORE-11 [AC20] 固定优惠超商品金额被拒绝\nPASS CORE-12 [AC06/12] 预算未填写表示不设上限\nPASS CORE-13 [AC19] 尺码总数90或110均不能冒充100套\nPASS CORE-14 [AC13/19] 款式总量充足但M码不足仍拒绝\nPASS CORE-15 [AC19] 负数、小数或不存在尺码不能进入正式报价\nPASS CORE-16 [AC12] 备选60套与50套不累计消耗帽子库存\nPASS CORE-17 [AC12] 合并60套与50套需110顶并拒绝90顶库存\nPASS CORE-18 [AC12] 合并库存恰足且折扣运费整单仅计算一次\nPASS CORE-19 [AC12/25] 合并固定优惠按整单判定而非先按每个候选扣减\nPASS CORE-20 [AC13] 库存超过24小时被拒绝\nPASS CORE-21 [AC13] 库存正好24小时仍在有效边界\nPASS CORE-22 [AC13] 无效库存时间不能绕过过期核验\nPASS CORE-23 [AC03/13] 未来超过5分钟的库存时间被拒绝\nPASS CORE-24 [AC22] 客户专属表完全缺价不回退批发价\nPASS CORE-25 [AC22] 客户专属价取SKU值且缺失尺码仍不可报价\nPASS CORE-26 [AC25] 销售不能批准自己的超限例外\nPASS CORE-27 [AC25] 负责人例外只对当次内容签名生效\nPASS CORE-28 [AC25] 已到期的例外不能继续生效\nPASS CORE-29 [AC14] 确认快照与后续价格库存和输入隔离\nPASS CORE-30 [AC14/17] 返回给导出方的快照对象不能改写已保存快照\nPASS CORE-31 [AC16] 对客快照不带成本和客户内部备注或例外原因\nPASS CORE-32 [AC08/18/28] 正式报价拒绝组合版本不一致的已采用图片\nPASS CORE-33 [AC28/31] 外部上传图不得标为模型实时生成或样例图\nPASS CORE-34 [AC26] 持久化失败保持旧内存状态和存储\nPASS CORE-35 [AC26] 损坏但顶层合法的备份不覆盖可用状态\nPASS CORE-36 [AC26] 正常备份完整恢复且未知版本被拒绝\nPASS CORE-37 [AC06/31] 新空白方案不会沿用样例300元运费\nPASS CORE-38 [AC07] 预算无解时不生成超预算的正式候选\nPASS CORE-39 [AC07] 候选不足不通过取模重复凑数\nPASS CORE-40 [AC07] 递进档位保留同一序列基础商品\nPASS CORE-41 [AC14] 报价有效期超出1至30天不能确认\nPASS CORE-42 [AC07] 一个上衣搭配三个裤子可以形成三个不同候选\nPASS CORE-43 [AC07] 排序优先组合超预算时仍找到存在的可行搭配\nPASS CORE-44 [AC07/13] 库存过期商品不能混入已满足硬条件的候选\n{\n  \"total\": 44,\n  \"passed\": 44,\n  \"failed\": 0,\n  \"failedIds\": [],\n  \"sourceHash\": \"b9eef4fe429ab1a1d23691d27d18491f1a206f2404f1fa1fbdd92f08e195e24f\"\n}\n"
+    },
+    {
+      "script": "catalog-test.cjs",
+      "exitCode": 0,
+      "output": "PASS CSV quoted comma, embedded newline and escaped quotes\nPASS CSV rejects unclosed quote / characters after closing quote\nPASS money precision and integer inventory are strict\nPASS CSV export neutralizes formula text\nPASS full update fails on missing SKU and leaves input untouched\nPASS full update rejects repeated/unknown SKU, blank, invalid currency and unit\nPASS atomic valid price applies all rows and keeps other source and stock\nPASS explicit zero stock works, blank and old time do not\nPASS same-scope concurrent change blocks but price and stock batches remain independent\nPASS catalog version changes force revalidation\nPASS restore preserves old time, other data and records its own version\nPASS restore refuses partial SKU coverage after catalog changes\nPASS customer price table applies independently without fallback\nPASS product import does not overwrite price/stock and duplicate file never duplicates SKU\nPASS new metadata rows create one draft with independent sizes and unknown commerce\nPASS same color metadata conflicts, duplicate sizes and invalid JD links fail\nCatalog domain checks: 16 passed.\nPASS tax basis is validated, versioned and restored with the values\nFinal catalog domain checks: 17 passed.\n"
+    },
+    {
+      "script": "delivery-check.cjs",
+      "exitCode": 0,
+      "output": "{\n  \"checkedAt\": \"2026-09-11T03:05:07.368Z\",\n  \"library\": \"PptxGenJS 4.0.1\",\n  \"slideCount\": 36,\n  \"editableTables\": 143,\n  \"mediaCount\": 14,\n  \"requirements\": [\n    \"1–4 independent alternative layouts\",\n    \"24,050.00 four-category quote\",\n    \"all size SKU text present\",\n    \"long names continued without dropping characters\",\n    \"editable text and tables\",\n    \"embedded PNG with source aspect ratio\",\n    \"actual OOXML table coordinates stay within slide\",\n    \"no internal sentinel in OOXML\",\n    \"no implicit sum in alternatives\",\n    \"CSV formula escaping\",\n    \"historical exports fixed after price update\",\n    \"revoked-image export blocked\",\n    \"unknown snapshot rejected\",\n    \"combined components retain all individual visual layouts\",\n    \"combined fee and payment occur once\",\n    \"explicit excluded-tax rows\"\n  ],\n  \"limitation\": \"Independent fixture validates generated OOXML and pure export logic. Does not prove core quote checks, browser download flow, or PowerPoint/WPS native rendering.\"\n}\n"
+    },
+    {
+      "script": "browser-test.cjs",
+      "exitCode": 0,
+      "output": "{\"passed\":11,\"checks\":[\"首页实际渲染\",\"12个页面可访问\",\"1至4品类各2个候选\",\"尺码缺配阻断并保留输入\",\"模特样例任务与逐件复核\",\"实际生成并下载拼版JPG\",\"确认尺码配比后持久化报价快照\",\"刷新后报价及方案恢复\",\"11页面390px无整体溢出\",\"字体放大与减少动画模式\",\"浏览器控制台与资源无错误\"],\"errors\":[]}\n"
+    },
+    {
+      "script": "catalog-browser-check.cjs",
+      "exitCode": 0,
+      "output": "PASS sales has no catalog write action\nPASS catalog search and 1440px layout\nPASS operator product edit persists\nPASS download/reupload actual CSV atomically updates prices only\nPASS missing full CSV blocks publication\nPASS actual XLSX parses and updates explicit zero stock independently\nPASS UI customer price table and untaxed import remain isolated from wholesale\nPASS historical restore and undo-restore are both operable with original tax metadata\nPASS actual image upload and SHA256 deduplication\nPASS manual main-image assignment changes version and requires attribute review\nPASS corrupted image retained as retryable failure\nPASS failed-item retry deduplicates content and retains recovery history\nPASS ZIP image extraction deduplicates existing content\nPASS catalog/imports 375px no page-level horizontal overflow\nPASS reduced-motion environment renders without errors\nPASS no browser runtime exception during exercised flows\n"
+    },
+    {
+      "script": "delivery-browser-check.cjs",
+      "exitCode": 0,
+      "output": "[\n  {\n    \"fileURLImageExport\": {\n      \"supported\": false,\n      \"reason\": \"浏览器限制直接打开本地文件时的图片处理。请通过本地预览服务打开原型，再重试图片导出。\"\n    }\n  },\n  {\n    \"result\": \"pass\",\n    \"browser\": \"152.0.7977.83\",\n    \"pages\": 21,\n    \"pptxEmbeddedImages\": 11,\n    \"zipImages\": 10,\n    \"checked\": [\n      \"core check blocks empty snapshots\",\n      \"four-category snapshot created via quote confirmation button\",\n      \"page selection\",\n      \"actual PPTX/CSV/ZIP download\",\n      \"editable OOXML tables\",\n      \"fixed historical export after price update\",\n      \"template version stays immutable\",\n      \"historical version selection\",\n      \"material disabled blocks exports\",\n      \"390px no horizontal overflow\",\n      \"combined snapshot retains four visual components and one payable\",\n      \"void requires reason and keeps original snapshot immutable\",\n      \"copy voided snapshot creates new unconfirmed draft from its allocations\",\n      \"expired version uses internal-only filename and CSV/slide labels\",\n      \"no JavaScript page errors\"\n    ],\n    \"limitations\": [\n      \"Chromium automation in isolated context, no real account or provider\",\n      \"PPTX not opened in native PowerPoint or WPS\"\n    ]\n  }\n]\n"
+    }
+  ]
+}

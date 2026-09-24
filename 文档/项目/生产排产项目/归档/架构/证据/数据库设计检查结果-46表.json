@@ -1,0 +1,170 @@
+{
+  "generatedAt": "2026-09-12T13:37:47.081Z",
+  "kind": "aps-database-design-static-check",
+  "sources": {
+    "design": "文档/项目/生产排产项目/归档/架构/数据库设计-46表草案.md",
+    "designSha256": "d0b12705bf1622babcf7ba7c227eb3a76a92dccd8b50ea32a45ac316ebfa0b1e",
+    "sql": "文档/项目/生产排产项目/归档/架构/生产排程数据库基线草案-46表.sql",
+    "sqlSha256": "ba46e114925332b2af161410aab8b9a248df0615e8cbddfc6e9a863cd522527b"
+  },
+  "runtime": "v24.15.0",
+  "summary": {
+    "status": "Pass",
+    "pass": 19,
+    "fail": 0,
+    "designTables": 46,
+    "sqlCreateStatements": 46,
+    "sqlUniqueTables": 46,
+    "expectedFields": 780,
+    "sqlFields": 780,
+    "designForeignKeys": 175,
+    "sqlForeignKeys": 175,
+    "sqlCheckExpressions": 150,
+    "sqlNamedConstraints": 325
+  },
+  "checks": [
+    {
+      "name": "Design table identities are exactly T01-T46 and unique",
+      "status": "Pass",
+      "detail": {
+        "expected": 46,
+        "actual": 46,
+        "errors": []
+      }
+    },
+    {
+      "name": "Design field dictionaries and inherited common fields are well formed",
+      "status": "Pass",
+      "detail": {
+        "malformed": [],
+        "duplicate": []
+      }
+    },
+    {
+      "name": "SQL CREATE TABLE set exactly matches the 46 design tables",
+      "status": "Pass",
+      "detail": {
+        "designCount": 46,
+        "createStatementCount": 46,
+        "uniqueSqlTableCount": 46,
+        "missingInSql": [],
+        "extraInSql": [],
+        "duplicateCreateTables": [],
+        "malformedCreateStatements": []
+      }
+    },
+    {
+      "name": "Each SQL table field set equals explicit plus inherited design fields",
+      "status": "Pass",
+      "detail": {
+        "mismatches": [],
+        "duplicateSqlFields": []
+      }
+    },
+    {
+      "name": "SQL column types and nullability match the design aliases and dictionaries",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "All ID columns use CHAR(36) with ASCII binary collation",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "Every CREATE TABLE targets InnoDB with utf8mb4",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "Every CREATE TABLE CHECK expression only references columns from its own table",
+      "status": "Pass",
+      "detail": {
+        "checkExpressionCount": 150,
+        "invalid": [],
+        "note": "This is a conservative lexical check; server-side expression validation is still not run."
+      }
+    },
+    {
+      "name": "Named constraints are globally unique (case-insensitive) and at most 64 characters",
+      "status": "Pass",
+      "detail": {
+        "namedConstraintCount": 325,
+        "duplicates": [],
+        "overlong": []
+      }
+    },
+    {
+      "name": "Every design foreign-key target table and column exists",
+      "status": "Pass",
+      "detail": {
+        "expectedForeignKeys": 175,
+        "invalid": []
+      }
+    },
+    {
+      "name": "Every SQL foreign key has existing local and target tables and columns",
+      "status": "Pass",
+      "detail": {
+        "foreignKeyCount": 175,
+        "invalid": []
+      }
+    },
+    {
+      "name": "Every composite SQL foreign key targets an exact PRIMARY or UNIQUE key",
+      "status": "Pass",
+      "detail": {
+        "compositeForeignKeyCount": 130,
+        "mismatches": []
+      }
+    },
+    {
+      "name": "Every SQL foreign key has an explicit child-side index with the FK columns as its left prefix",
+      "status": "Pass",
+      "detail": {
+        "mismatches": []
+      }
+    },
+    {
+      "name": "Every design foreign key is implemented by CREATE TABLE or ALTER TABLE SQL",
+      "status": "Pass",
+      "detail": {
+        "expectedForeignKeys": 175,
+        "missing": []
+      }
+    },
+    {
+      "name": "No retired physical table name from the 62-table draft remains in SQL",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "No PostgreSQL-only type or syntax remains in executable SQL",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "No destructive SQL or foreign-key bypass is present",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "Baseline SQL contains no seed or data-mutation statements",
+      "status": "Pass",
+      "detail": []
+    },
+    {
+      "name": "Sources contain no conflict markers or NUL bytes",
+      "status": "Pass",
+      "detail": []
+    }
+  ],
+  "notRun": [
+    "MySQL parser or empty-database DDL execution",
+    "Foreign-key enforcement against live data",
+    "Concurrent transaction and lock-order verification",
+    "Query-plan and performance verification",
+    "Backup, restore, migration, or rollback rehearsal",
+    "Application integration or user acceptance"
+  ]
+}

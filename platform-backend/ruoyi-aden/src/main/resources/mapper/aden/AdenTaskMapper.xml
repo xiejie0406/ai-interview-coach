@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.aden.infrastructure.persistence.mapper.AdenTaskMapper">
+    <resultMap id="inboxFact" type="com.ruoyi.aden.infrastructure.persistence.mapper.AdenInboxRow">
+        <id property="inboxId" column="inbox_id"/>
+        <result property="workspaceId" column="workspace_id"/>
+        <result property="producerId" column="producer_id"/>
+        <result property="operation" column="operation"/>
+        <result property="idempotencyKey" column="idempotency_key"/>
+        <result property="requestHash" column="request_hash"/>
+        <result property="inboxState" column="inbox_state"/>
+        <result property="responseJson" column="response_json"/>
+        <result property="inProgressUntil" column="in_progress_until"/>
+        <result property="retentionUntil" column="retention_until"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <resultMap id="storedTask" type="com.ruoyi.aden.infrastructure.persistence.mapper.AdenTaskPersistenceRow">
+        <id property="taskId" column="task_id"/>
+        <result property="workspaceId" column="workspace_id"/>
+        <result property="taskType" column="task_type"/>
+        <result property="requiredCapability" column="required_capability"/>
+        <result property="taskState" column="task_state"/>
+        <result property="correlationId" column="correlation_id"/>
+        <result property="title" column="title"/>
+        <result property="inputJson" column="input_json"/>
+        <result property="errorCode" column="error_code"/>
+        <result property="version" column="version"/>
+        <result property="createdByRuoYiUserId" column="created_by_ruoyi_user_id"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="lockWorkspaceEventSequence" resultType="java.lang.Long">
+        select last_event_seq
+          from aden_workspace
+         where workspace_id = #{workspaceId}
+           and workspace_status = 'ACTIVE'
+           for update
+    </select>
+
+    <select id="selectInboxForUpdate" resultMap="inboxFact">
+        select workspace_id, inbox_id, producer_id, operation, idempotency_key, request_hash,
+               inbox_state, response_json, in_progress_until, retention_until, created_at
+          from aden_inbox
+         where workspace_id = #{workspaceId}
+           and consumer = 'ADEN_OPERATOR_API'
+           and producer_id = #{producerId}
+           and operation = #{operation}
+           and idempotency_key = #{idempotencyKey}
+           for update
+    </select>
+
+    <insert id="insertInbox">
+        insert into aden_inbox (
+            workspace_id, inbox_id, consumer, producer_id, operation, idempotency_key,
+            request_hash, inbox_state, in_progress_until, retention_until, created_at, updated_at
+        ) values (
+            #{workspaceId}, #{inboxId}, 'ADEN_OPERATOR_API', #{producerId}, #{operation},
+            #{idempotencyKey}, #{requestHash}, 'IN_PROGRESS', #{inProgressUntil},
+            #{retentionUntil}, #{createdAt}, #{createdAt}
+        )
+    </insert>
+
+    <update id="completeInbox">
+        update aden_inbox
+           set inbox_state = 'COMPLETED',
+               response_status = #{responseStatus},
+               response_json = #{responseJson},
+               in_progress_until = null,
+               completed_at = #{completedAt},
+               updated_at = #{completedAt}
+         where workspace_id = #{workspaceId}
+           and inbox_id = #{inboxId}
+           and inbox_state = 'IN_PROGRESS'
+    </update>
+
+    <insert id="insertTask">
+        insert into aden_task (
+            workspace_id, task_id, task_type, required_capability, task_state, correlation_id,
+            title, input_json, latest_step_no, version, create_idempotency_key,
+            create_request_hash, created_by_ruoyi_user_id, created_at, updated_at
+        ) values (
+            #{workspaceId}, #{taskId}, #{taskType}, #{requiredCapability}, #{taskState},
+            #{correlationId}, #{title}, #{inputJson}, 1, #{version}, #{createIdempotencyKey},
+            #{createRequestHash}, #{createdByRuoYiUserId}, #{createdAt}, #{updatedAt}
+        )
+    </insert>
+
+    <insert id="insertStep">
+        insert into aden_task_step (
+            workspace_id, step_id, task_id, step_no, attempt_no, step_type, step_state,
+            input_json, version, created_at, updated_at
+        ) values (
+            #{workspaceId}, #{stepId}, #{taskId}, #{stepNo}, #{attemptNo},
+            'SYNTHETIC_EXECUTION', #{stepState}, #{inputJson}, #{version}, #{createdAt}, #{updatedAt}
+        )
+    </insert>
+
+    <select id="selectTaskForUpdate" resultMap="storedTask">
+        select workspace_id, task_id, task_type, required_capability, task_state, correlation_id,
+               title, input_json, error_code, version, created_by_ruoyi_user_id, created_at, updated_at
+          from aden_task
+         where workspace_id = #{workspaceId}
+           and task_id = #{taskId}
+           for update
+    </select>
+
+    <update id="updateStateCas">
+        update aden_task
+           set task_state = #{nextState},
+               version = #{nextVersion},
+               updated_at = #{updatedAt}
+         where workspace_id = #{workspaceId}
+           and task_id = #{taskId}
+           and version = #{expectedVersion}
+           and task_state = #{expectedState}
+    </update>
+
+    <update id="updateValidationFailureCas">
+        update aden_task
+           set task_state = 'FAILED',
+               version = #{nextVersion},
+               error_code = #{reasonCode},
+               error_message = '合成任务校验失败',
+               updated_at = #{updatedAt}
+         where workspace_id = #{workspaceId}
+           and task_id = #{taskId}
+           and version = #{expectedVersion}
+           and task_state = #{expectedState}
+    </update>
+
+    <update id="markFirstStepReady">
+        update aden_task_step
+           set step_state = 'READY',
+               version = version + 1,
+               updated_at = #{updatedAt}
+         where workspace_id = #{workspaceId}
+           and task_id = #{taskId}
+           and step_no = 1
+           and attempt_no = 1
+           and step_state = 'PENDING'
+           and version = 0
+    </update>
+
+    <select id="selectFirstStepIdForUpdate" resultType="java.lang.String">
+        select step_id from aden_task_step
+         where workspace_id = #{workspaceId} and task_id = #{taskId}
+           and step_no = 1 and attempt_no = 1 for update
+    </select>
+
+    <insert id="insertReadyDelivery">
+        insert into aden_runner_delivery (
+            workspace_id, delivery_id, task_id, step_id, delivery_state, attempt_no,
+            required_capability, priority, available_at, task_package_json,
+            task_package_hash, fence_token, latest_receipt_sequence, heartbeat_sequence,
+            version, created_at, updated_at
+        ) values (
+            #{workspaceId}, #{deliveryId}, #{taskId}, #{stepId}, 'READY', 1,
+            'CORE', 100, #{now}, #{taskPackageJson}, #{taskPackageHash},
+            0, 0, 0, 0, #{now}, #{now}
+        )
+    </insert>
+
+    <update id="requestCancelDeliveries">
+        update aden_runner_delivery
+           set delivery_state = case when delivery_state = 'READY' then 'CANCELED' else delivery_state end,
+               cancel_requested_at = case when delivery_state in ('LEASED','RUNNING') then #{now} else cancel_requested_at end,
+               completed_at = case when delivery_state = 'READY' then #{now} else completed_at end,
+               version = version + 1,
+               updated_at = #{now}
+         where workspace_id = #{workspaceId}
+           and task_id = #{taskId}
+           and delivery_state in ('READY','LEASED','RUNNING')
+    </update>
+
+    <update id="cancelReadySteps">
+        update aden_task_step s
+           set s.step_state = 'CANCELED', s.finished_at = #{now},
+               s.version = s.version + 1, s.updated_at = #{now}
+         where s.workspace_id = #{workspaceId} and s.task_id = #{taskId}
+           and s.step_state = 'READY'
+           and exists (select 1 from aden_runner_delivery d
+                        where d.workspace_id=s.workspace_id and d.step_id=s.step_id
+                          and d.delivery_state='CANCELED')
+    </update>
+
+    <select id="countActiveDeliveries" resultType="int">
+        select count(*) from aden_runner_delivery
+         where workspace_id=#{workspaceId} and task_id=#{taskId}
+           and delivery_state in ('LEASED','RUNNING')
+    </select>
+
+    <update id="advanceWorkspaceEventSequence">
+        update aden_workspace
+           set last_event_seq = #{next},
+               version = version + 1,
+               updated_at = #{updatedAt}
+         where workspace_id = #{workspaceId}
+           and last_event_seq = #{expected}
+           and workspace_status = 'ACTIVE'
+    </update>
+
+    <insert id="insertEvent">
+        insert into aden_event (
+            workspace_id, event_id, event_seq, aggregate_type, aggregate_id, aggregate_version,
+            event_type, payload_json, correlation_id, actor_type, actor_id, occurred_at, created_at
+        ) values (
+            #{workspaceId}, #{eventId}, #{eventSequence}, 'TASK', #{aggregateId},
+            #{aggregateVersion}, #{eventType}, #{payloadJson}, #{correlationId},
+            #{actorType}, #{actorId}, #{occurredAt}, #{createdAt}
+        )
+    </insert>
+
+    <insert id="insertOutbox">
+        insert into aden_outbox (
+            workspace_id, outbox_id, event_id, consumer, outbox_state, attempts,
+            available_at, created_at, updated_at
+        ) values (
+            #{workspaceId}, #{outboxId}, #{eventId}, #{consumer}, 'PENDING', 0,
+            #{availableAt}, #{createdAt}, #{updatedAt}
+        )
+    </insert>
+
+    <insert id="insertTaskAudit">
+        insert into aden_audit_event (
+            workspace_id, audit_event_id, scope_type, action_code, resource_type, resource_id,
+            actor_type, actor_id, correlation_id, outcome, details_json, occurred_at, created_at
+        ) values (
+            #{workspaceId}, #{auditEventId}, 'WORKSPACE', #{actionCode}, 'TASK', #{taskId},
+            #{actorType}, #{actorId}, #{correlationId}, 'SUCCEEDED', #{detailsJson},
+            #{occurredAt}, #{createdAt}
+        )
+    </insert>
+</mapper>

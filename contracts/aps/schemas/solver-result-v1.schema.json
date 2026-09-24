@@ -1,0 +1,529 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aps.local/contracts/schemas/solver-result-v1.schema.json",
+  "title": "APS SolverResult v1",
+  "description": "APS 求解结果。planStatus、solverStatus、resultKind 与 problem.reasonCode 是四层不同语义。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "contractType",
+    "requestId",
+    "planVersionId",
+    "generatedAt",
+    "definitionRevision",
+    "executionRevision",
+    "inputHash",
+    "modelVersion",
+    "solverVersion",
+    "planStatus",
+    "solverStatus",
+    "resultKind",
+    "solverSummary",
+    "candidateHash",
+    "candidate",
+    "problems"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "contractType": { "const": "SOLVER_RESULT" },
+    "requestId": { "$ref": "#/$defs/uuid" },
+    "planVersionId": { "$ref": "#/$defs/uuid" },
+    "generatedAt": { "$ref": "#/$defs/utcInstant" },
+    "definitionRevision": { "$ref": "#/$defs/revision" },
+    "executionRevision": { "$ref": "#/$defs/revision" },
+    "inputHash": { "$ref": "#/$defs/sha256" },
+    "modelVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "solverVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]*$"
+    },
+    "planStatus": {
+      "enum": [
+        "DRAFT",
+        "SOLVING",
+        "FEASIBLE",
+        "CONFLICT",
+        "CANCELLED",
+        "PUBLISHING",
+        "PUBLISHED",
+        "FAILED",
+        "SUPERSEDED"
+      ]
+    },
+    "solverStatus": {
+      "type": ["string", "null"],
+      "enum": ["OPTIMAL", "FEASIBLE", "INFEASIBLE", "UNKNOWN", "MODEL_INVALID", null]
+    },
+    "resultKind": {
+      "type": ["string", "null"],
+      "enum": [
+        "FEASIBLE",
+        "TIMEOUT_WITH_SOLUTION",
+        "INFEASIBLE_PROVEN",
+        "TIMEOUT_NO_SOLUTION",
+        "INVALID_INPUT",
+        null
+      ]
+    },
+    "solverSummary": { "$ref": "#/$defs/solverSummary" },
+    "candidateHash": {
+      "oneOf": [
+        { "$ref": "#/$defs/sha256" },
+        { "type": "null" }
+      ]
+    },
+    "candidate": {
+      "oneOf": [
+        { "$ref": "#/$defs/candidate" },
+        { "type": "null" }
+      ]
+    },
+    "problems": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "$ref": "problem-v1.schema.json"
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "title": "Draft result state",
+      "properties": {
+        "planStatus": { "const": "DRAFT" },
+        "solverStatus": { "type": "null" },
+        "resultKind": { "type": "null" },
+        "candidateHash": { "type": "null" },
+        "candidate": { "type": "null" },
+        "solverSummary": {
+          "allOf": [
+            { "$ref": "#/$defs/solverSummary" },
+            { "properties": { "stopReason": { "const": "NOT_STARTED" } } }
+          ]
+        }
+      }
+    },
+    {
+      "title": "Solving result state",
+      "properties": {
+        "planStatus": { "const": "SOLVING" },
+        "solverStatus": { "type": "null" },
+        "resultKind": { "type": "null" },
+        "candidateHash": { "type": "null" },
+        "candidate": { "type": "null" },
+        "solverSummary": {
+          "allOf": [
+            { "$ref": "#/$defs/solverSummary" },
+            { "properties": { "stopReason": { "const": "IN_PROGRESS" } } }
+          ]
+        }
+      }
+    },
+    {
+      "title": "Candidate-bearing result state",
+      "properties": {
+        "planStatus": { "enum": ["FEASIBLE", "PUBLISHING", "PUBLISHED", "SUPERSEDED"] },
+        "candidateHash": { "$ref": "#/$defs/sha256" },
+        "candidate": { "$ref": "#/$defs/candidate" },
+        "problems": {
+          "not": {
+            "contains": {
+              "type": "object",
+              "properties": { "severity": { "const": "ERROR" } },
+              "required": ["severity"]
+            }
+          }
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "solverStatus": { "enum": ["OPTIMAL", "FEASIBLE"] },
+            "resultKind": { "const": "FEASIBLE" },
+            "solverSummary": {
+              "allOf": [
+                { "$ref": "#/$defs/solverSummary" },
+                { "properties": { "stopReason": { "const": "COMPLETED" } } }
+              ]
+            }
+          }
+        },
+        {
+          "properties": {
+            "solverStatus": { "const": "FEASIBLE" },
+            "resultKind": { "const": "TIMEOUT_WITH_SOLUTION" },
+            "solverSummary": {
+              "allOf": [
+                { "$ref": "#/$defs/solverSummary" },
+                { "properties": { "stopReason": { "const": "TIME_LIMIT" } } }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "Conflict result state",
+      "properties": {
+        "planStatus": { "const": "CONFLICT" },
+        "candidateHash": { "type": "null" },
+        "candidate": { "type": "null" },
+        "problems": {
+          "minItems": 1,
+          "contains": {
+            "type": "object",
+            "properties": { "severity": { "const": "ERROR" } },
+            "required": ["severity"]
+          },
+          "minContains": 1
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "solverStatus": { "const": "INFEASIBLE" },
+            "resultKind": { "const": "INFEASIBLE_PROVEN" },
+            "solverSummary": {
+              "allOf": [
+                { "$ref": "#/$defs/solverSummary" },
+                { "properties": { "stopReason": { "const": "COMPLETED" } } }
+              ]
+            }
+          }
+        },
+        {
+          "properties": {
+            "solverStatus": { "const": "UNKNOWN" },
+            "resultKind": { "const": "TIMEOUT_NO_SOLUTION" },
+            "solverSummary": {
+              "allOf": [
+                { "$ref": "#/$defs/solverSummary" },
+                { "properties": { "stopReason": { "const": "TIME_LIMIT" } } }
+              ]
+            }
+          }
+        },
+        {
+          "properties": {
+            "solverStatus": { "type": "null" },
+            "resultKind": { "const": "INVALID_INPUT" },
+            "solverSummary": {
+              "allOf": [
+                { "$ref": "#/$defs/solverSummary" },
+                { "properties": { "stopReason": { "const": "INPUT_REJECTED" } } }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": "Cancelled result state",
+      "properties": {
+        "planStatus": { "const": "CANCELLED" },
+        "solverStatus": { "enum": ["UNKNOWN", null] },
+        "resultKind": { "type": "null" },
+        "candidateHash": { "type": "null" },
+        "candidate": { "type": "null" },
+        "solverSummary": {
+          "allOf": [
+            { "$ref": "#/$defs/solverSummary" },
+            { "properties": { "stopReason": { "const": "CANCELLED" } } }
+          ]
+        }
+      }
+    },
+    {
+      "title": "Failed result state",
+      "properties": {
+        "planStatus": { "const": "FAILED" },
+        "resultKind": { "type": "null" },
+        "candidateHash": { "type": "null" },
+        "candidate": { "type": "null" },
+        "problems": {
+          "minItems": 1,
+          "contains": {
+            "type": "object",
+            "properties": { "severity": { "const": "ERROR" } },
+            "required": ["severity"]
+          },
+          "minContains": 1
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "solverStatus": { "const": "MODEL_INVALID" },
+            "solverSummary": {
+              "allOf": [
+                { "$ref": "#/$defs/solverSummary" },
+                { "properties": { "stopReason": { "const": "MODEL_INVALID" } } }
+              ]
+            }
+          }
+        },
+        {
+          "properties": {
+            "solverStatus": { "enum": ["UNKNOWN", null] },
+            "solverSummary": {
+              "allOf": [
+                { "$ref": "#/$defs/solverSummary" },
+                { "properties": { "stopReason": { "const": "WORKER_ERROR" } } }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    },
+    "nullableUuid": {
+      "oneOf": [
+        { "$ref": "#/$defs/uuid" },
+        { "type": "null" }
+      ]
+    },
+    "utcInstant": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+    },
+    "revision": { "type": "integer", "minimum": 0 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "positiveDecimal": {
+      "type": "string",
+      "description": "DECIMAL(18,6) 的正数定点文本；最多 12 位整数和 6 位小数。",
+      "pattern": "^(?:0\\.(?=[0-9]{1,6}$)(?=[0-9]*[1-9])[0-9]+|[1-9][0-9]{0,11}(?:\\.[0-9]{1,6})?)$"
+    },
+    "solverSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stopReason",
+        "wallTimeMillis",
+        "firstSolutionMillis",
+        "objectiveValue",
+        "bestBound",
+        "absoluteGap",
+        "relativeGap",
+        "variableCount",
+        "constraintCount",
+        "searchThreads",
+        "randomSeed",
+        "objectives"
+      ],
+      "properties": {
+        "stopReason": {
+          "enum": [
+            "COMPLETED",
+            "TIME_LIMIT",
+            "CANCELLED",
+            "INPUT_REJECTED",
+            "MODEL_INVALID",
+            "WORKER_ERROR",
+            "IN_PROGRESS",
+            "NOT_STARTED"
+          ]
+        },
+        "wallTimeMillis": { "type": "integer", "minimum": 0 },
+        "firstSolutionMillis": { "type": ["integer", "null"], "minimum": 0 },
+        "objectiveValue": { "type": ["number", "null"] },
+        "bestBound": { "type": ["number", "null"] },
+        "absoluteGap": { "type": ["number", "null"], "minimum": 0 },
+        "relativeGap": { "type": ["number", "null"], "minimum": 0 },
+        "variableCount": { "type": "integer", "minimum": 0 },
+        "constraintCount": { "type": "integer", "minimum": 0 },
+        "searchThreads": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "randomSeed": { "type": "integer", "minimum": 0, "maximum": 2147483647 },
+        "objectives": {
+          "type": "array",
+          "maxItems": 5,
+          "items": { "$ref": "#/$defs/objective" }
+        }
+      }
+    },
+    "objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "name", "value", "bestBound", "provenOptimal"],
+      "properties": {
+        "level": { "enum": ["L0", "L1", "L2", "L3", "L4"] },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "value": { "type": ["number", "null"] },
+        "bestBound": { "type": ["number", "null"] },
+        "provenOptimal": { "type": "boolean" }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "horizonStartAt",
+        "horizonEndAt",
+        "jobs",
+        "segments",
+        "allocations",
+        "futureCarryForwardTaskIds",
+        "unplannedTaskIds"
+      ],
+      "properties": {
+        "horizonStartAt": { "$ref": "#/$defs/utcInstant" },
+        "horizonEndAt": { "$ref": "#/$defs/utcInstant" },
+        "jobs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/job" }
+        },
+        "segments": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/segment" }
+        },
+        "allocations": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/allocation" }
+        },
+        "futureCarryForwardTaskIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        },
+        "unplannedTaskIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        }
+      }
+    },
+    "job": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "jobId",
+        "jobType",
+        "operationSpecId",
+        "workCenterId",
+        "plannedQuantity",
+        "uomCode",
+        "startAt",
+        "endAt",
+        "memberTaskIds",
+        "carryRunId"
+      ],
+      "properties": {
+        "jobId": { "$ref": "#/$defs/uuid" },
+        "jobType": { "enum": ["NORMAL", "SPLIT", "SHARED_BATCH", "CARRY"] },
+        "operationSpecId": { "$ref": "#/$defs/uuid" },
+        "workCenterId": { "$ref": "#/$defs/uuid" },
+        "plannedQuantity": { "$ref": "#/$defs/positiveDecimal" },
+        "uomCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16,
+          "pattern": "^[A-Z0-9_]+$"
+        },
+        "startAt": { "$ref": "#/$defs/utcInstant" },
+        "endAt": { "$ref": "#/$defs/utcInstant" },
+        "memberTaskIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/uuid" }
+        },
+        "carryRunId": { "$ref": "#/$defs/nullableUuid" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "jobType": { "const": "CARRY" } } },
+          "then": { "properties": { "carryRunId": { "$ref": "#/$defs/uuid" } } },
+          "else": { "properties": { "carryRunId": { "type": "null" } } }
+        }
+      ]
+    },
+    "segment": {
+      "type": "object",
+      "description": "计划段使用半开区间 [startAt,endAt)。",
+      "additionalProperties": false,
+      "required": [
+        "segmentId",
+        "jobId",
+        "phaseId",
+        "phaseType",
+        "segmentNo",
+        "startAt",
+        "endAt",
+        "plannedQuantity",
+        "releaseAt",
+        "releaseQuantity"
+      ],
+      "properties": {
+        "segmentId": { "$ref": "#/$defs/uuid" },
+        "jobId": { "$ref": "#/$defs/uuid" },
+        "phaseId": { "$ref": "#/$defs/uuid" },
+        "phaseType": { "enum": ["SETUP", "RUN", "UNLOAD", "WAIT", "TRANSPORT"] },
+        "segmentNo": { "type": "integer", "minimum": 1, "maximum": 32767 },
+        "startAt": { "$ref": "#/$defs/utcInstant" },
+        "endAt": { "$ref": "#/$defs/utcInstant" },
+        "plannedQuantity": {
+          "oneOf": [
+            { "$ref": "#/$defs/positiveDecimal" },
+            { "type": "null" }
+          ]
+        },
+        "releaseAt": {
+          "oneOf": [
+            { "$ref": "#/$defs/utcInstant" },
+            { "type": "null" }
+          ]
+        },
+        "releaseQuantity": {
+          "oneOf": [
+            { "$ref": "#/$defs/positiveDecimal" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "allocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allocationId",
+        "segmentId",
+        "requirementId",
+        "resourceId",
+        "resourceType",
+        "seatNo",
+        "capacityUsed"
+      ],
+      "properties": {
+        "allocationId": { "$ref": "#/$defs/uuid" },
+        "segmentId": { "$ref": "#/$defs/uuid" },
+        "requirementId": { "$ref": "#/$defs/uuid" },
+        "resourceId": { "$ref": "#/$defs/uuid" },
+        "resourceType": { "enum": ["PERSON", "MACHINE", "WORKSTATION", "TOOL"] },
+        "seatNo": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "capacityUsed": { "$ref": "#/$defs/positiveDecimal" }
+      }
+    }
+  }
+}

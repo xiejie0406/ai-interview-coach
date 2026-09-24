@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "1.0",
+  "contractType": "SOLVER_INPUT",
+  "requestId": "10101010-1010-4010-8010-101010101010",
+  "planVersionId": "20202020-2020-4020-8020-202020202020",
+  "capturedAt": "2026-09-15T00:00:00.000Z",
+  "definitionRevision": 8,
+  "executionRevision": 3,
+  "inputHash": "a8750dc76d016e84c85ca6172d80208f1147225c2dfca03e5fb97111e7a12497",
+  "hashAlgorithm": "SHA-256",
+  "canonicalization": "JCS-RFC8785",
+  "modelVersion": "aps-cpsat-v1",
+  "scope": {
+    "siteCode": "SITE_01",
+    "workshopIds": ["30303030-3030-4030-8030-303030303030"]
+  },
+  "horizon": {
+    "startAt": "2026-09-15T00:00:00.000Z",
+    "detailEndAt": "2026-09-16T00:00:00.000Z",
+    "endAt": "2026-09-17T00:00:00.000Z",
+    "planningAnchorAt": "2026-09-15T00:00:00.000Z",
+    "timeUnitSeconds": 60,
+    "displayTimeZone": "Asia/Shanghai"
+  },
+  "baseVersion": null,
+  "parameters": {
+    "direction": "FORWARD",
+    "maxSolveSeconds": 30,
+    "randomSeed": 1,
+    "solverSearchThreads": 1,
+    "absoluteGapLimit": 0,
+    "relativeGapLimit": 0
+  },
+  "resources": [],
+  "availabilityWindows": [],
+  "tasks": [
+    {
+      "taskId": "40404040-4040-4040-8040-404040404040",
+      "orderLineId": "50505050-5050-4050-8050-505050505050",
+      "operationSpecId": "60606060-6060-4060-8060-606060606060",
+      "workCenterId": "70707070-7070-4070-8070-707070707070",
+      "planningClass": "MANDATORY_DETAIL",
+      "quantity": "1",
+      "uomCode": "PCS",
+      "earliestStartAt": "2026-09-15T01:00:00.000Z",
+      "promisedAt": null,
+      "phases": [
+        {
+          "phaseId": "80808080-8080-4080-8080-808080808080",
+          "phaseType": "WAIT",
+          "sequenceNo": 1,
+          "fixedSeconds": 60,
+          "secondsPerUnit": "0",
+          "interruptible": false,
+          "maxSegments": 1,
+          "minSegmentSeconds": 0,
+          "resumeSetupSeconds": 0,
+          "segmentResourcePolicy": "SAME_RESOURCES",
+          "requirements": []
+        }
+      ]
+    },
+    {
+      "taskId": "90909090-9090-4090-8090-909090909090",
+      "orderLineId": "50505050-5050-4050-8050-505050505050",
+      "operationSpecId": "a0a0a0a0-a0a0-40a0-80a0-a0a0a0a0a0a0",
+      "workCenterId": "70707070-7070-4070-8070-707070707070",
+      "planningClass": "MANDATORY_DETAIL",
+      "quantity": "1",
+      "uomCode": "PCS",
+      "earliestStartAt": "2026-09-15T01:00:00.000Z",
+      "promisedAt": null,
+      "phases": [
+        {
+          "phaseId": "b0b0b0b0-b0b0-40b0-80b0-b0b0b0b0b0b0",
+          "phaseType": "WAIT",
+          "sequenceNo": 1,
+          "fixedSeconds": 60,
+          "secondsPerUnit": "0",
+          "interruptible": false,
+          "maxSegments": 1,
+          "minSegmentSeconds": 0,
+          "resumeSetupSeconds": 0,
+          "segmentResourcePolicy": "SAME_RESOURCES",
+          "requirements": []
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "dependencyId": "c0c0c0c0-c0c0-40c0-80c0-c0c0c0c0c0c0",
+      "predecessorTaskId": "40404040-4040-4040-8040-404040404040",
+      "successorTaskId": "90909090-9090-4090-8090-909090909090",
+      "relationType": "SAME_START",
+      "lagSeconds": 0,
+      "lagBasis": "ELAPSED",
+      "thresholdQty": null,
+      "thresholdRatio": null,
+      "transferBatchQty": null,
+      "uomCode": null,
+      "consumesOutput": false
+    }
+  ],
+  "materialSupplies": [],
+  "materialDemands": [],
+  "sharedBatchCandidates": [],
+  "locks": [],
+  "actualOccupancies": []
+}

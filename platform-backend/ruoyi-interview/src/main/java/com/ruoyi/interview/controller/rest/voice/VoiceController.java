@@ -176,6 +176,8 @@ public class VoiceController {
             HttpServletRequest request) {
         var context = contexts.operation(request);
         var principal = context.requirePrincipal();
+        // 删除前复用状态查询的 session owner 校验，不能仅凭 tenant 与 artifact ID 删除。
+        getArtifact.handle(new GetAudioArtifactStatus.Query(ResourceId.of(artifactId), contexts.query(request)));
         deleteArtifact.handle(new DeleteAudioArtifact.Command(principal.tenantId(),
                 ResourceId.of(artifactId), HttpVersionPreconditions.requireIfMatch(ifMatch),
                 context.correlationId(), context.requestedAt()));

@@ -145,6 +145,7 @@ public final class VoiceCaptureCoordinator {
             var artifact = repository.findArtifact(request.tenantId(), request.artifactId()).orElseThrow();
             artifact.markUploaded(stored.objectRef(), stored.bytes(), declaredDuration,
                     stored.contentHash(), artifact.version(), eventContext);
+            repository.saveArtifact(artifact);
             artifact.beginTranscription(artifact.version(), eventContext);
             var execution = repository.findExecution(request.tenantId(), request.sessionId(), request.turnId())
                     .orElseThrow();
@@ -265,6 +266,14 @@ public final class VoiceCaptureCoordinator {
                 && ttsModelAlias != null && !ttsModelAlias.isBlank()
                 && ttsVoice != null && !ttsVoice.isBlank()
                 && ttsCodec != null && !ttsCodec.isBlank() && ttsSampleRate > 0;
+    }
+
+    public String ttsCodec() {
+        return ttsCodec;
+    }
+
+    public int ttsSampleRate() {
+        return ttsSampleRate;
     }
 
     public TtsResult synthesizeNextQuestion(

@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aden-runner"
+version = "0.1.0"
+description = "Aden low-privilege runner simulator"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "httpx>=0.28,<1.0",
+  "jsonschema>=4.25,<5.0",
+  "pydantic>=2.12,<3.0",
+  "referencing>=0.37,<1.0",
+]
+
+[project.optional-dependencies]
+test = [
+  "pyright>=1.1.408,<2.0",
+  "pytest>=9.1,<10.0",
+  "ruff>=0.15,<1.0",
+]
+
+[project.scripts]
+aden-runner = "aden_runner.__main__:main"
+aden-runner-contracts = "aden_runner.contracts.validation:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aden_runner"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["RUF001", "RUF002"]
+
+[tool.pyright]
+include = ["src", "tests"]
+pythonVersion = "3.12"
+typeCheckingMode = "strict"

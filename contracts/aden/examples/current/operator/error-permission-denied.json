@@ -1,0 +1,8 @@
+{
+  "code": 403,
+  "msg": "无权访问该工作空间资源",
+  "data": null,
+  "errorCode": "ADEN_PERMISSION_DENIED",
+  "retryable": false,
+  "correlationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+}

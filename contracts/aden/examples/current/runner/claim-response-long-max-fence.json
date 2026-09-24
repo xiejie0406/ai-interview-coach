@@ -1,0 +1,30 @@
+{
+  "claimRequestId": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+  "sessionId": "55555555-5555-4555-8555-555555555555",
+  "sessionEpoch": "9007199254740992",
+  "items": [
+    {
+      "deliveryId": "66666666-6666-4666-8666-666666666666",
+      "state": "LEASED",
+      "fencingToken": "9223372036854775807",
+      "leaseUntil": "2026-09-12T12:01:00Z",
+      "taskPackage": {
+        "schemaVersion": 1,
+        "taskId": "22222222-2222-4222-8222-222222222222",
+        "stepId": "33333333-3333-4333-8333-333333333333",
+        "taskType": "SYNTHETIC_CORE",
+        "capabilityCode": "CORE",
+        "attemptNo": 1,
+        "packageHash": "3333333333333333333333333333333333333333333333333333333333333333",
+        "input": {
+          "fixtureId": "fixture:core-success-v1",
+          "instruction": "仅处理固定合成数据并返回确定性结果。",
+          "expectedOutcome": "SUCCEED"
+        },
+        "externalActionsEnabled": false,
+        "deadlineAt": "2026-09-12T12:10:00Z"
+      }
+    }
+  ],
+  "serverTime": "2026-09-12T12:00:00Z"
+}

@@ -1,0 +1,4417 @@
+{
+  "at": "2026-09-11T01:55:40.037Z",
+  "command": "node prototype/fashion-workbench-v2/studio-browser-check.cjs",
+  "environment": {
+    "browser": "独立无登录态 Chrome，经捆绑 Playwright CJS 驱动",
+    "viewport": "1440×1000",
+    "externalWrites": false,
+    "paidCalls": false,
+    "url": "http://127.0.0.1:3496",
+    "browserVersion": "152.0.7977.83"
+  },
+  "baseline": {
+    "core.js": "b500a2fc3104e3f35210de980a117f03617a4d89a8a00cdc9845abe2b5254095",
+    "app.js": "90c60d98aa566a0cb08fd7fce24c3b0bdabe2273a019119188a701a4adc47ea6",
+    "style.css": "e0a6f8847d1598c39b727fb5731a87aa2fc4186a505173dc16c85cbb2b2e75b2",
+    "index.html": "d0f48ca8a438f0539e46082480bed4b9d43a287063c2c60eb30cd8d1b81ce0a0"
+  },
+  "fixtures": [
+    {
+      "case": "ST-10",
+      "scope": "仅该新建隔离 context 的 F.state.settings.credits，使用 F.commit 将演示积分置为 0；之后均从页面发起。"
+    }
+  ],
+  "limitations": [
+    "模特来源为项目内预置样例，不证明真实模型调用或四 SKU 保真。",
+    "外部图输入为已有样例 PNG 的真实文件上传，验证上传、版本绑定及逐项人工复核工作流。",
+    "本测试不代替用户验收、服务端权限、真实费用结算或生产并发验证。"
+  ],
+  "cases": [
+    {
+      "id": "ST-01",
+      "name": "模特样例积分预留、成功结算与真实下载",
+      "steps": [
+        "选择匹配四品类搭配，创建两张模特样例",
+        "等待任务变为待复核，下载一张图片"
+      ],
+      "expected": "每张预留 1 积分；成功后预留结束且不退款；下载与明示的预置样例相同",
+      "result": "Fail",
+      "actual": {
+        "beforeCredits": 120,
+        "reservedCredits": 118,
+        "afterCredits": 118,
+        "jobs": [
+          {
+            "id": "image-mtwb1388-8etna",
+            "status": "review",
+            "source": "sample",
+            "reserved": false,
+            "cost": 0
+          },
+          {
+            "id": "image-mtwb1387-xd8j5",
+            "status": "review",
+            "source": "sample",
+            "reserved": false,
+            "cost": 0
+          }
+        ],
+        "file": {
+          "filename": "2026-09-11T01-55-40-034Z-model-sample.png",
+          "suggestedFilename": "搭配图-image-mtwb1388-8etna.png",
+          "size": 1519936,
+          "sha256": "e16a711be782e56ae31b8d27421e170cc6a0b4f75fb6a5fb29004b605aa664cb"
+        }
+      },
+      "artifacts": [
+        "2026-09-11T01-55-40-034Z-model-sample.png",
+        "2026-09-11T01-55-40-034Z-studio-model-review.png",
+        "2026-09-11T01-55-40-034Z-ST-01-failure.png"
+      ],
+      "error": "AssertionError [ERR_ASSERTION]: 本场景浏览器无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at check (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:24:222)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:28:2",
+      "lastState": {
+        "credits": 118,
+        "jobs": [
+          {
+            "id": "image-mtwb1388-8etna",
+            "lookId": "look-mtwb131k-uer0d",
+            "lookRevision": 1,
+            "productVersions": {
+              "p00": 1,
+              "p01": 1,
+              "p02": 1,
+              "p03": 1
+            },
+            "kind": "model",
+            "status": "review",
+            "createdAt": "2026-09-11T01:55:42.104Z",
+            "review": null,
+            "reviewer": null,
+            "source": "sample",
+            "message": "四件模特预置示例已就绪，请逐一核对。",
+            "cost": 0,
+            "points": 1,
+            "reserved": false,
+            "imagePrefix": "assets/model-olive.png",
+            "imageLength": 22
+          },
+          {
+            "id": "image-mtwb1387-xd8j5",
+            "lookId": "look-mtwb131k-uer0d",
+            "lookRevision": 1,
+            "productVersions": {
+              "p00": 1,
+              "p01": 1,
+              "p02": 1,
+              "p03": 1
+            },
+            "kind": "model",
+            "status": "review",
+            "createdAt": "2026-09-11T01:55:42.103Z",
+            "review": null,
+            "reviewer": null,
+            "source": "sample",
+            "message": "四件模特预置示例已就绪，请逐一核对。",
+            "cost": 0,
+            "points": 1,
+            "reserved": false,
+            "imagePrefix": "assets/model-olive.png",
+            "imageLength": 22
+          }
+        ],
+        "looks": [
+          {
+            "id": "look-mtwb131h-1rht9",
+            "name": "1 品类 · 舒适优选",
+            "group": 1,
+            "productIds": [
+              "p00"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb131i-xohjf",
+            "name": "1 品类 · 质感备选",
+            "group": 1,
+            "productIds": [
+              "p20"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb131i-oqzov",
+            "name": "2 品类 · 舒适优选",
+            "group": 2,
+            "productIds": [
+              "p00",
+              "p01"
+            ],
+            "locks": [
+              "p00"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb131j-8iube",
+            "name": "2 品类 · 质感备选",
+            "group": 2,
+            "productIds": [
+              "p20",
+              "p21"
+            ],
+            "locks": [
+              "p20"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb131j-p4ruh",
+            "name": "3 品类 · 舒适优选",
+            "group": 3,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "locks": [
+              "p00",
+              "p01"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb131j-n2cr0",
+            "name": "3 品类 · 质感备选",
+            "group": 3,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "locks": [
+              "p20",
+              "p21"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb131k-uer0d",
+            "name": "4 品类 · 舒适优选",
+            "group": 4,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02",
+              "p03"
+            ],
+            "locks": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              },
+              "p03": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb131k-croab",
+            "name": "4 品类 · 质感备选",
+            "group": 4,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22",
+              "p23"
+            ],
+            "locks": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              },
+              "p23": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          }
+        ]
+      },
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    },
+    {
+      "id": "ST-02",
+      "name": "创建入口重复点击阻断",
+      "steps": [
+        "创建一张模特任务后立即再次点击创建"
+      ],
+      "expected": "仍只有一个待处理任务，第二次点击不扣积分并展示重复提交提示",
+      "result": "Fail",
+      "actual": {
+        "jobCount": 1,
+        "credits": 119,
+        "jobId": "image-mtwb1674-rq31f"
+      },
+      "artifacts": [
+        "2026-09-11T01-55-40-034Z-ST-02-failure.png"
+      ],
+      "error": "AssertionError [ERR_ASSERTION]: 本场景浏览器无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at check (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:24:222)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:29:2",
+      "lastState": {
+        "credits": 119,
+        "jobs": [
+          {
+            "id": "image-mtwb1674-rq31f",
+            "lookId": "look-mtwb163o-omue2",
+            "lookRevision": 1,
+            "productVersions": {
+              "p00": 1,
+              "p01": 1,
+              "p02": 1,
+              "p03": 1
+            },
+            "kind": "model",
+            "status": "queued",
+            "createdAt": "2026-09-11T01:55:45.952Z",
+            "review": null,
+            "reviewer": null,
+            "source": "sample",
+            "message": "使用预置模特示例；多张用于任务流程演示，不代表不同实生成结果。",
+            "cost": 0,
+            "points": 1,
+            "reserved": true,
+            "imagePrefix": null,
+            "imageLength": 0
+          }
+        ],
+        "looks": [
+          {
+            "id": "look-mtwb163n-p5k0m",
+            "name": "1 品类 · 舒适优选",
+            "group": 1,
+            "productIds": [
+              "p00"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb163n-i3eef",
+            "name": "1 品类 · 质感备选",
+            "group": 1,
+            "productIds": [
+              "p20"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb163n-48nbl",
+            "name": "2 品类 · 舒适优选",
+            "group": 2,
+            "productIds": [
+              "p00",
+              "p01"
+            ],
+            "locks": [
+              "p00"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb163o-0gdyo",
+            "name": "2 品类 · 质感备选",
+            "group": 2,
+            "productIds": [
+              "p20",
+              "p21"
+            ],
+            "locks": [
+              "p20"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb163o-lgwau",
+            "name": "3 品类 · 舒适优选",
+            "group": 3,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "locks": [
+              "p00",
+              "p01"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb163o-ru8gw",
+            "name": "3 品类 · 质感备选",
+            "group": 3,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "locks": [
+              "p20",
+              "p21"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb163o-omue2",
+            "name": "4 品类 · 舒适优选",
+            "group": 4,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02",
+              "p03"
+            ],
+            "locks": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              },
+              "p03": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb163o-c0tpt",
+            "name": "4 品类 · 质感备选",
+            "group": 4,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22",
+              "p23"
+            ],
+            "locks": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              },
+              "p23": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          }
+        ]
+      },
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    },
+    {
+      "id": "ST-03",
+      "name": "排队取消只退款一次",
+      "steps": [
+        "创建一张任务并立即取消",
+        "等待超过原任务完成时间"
+      ],
+      "expected": "任务保持已取消、reserved=false，积分完全退回且旧定时器不改状态",
+      "result": "Fail",
+      "actual": {
+        "createdStatus": "queued",
+        "finalStatus": "cancelled",
+        "beforeCredits": 120,
+        "afterCredits": 120
+      },
+      "artifacts": [
+        "2026-09-11T01-55-40-034Z-ST-03-failure.png"
+      ],
+      "error": "AssertionError [ERR_ASSERTION]: 本场景浏览器无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at check (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:24:222)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:30:2",
+      "lastState": {
+        "credits": 120,
+        "jobs": [
+          {
+            "id": "image-mtwb17cr-z50jn",
+            "lookId": "look-mtwb179i-zmpre",
+            "lookRevision": 1,
+            "productVersions": {
+              "p00": 1,
+              "p01": 1,
+              "p02": 1,
+              "p03": 1
+            },
+            "kind": "model",
+            "status": "cancelled",
+            "createdAt": "2026-09-11T01:55:47.451Z",
+            "review": null,
+            "reviewer": null,
+            "source": "sample",
+            "message": "用户取消，演示积分已释放；不发生收费。",
+            "cost": 0,
+            "points": 1,
+            "reserved": false,
+            "imagePrefix": null,
+            "imageLength": 0
+          }
+        ],
+        "looks": [
+          {
+            "id": "look-mtwb179g-eai85",
+            "name": "1 品类 · 舒适优选",
+            "group": 1,
+            "productIds": [
+              "p00"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb179h-ey3nl",
+            "name": "1 品类 · 质感备选",
+            "group": 1,
+            "productIds": [
+              "p20"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb179h-pt05m",
+            "name": "2 品类 · 舒适优选",
+            "group": 2,
+            "productIds": [
+              "p00",
+              "p01"
+            ],
+            "locks": [
+              "p00"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb179h-iv2xy",
+            "name": "2 品类 · 质感备选",
+            "group": 2,
+            "productIds": [
+              "p20",
+              "p21"
+            ],
+            "locks": [
+              "p20"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb179h-830t1",
+            "name": "3 品类 · 舒适优选",
+            "group": 3,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "locks": [
+              "p00",
+              "p01"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb179i-i9siw",
+            "name": "3 品类 · 质感备选",
+            "group": 3,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "locks": [
+              "p20",
+              "p21"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb179i-zmpre",
+            "name": "4 品类 · 舒适优选",
+            "group": 4,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02",
+              "p03"
+            ],
+            "locks": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              },
+              "p03": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb179i-ii5mr",
+            "name": "4 品类 · 质感备选",
+            "group": 4,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22",
+              "p23"
+            ],
+            "locks": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              },
+              "p23": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          }
+        ]
+      },
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    },
+    {
+      "id": "ST-04",
+      "name": "处理中取消释放积分",
+      "steps": [
+        "创建一张任务并等待处理中",
+        "点击取消，等待原完成时间"
+      ],
+      "expected": "运行中任务取消后退款，旧完成回调不生成图片",
+      "result": "Fail",
+      "actual": {
+        "finalStatus": "cancelled",
+        "image": null,
+        "beforeCredits": 120,
+        "afterCredits": 120
+      },
+      "artifacts": [
+        "2026-09-11T01-55-40-034Z-ST-04-failure.png"
+      ],
+      "error": "AssertionError [ERR_ASSERTION]: 本场景浏览器无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at check (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:24:222)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:31:2",
+      "lastState": {
+        "credits": 120,
+        "jobs": [
+          {
+            "id": "image-mtwb1a8d-lrvhj",
+            "lookId": "look-mtwb1a4l-n0osp",
+            "lookRevision": 1,
+            "productVersions": {
+              "p00": 1,
+              "p01": 1,
+              "p02": 1,
+              "p03": 1
+            },
+            "kind": "model",
+            "status": "cancelled",
+            "createdAt": "2026-09-11T01:55:51.181Z",
+            "review": null,
+            "reviewer": null,
+            "source": "sample",
+            "message": "用户取消，演示积分已释放；不发生收费。",
+            "cost": 0,
+            "points": 1,
+            "reserved": false,
+            "imagePrefix": null,
+            "imageLength": 0
+          }
+        ],
+        "looks": [
+          {
+            "id": "look-mtwb1a4j-48q2d",
+            "name": "1 品类 · 舒适优选",
+            "group": 1,
+            "productIds": [
+              "p00"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1a4k-tjwu4",
+            "name": "1 品类 · 质感备选",
+            "group": 1,
+            "productIds": [
+              "p20"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1a4k-efgp5",
+            "name": "2 品类 · 舒适优选",
+            "group": 2,
+            "productIds": [
+              "p00",
+              "p01"
+            ],
+            "locks": [
+              "p00"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1a4k-01i3h",
+            "name": "2 品类 · 质感备选",
+            "group": 2,
+            "productIds": [
+              "p20",
+              "p21"
+            ],
+            "locks": [
+              "p20"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1a4k-dyg62",
+            "name": "3 品类 · 舒适优选",
+            "group": 3,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "locks": [
+              "p00",
+              "p01"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1a4k-vojmx",
+            "name": "3 品类 · 质感备选",
+            "group": 3,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "locks": [
+              "p20",
+              "p21"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1a4l-n0osp",
+            "name": "4 品类 · 舒适优选",
+            "group": 4,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02",
+              "p03"
+            ],
+            "locks": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              },
+              "p03": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1a4l-30cwq",
+            "name": "4 品类 · 质感备选",
+            "group": 4,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22",
+              "p23"
+            ],
+            "locks": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              },
+              "p23": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          }
+        ]
+      },
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    },
+    {
+      "id": "ST-05",
+      "name": "失败退款、重试及重试入口防重复",
+      "steps": [
+        "选择不匹配预置示例的单品候选并等待失败",
+        "连续两次点击该失败任务的重新准备"
+      ],
+      "expected": "失败释放积分；重试保留历史，重复重试不创建第二个处理中任务",
+      "result": "Fail",
+      "actual": null,
+      "artifacts": [
+        "2026-09-11T01-55-40-034Z-ST-05-failure.png"
+      ],
+      "error": "AssertionError [ERR_ASSERTION]: 重复点击失败任务的重试按钮不得再次提交\n\n3 !== 2\n\n    at D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:32:647\n    at async check (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:24:195)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:32:2",
+      "lastState": {
+        "credits": 118,
+        "jobs": [
+          {
+            "id": "image-mtwb1ep2-y2gny",
+            "lookId": "look-mtwb1d00-snx1f",
+            "lookRevision": 1,
+            "productVersions": {
+              "p00": 1
+            },
+            "kind": "model",
+            "status": "queued",
+            "createdAt": "2026-09-11T01:55:56.966Z",
+            "review": null,
+            "reviewer": null,
+            "source": "sample",
+            "message": "使用预置模特示例；多张用于任务流程演示，不代表不同实生成结果。",
+            "cost": 0,
+            "points": 1,
+            "reserved": true,
+            "imagePrefix": null,
+            "imageLength": 0
+          },
+          {
+            "id": "image-mtwb1eo3-c2d6u",
+            "lookId": "look-mtwb1d00-snx1f",
+            "lookRevision": 1,
+            "productVersions": {
+              "p00": 1
+            },
+            "kind": "model",
+            "status": "queued",
+            "createdAt": "2026-09-11T01:55:56.931Z",
+            "review": null,
+            "reviewer": null,
+            "source": "sample",
+            "message": "使用预置模特示例；多张用于任务流程演示，不代表不同实生成结果。",
+            "cost": 0,
+            "points": 1,
+            "reserved": true,
+            "imagePrefix": null,
+            "imageLength": 0
+          },
+          {
+            "id": "image-mtwb1d68-drfdt",
+            "lookId": "look-mtwb1d00-snx1f",
+            "lookRevision": 1,
+            "productVersions": {
+              "p00": 1
+            },
+            "kind": "model",
+            "status": "failed",
+            "createdAt": "2026-09-11T01:55:54.992Z",
+            "review": null,
+            "reviewer": null,
+            "source": "sample",
+            "message": "此组合无匹配的预置模特示例。可上传外部生成图复核，或制作商品拼版；演示积分已释放。",
+            "cost": 0,
+            "points": 1,
+            "reserved": false,
+            "imagePrefix": null,
+            "imageLength": 0
+          }
+        ],
+        "looks": [
+          {
+            "id": "look-mtwb1d00-snx1f",
+            "name": "1 品类 · 舒适优选",
+            "group": 1,
+            "productIds": [
+              "p00"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1d01-21ze9",
+            "name": "1 品类 · 质感备选",
+            "group": 1,
+            "productIds": [
+              "p20"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1d01-hpniv",
+            "name": "2 品类 · 舒适优选",
+            "group": 2,
+            "productIds": [
+              "p00",
+              "p01"
+            ],
+            "locks": [
+              "p00"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1d01-t5mpo",
+            "name": "2 品类 · 质感备选",
+            "group": 2,
+            "productIds": [
+              "p20",
+              "p21"
+            ],
+            "locks": [
+              "p20"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1d01-4l0b4",
+            "name": "3 品类 · 舒适优选",
+            "group": 3,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "locks": [
+              "p00",
+              "p01"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1d02-byj25",
+            "name": "3 品类 · 质感备选",
+            "group": 3,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "locks": [
+              "p20",
+              "p21"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1d02-eve13",
+            "name": "4 品类 · 舒适优选",
+            "group": 4,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02",
+              "p03"
+            ],
+            "locks": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              },
+              "p03": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1d02-pmtuu",
+            "name": "4 品类 · 质感备选",
+            "group": 4,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22",
+              "p23"
+            ],
+            "locks": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              },
+              "p23": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          }
+        ]
+      },
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    },
+    {
+      "id": "ST-06",
+      "name": "外部生成图真实文件上传与逐项审核",
+      "steps": [
+        "从上传按钮选择实际 PNG 文件",
+        "不勾选及只勾选部分项目分别尝试采用",
+        "全部项目确认后采用"
+      ],
+      "expected": "上传零积分；审核不完整时保持待复核，完整后绑定当前方案、商品版本和复核人",
+      "result": "Fail",
+      "actual": {
+        "source": "upload",
+        "status": "approved",
+        "reviewer": "sales",
+        "reviewedAt": "2026-09-11T01:55:59.262Z",
+        "productVersions": {
+          "p00": 1,
+          "p01": 1,
+          "p02": 1,
+          "p03": 1
+        },
+        "checks": 5,
+        "credits": 120
+      },
+      "artifacts": [
+        "2026-09-11T01-55-40-034Z-studio-upload-review.png",
+        "2026-09-11T01-55-40-034Z-ST-06-failure.png"
+      ],
+      "error": "AssertionError [ERR_ASSERTION]: 本场景浏览器无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at check (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:24:222)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:33:2",
+      "lastState": {
+        "credits": 120,
+        "jobs": [
+          {
+            "id": "image-mtwb1ft4-pbx8f",
+            "lookId": "look-mtwb1foc-0fqmx",
+            "lookRevision": 1,
+            "productVersions": {
+              "p00": 1,
+              "p01": 1,
+              "p02": 1,
+              "p03": 1
+            },
+            "kind": "model",
+            "status": "approved",
+            "createdAt": "2026-09-11T01:55:58.408Z",
+            "review": "独立验证：已逐件核对四品类及人物边缘。",
+            "reviewer": "sales",
+            "source": "upload",
+            "message": "用户上传的图像，须按当前商品逐件复核。",
+            "cost": 0,
+            "points": 0,
+            "reserved": false,
+            "reviewedAt": "2026-09-11T01:55:59.262Z",
+            "imagePrefix": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgA",
+            "imageLength": 2026606
+          }
+        ],
+        "looks": [
+          {
+            "id": "look-mtwb1fo9-e9qot",
+            "name": "1 品类 · 舒适优选",
+            "group": 1,
+            "productIds": [
+              "p00"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1foa-z8xaa",
+            "name": "1 品类 · 质感备选",
+            "group": 1,
+            "productIds": [
+              "p20"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1fob-b0f88",
+            "name": "2 品类 · 舒适优选",
+            "group": 2,
+            "productIds": [
+              "p00",
+              "p01"
+            ],
+            "locks": [
+              "p00"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1fob-4s445",
+            "name": "2 品类 · 质感备选",
+            "group": 2,
+            "productIds": [
+              "p20",
+              "p21"
+            ],
+            "locks": [
+              "p20"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1fob-m9cz4",
+            "name": "3 品类 · 舒适优选",
+            "group": 3,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "locks": [
+              "p00",
+              "p01"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1fob-bk1x3",
+            "name": "3 品类 · 质感备选",
+            "group": 3,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "locks": [
+              "p20",
+              "p21"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1foc-0fqmx",
+            "name": "4 品类 · 舒适优选",
+            "group": 4,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02",
+              "p03"
+            ],
+            "locks": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              },
+              "p03": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": "image-mtwb1ft4-pbx8f",
+            "imageMode": "model",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1foc-yxhq2",
+            "name": "4 品类 · 质感备选",
+            "group": 4,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22",
+              "p23"
+            ],
+            "locks": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              },
+              "p23": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          }
+        ]
+      },
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    },
+    {
+      "id": "ST-07",
+      "name": "审核驳回须说明原因",
+      "steps": [
+        "上传实际 PNG 后打开复核",
+        "空原因驳回，再填写颜色不符原因驳回"
+      ],
+      "expected": "空原因不改变状态；有原因后记录驳回，不能绑定为当前采用图",
+      "result": "Fail",
+      "actual": {
+        "status": "rejected",
+        "reason": "帽子颜色不符，需重新生成"
+      },
+      "artifacts": [
+        "2026-09-11T01-55-40-034Z-ST-07-failure.png"
+      ],
+      "error": "AssertionError [ERR_ASSERTION]: 本场景浏览器无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at check (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:24:222)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:34:2",
+      "lastState": {
+        "credits": 120,
+        "jobs": [
+          {
+            "id": "image-mtwb1hn4-nxc1g",
+            "lookId": "look-mtwb1hj4-9vvub",
+            "lookRevision": 1,
+            "productVersions": {
+              "p00": 1,
+              "p01": 1,
+              "p02": 1,
+              "p03": 1
+            },
+            "kind": "model",
+            "status": "rejected",
+            "createdAt": "2026-09-11T01:56:00.784Z",
+            "review": "帽子颜色不符，需重新生成",
+            "reviewer": "sales",
+            "source": "upload",
+            "message": "用户上传的图像，须按当前商品逐件复核。",
+            "cost": 0,
+            "points": 0,
+            "reserved": false,
+            "reviewedAt": "2026-09-11T01:56:01.022Z",
+            "imagePrefix": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgA",
+            "imageLength": 2026606
+          }
+        ],
+        "looks": [
+          {
+            "id": "look-mtwb1hj1-flvgc",
+            "name": "1 品类 · 舒适优选",
+            "group": 1,
+            "productIds": [
+              "p00"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1hj3-33az4",
+            "name": "1 品类 · 质感备选",
+            "group": 1,
+            "productIds": [
+              "p20"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1hj3-z3sn1",
+            "name": "2 品类 · 舒适优选",
+            "group": 2,
+            "productIds": [
+              "p00",
+              "p01"
+            ],
+            "locks": [
+              "p00"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1hj3-r3fc3",
+            "name": "2 品类 · 质感备选",
+            "group": 2,
+            "productIds": [
+              "p20",
+              "p21"
+            ],
+            "locks": [
+              "p20"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1hj3-6ym5t",
+            "name": "3 品类 · 舒适优选",
+            "group": 3,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "locks": [
+              "p00",
+              "p01"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1hj3-xhw9k",
+            "name": "3 品类 · 质感备选",
+            "group": 3,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "locks": [
+              "p20",
+              "p21"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1hj4-9vvub",
+            "name": "4 品类 · 舒适优选",
+            "group": 4,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02",
+              "p03"
+            ],
+            "locks": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              },
+              "p03": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1hj4-wnlec",
+            "name": "4 品类 · 质感备选",
+            "group": 4,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22",
+              "p23"
+            ],
+            "locks": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              },
+              "p23": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          }
+        ]
+      },
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    },
+    {
+      "id": "ST-08",
+      "name": "电商用途真实生成拼版且正确标记来源",
+      "steps": [
+        "选择电商展示图用途，创建一张",
+        "等待真实拼版完成，检查卡片及审核标签，下载文件"
+      ],
+      "expected": "source=composition；不扣积分，不标成 AI 或本地上传；输出 1200×900 的实际 JPG",
+      "result": "Fail",
+      "actual": null,
+      "artifacts": [
+        "2026-09-11T01-55-40-034Z-ST-08-failure.png"
+      ],
+      "error": "AssertionError [ERR_ASSERTION]: The input was expected to not match the regular expression /本地上传|AI.*图/. Input:\n\n'待人工复核\\n' +\n  '4 品类 · 舒适优选\\n' +\n  '\\n' +\n  '商品电商拼版已生成，请检查清单与图片。\\n' +\n  '\\n' +\n  '复核与采用\\n' +\n  '下载图片\\n' +\n  '\\n' +\n  '09/11 09:56 · 本地上传 · ¥0.00'\n\n    at D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:35:745\n    at async check (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:24:195)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:35:2",
+      "lastState": {
+        "credits": 120,
+        "jobs": [
+          {
+            "id": "image-mtwb1izt-qwu6u",
+            "lookId": "look-mtwb1iwf-sofq8",
+            "lookRevision": 1,
+            "productVersions": {
+              "p00": 1,
+              "p01": 1,
+              "p02": 1,
+              "p03": 1
+            },
+            "kind": "ecommerce",
+            "status": "review",
+            "createdAt": "2026-09-11T01:56:02.537Z",
+            "review": null,
+            "reviewer": null,
+            "source": "composition",
+            "message": "商品电商拼版已生成，请检查清单与图片。",
+            "cost": 0,
+            "points": 0,
+            "reserved": false,
+            "imagePrefix": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ",
+            "imageLength": 66711
+          }
+        ],
+        "looks": [
+          {
+            "id": "look-mtwb1iwd-d58zn",
+            "name": "1 品类 · 舒适优选",
+            "group": 1,
+            "productIds": [
+              "p00"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1iwe-ocqad",
+            "name": "1 品类 · 质感备选",
+            "group": 1,
+            "productIds": [
+              "p20"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1iwe-qv6mi",
+            "name": "2 品类 · 舒适优选",
+            "group": 2,
+            "productIds": [
+              "p00",
+              "p01"
+            ],
+            "locks": [
+              "p00"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1iwe-cduar",
+            "name": "2 品类 · 质感备选",
+            "group": 2,
+            "productIds": [
+              "p20",
+              "p21"
+            ],
+            "locks": [
+              "p20"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1iwe-e4vhm",
+            "name": "3 品类 · 舒适优选",
+            "group": 3,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "locks": [
+              "p00",
+              "p01"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1iwe-7yiac",
+            "name": "3 品类 · 质感备选",
+            "group": 3,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "locks": [
+              "p20",
+              "p21"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1iwf-sofq8",
+            "name": "4 品类 · 舒适优选",
+            "group": 4,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02",
+              "p03"
+            ],
+            "locks": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              },
+              "p03": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1iwf-sfuvy",
+            "name": "4 品类 · 质感备选",
+            "group": 4,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22",
+              "p23"
+            ],
+            "locks": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              },
+              "p23": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          }
+        ]
+      },
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    },
+    {
+      "id": "ST-09",
+      "name": "拼版对话框键盘、焦点与图片比例",
+      "steps": [
+        "以键盘打开制作商品拼版，Tab 轮转并按 Escape",
+        "再次打开生成真实 JPG 并检查预览比例"
+      ],
+      "expected": "焦点保持在模态框内；Escape 后回到触发按钮；图片按原始比例显示",
+      "result": "Fail",
+      "actual": null,
+      "artifacts": [
+        "2026-09-11T01-55-40-034Z-ST-09-failure.png"
+      ],
+      "error": "AssertionError [ERR_ASSERTION]: Tab 焦点不离开打开的模态框\n    at D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:36:458\n    at async check (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:24:195)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:36:2",
+      "lastState": {
+        "credits": 120,
+        "jobs": [],
+        "looks": [
+          {
+            "id": "look-mtwb1lhd-lhpif",
+            "name": "1 品类 · 舒适优选",
+            "group": 1,
+            "productIds": [
+              "p00"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1lhe-pp4cb",
+            "name": "1 品类 · 质感备选",
+            "group": 1,
+            "productIds": [
+              "p20"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1lhe-kvz42",
+            "name": "2 品类 · 舒适优选",
+            "group": 2,
+            "productIds": [
+              "p00",
+              "p01"
+            ],
+            "locks": [
+              "p00"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1lhf-uxhx3",
+            "name": "2 品类 · 质感备选",
+            "group": 2,
+            "productIds": [
+              "p20",
+              "p21"
+            ],
+            "locks": [
+              "p20"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1lhf-xdrc4",
+            "name": "3 品类 · 舒适优选",
+            "group": 3,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "locks": [
+              "p00",
+              "p01"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1lhf-jsmbq",
+            "name": "3 品类 · 质感备选",
+            "group": 3,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "locks": [
+              "p20",
+              "p21"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1lhg-95s1v",
+            "name": "4 品类 · 舒适优选",
+            "group": 4,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02",
+              "p03"
+            ],
+            "locks": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              },
+              "p03": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1lhg-9l64r",
+            "name": "4 品类 · 质感备选",
+            "group": 4,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22",
+              "p23"
+            ],
+            "locks": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              },
+              "p23": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          }
+        ]
+      },
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    },
+    {
+      "id": "ST-10",
+      "name": "零积分异常夹具与免费拼版",
+      "steps": [
+        "仅本隔离页面将演示积分置零",
+        "从页面尝试创建四张模特图，再创建一张电商拼版"
+      ],
+      "expected": "模特整批阻断、不生成部分任务；零积分仍可完成免费拼版",
+      "result": "Fail",
+      "actual": {
+        "fixture": "仅 credits=0；操作通过真实 UI",
+        "finalCredits": 0,
+        "jobCount": 1,
+        "source": "composition"
+      },
+      "artifacts": [
+        "2026-09-11T01-55-40-034Z-ST-10-failure.png"
+      ],
+      "error": "AssertionError [ERR_ASSERTION]: 本场景浏览器无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at check (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:24:222)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:37:2",
+      "lastState": {
+        "credits": 0,
+        "jobs": [
+          {
+            "id": "image-mtwb1mpi-71qtz",
+            "lookId": "look-mtwb1mkm-hyl40",
+            "lookRevision": 1,
+            "productVersions": {
+              "p00": 1,
+              "p01": 1,
+              "p02": 1,
+              "p03": 1
+            },
+            "kind": "ecommerce",
+            "status": "review",
+            "createdAt": "2026-09-11T01:56:07.350Z",
+            "review": null,
+            "reviewer": null,
+            "source": "composition",
+            "message": "商品电商拼版已生成，请检查清单与图片。",
+            "cost": 0,
+            "points": 0,
+            "reserved": false,
+            "imagePrefix": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ",
+            "imageLength": 66711
+          }
+        ],
+        "looks": [
+          {
+            "id": "look-mtwb1mkk-a03zi",
+            "name": "1 品类 · 舒适优选",
+            "group": 1,
+            "productIds": [
+              "p00"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1mkl-yud3x",
+            "name": "1 品类 · 质感备选",
+            "group": 1,
+            "productIds": [
+              "p20"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1mkl-wt4e2",
+            "name": "2 品类 · 舒适优选",
+            "group": 2,
+            "productIds": [
+              "p00",
+              "p01"
+            ],
+            "locks": [
+              "p00"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1mkl-xh9iq",
+            "name": "2 品类 · 质感备选",
+            "group": 2,
+            "productIds": [
+              "p20",
+              "p21"
+            ],
+            "locks": [
+              "p20"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1mkl-05ufl",
+            "name": "3 品类 · 舒适优选",
+            "group": 3,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "locks": [
+              "p00",
+              "p01"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1mkl-7jv8e",
+            "name": "3 品类 · 质感备选",
+            "group": 3,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "locks": [
+              "p20",
+              "p21"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1mkm-hyl40",
+            "name": "4 品类 · 舒适优选",
+            "group": 4,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02",
+              "p03"
+            ],
+            "locks": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              },
+              "p03": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1mkm-atgn0",
+            "name": "4 品类 · 质感备选",
+            "group": 4,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22",
+              "p23"
+            ],
+            "locks": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              },
+              "p23": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          }
+        ]
+      },
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    },
+    {
+      "id": "ST-11",
+      "name": "刷新中断恢复与退款",
+      "steps": [
+        "创建模特任务后立即刷新浏览器",
+        "回读持久化任务与积分"
+      ],
+      "expected": "未完成任务记为失败并释放预留，不能伪造成功",
+      "result": "Fail",
+      "actual": {
+        "status": "failed",
+        "message": "页面刷新中断了本地任务，演示积分已释放，可重新准备。",
+        "beforeCredits": 120,
+        "afterCredits": 120
+      },
+      "artifacts": [
+        "2026-09-11T01-55-40-034Z-ST-11-failure.png"
+      ],
+      "error": "AssertionError [ERR_ASSERTION]: 本场景浏览器无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)',\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at check (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:24:222)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:38:2",
+      "lastState": {
+        "credits": 120,
+        "jobs": [
+          {
+            "id": "image-mtwb1pb2-05jzx",
+            "lookId": "look-mtwb1p6t-x35op",
+            "lookRevision": 1,
+            "productVersions": {
+              "p00": 1,
+              "p01": 1,
+              "p02": 1,
+              "p03": 1
+            },
+            "kind": "model",
+            "status": "failed",
+            "createdAt": "2026-09-11T01:56:10.718Z",
+            "review": null,
+            "reviewer": null,
+            "source": "sample",
+            "message": "页面刷新中断了本地任务，演示积分已释放，可重新准备。",
+            "cost": 0,
+            "points": 1,
+            "reserved": false,
+            "imagePrefix": null,
+            "imageLength": 0
+          }
+        ],
+        "looks": [
+          {
+            "id": "look-mtwb1p6r-pjaq8",
+            "name": "1 品类 · 舒适优选",
+            "group": 1,
+            "productIds": [
+              "p00"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1p6s-yen66",
+            "name": "1 品类 · 质感备选",
+            "group": 1,
+            "productIds": [
+              "p20"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1p6s-q6rln",
+            "name": "2 品类 · 舒适优选",
+            "group": 2,
+            "productIds": [
+              "p00",
+              "p01"
+            ],
+            "locks": [
+              "p00"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1p6s-n1hsc",
+            "name": "2 品类 · 质感备选",
+            "group": 2,
+            "productIds": [
+              "p20",
+              "p21"
+            ],
+            "locks": [
+              "p20"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1p6s-t5nud",
+            "name": "3 品类 · 舒适优选",
+            "group": 3,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "locks": [
+              "p00",
+              "p01"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1p6s-f5xhq",
+            "name": "3 品类 · 质感备选",
+            "group": 3,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "locks": [
+              "p20",
+              "p21"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1p6t-x35op",
+            "name": "4 品类 · 舒适优选",
+            "group": 4,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02",
+              "p03"
+            ],
+            "locks": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              },
+              "p03": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1p6t-6h7wz",
+            "name": "4 品类 · 质感备选",
+            "group": 4,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22",
+              "p23"
+            ],
+            "locks": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              },
+              "p23": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          }
+        ]
+      },
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    },
+    {
+      "id": "ST-12",
+      "name": "模特图在桌面与移动审核保持完整比例",
+      "steps": [
+        "生成模特样例，检查卡片图片的完整显示规则",
+        "打开复核，切换 390px 宽度检查图片与对话框"
+      ],
+      "expected": "卡片与审核图片使用 contain、文件完整解码，移动端无整页横向溢出",
+      "result": "Fail",
+      "actual": {
+        "card": {
+          "width": 1086,
+          "height": 1448,
+          "objectFit": "contain",
+          "renderedWidth": 334.65625,
+          "renderedHeight": 446.203125,
+          "src": "assets/model-olive.png"
+        },
+        "desktop": {
+          "width": 1086,
+          "height": 1448,
+          "objectFit": "contain",
+          "renderedWidth": 342,
+          "renderedHeight": 456,
+          "src": "assets/model-olive.png"
+        },
+        "mobile": {
+          "width": 1086,
+          "height": 1448,
+          "objectFit": "contain",
+          "renderedWidth": 322,
+          "renderedHeight": 350,
+          "src": "assets/model-olive.png"
+        }
+      },
+      "artifacts": [
+        "2026-09-11T01-55-40-034Z-studio-review-mobile.png",
+        "2026-09-11T01-55-40-034Z-ST-12-failure.png"
+      ],
+      "error": "AssertionError [ERR_ASSERTION]: 本场景浏览器无脚本或资源错误\n+ actual - expected\n\n+ [\n+   'Failed to load resource: the server responded with a status of 404 (Not Found)'\n+ ]\n- []\n\n    at check (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:24:222)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:39:2",
+      "lastState": {
+        "credits": 119,
+        "jobs": [
+          {
+            "id": "image-mtwb1qv9-oaj74",
+            "lookId": "look-mtwb1qs0-o02dp",
+            "lookRevision": 1,
+            "productVersions": {
+              "p00": 1,
+              "p01": 1,
+              "p02": 1,
+              "p03": 1
+            },
+            "kind": "model",
+            "status": "review",
+            "createdAt": "2026-09-11T01:56:12.741Z",
+            "review": null,
+            "reviewer": null,
+            "source": "sample",
+            "message": "四件模特预置示例已就绪，请逐一核对。",
+            "cost": 0,
+            "points": 1,
+            "reserved": false,
+            "imagePrefix": "assets/model-olive.png",
+            "imageLength": 22
+          }
+        ],
+        "looks": [
+          {
+            "id": "look-mtwb1qry-rgkkt",
+            "name": "1 品类 · 舒适优选",
+            "group": 1,
+            "productIds": [
+              "p00"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1qrz-09n3d",
+            "name": "1 品类 · 质感备选",
+            "group": 1,
+            "productIds": [
+              "p20"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1qs0-bdcoq",
+            "name": "2 品类 · 舒适优选",
+            "group": 2,
+            "productIds": [
+              "p00",
+              "p01"
+            ],
+            "locks": [
+              "p00"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1qs0-qfr2d",
+            "name": "2 品类 · 质感备选",
+            "group": 2,
+            "productIds": [
+              "p20",
+              "p21"
+            ],
+            "locks": [
+              "p20"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1qs0-4coqq",
+            "name": "3 品类 · 舒适优选",
+            "group": 3,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "locks": [
+              "p00",
+              "p01"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1qs0-aprk8",
+            "name": "3 品类 · 质感备选",
+            "group": 3,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "locks": [
+              "p20",
+              "p21"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1qs0-o02dp",
+            "name": "4 品类 · 舒适优选",
+            "group": 4,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02",
+              "p03"
+            ],
+            "locks": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              },
+              "p03": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1qs0-p10fb",
+            "name": "4 品类 · 质感备选",
+            "group": 4,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22",
+              "p23"
+            ],
+            "locks": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              },
+              "p23": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          }
+        ]
+      },
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    },
+    {
+      "id": "ST-13",
+      "name": "处理时重搭使旧图过期并释放预留",
+      "steps": [
+        "创建模特任务，立即通过搭配页保持锁定重搭",
+        "等待原任务完成时间，回读任务状态与积分"
+      ],
+      "expected": "候选变化后旧任务标为过期，未完成任务释放积分，不能把旧图写回新组合",
+      "result": "Fail",
+      "actual": null,
+      "artifacts": [
+        "2026-09-11T01-55-40-034Z-ST-13-failure.png"
+      ],
+      "error": "AssertionError [ERR_ASSERTION]: 已过期未完成任务必须释放预留\n\ntrue !== false\n\n    at D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:40:508\n    at async check (D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:24:195)\n    at async D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\fashion-workbench-v2\\studio-browser-check.cjs:40:2",
+      "lastState": {
+        "credits": 119,
+        "jobs": [
+          {
+            "id": "image-mtwb1tlr-tsj8r",
+            "lookId": "look-mtwb1ti7-5hroq",
+            "lookRevision": 1,
+            "productVersions": {
+              "p00": 1,
+              "p01": 1,
+              "p02": 1,
+              "p03": 1
+            },
+            "kind": "model",
+            "status": "stale",
+            "createdAt": "2026-09-11T01:56:16.287Z",
+            "review": null,
+            "reviewer": null,
+            "source": "sample",
+            "message": "候选重搭后需重新复核",
+            "cost": 0,
+            "points": 1,
+            "reserved": true,
+            "imagePrefix": null,
+            "imageLength": 0
+          }
+        ],
+        "looks": [
+          {
+            "id": "look-mtwb1ti5-vg2lv",
+            "name": "1 品类 · 舒适优选",
+            "group": 1,
+            "productIds": [
+              "p00"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1ti6-0401v",
+            "name": "1 品类 · 质感备选",
+            "group": 1,
+            "productIds": [
+              "p20"
+            ],
+            "locks": [],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1ti6-op9d8",
+            "name": "2 品类 · 舒适优选",
+            "group": 2,
+            "productIds": [
+              "p00",
+              "p01"
+            ],
+            "locks": [
+              "p00"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1ti7-vnyy4",
+            "name": "2 品类 · 质感备选",
+            "group": 2,
+            "productIds": [
+              "p20",
+              "p21"
+            ],
+            "locks": [
+              "p20"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1ti7-8fz8y",
+            "name": "3 品类 · 舒适优选",
+            "group": 3,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "locks": [
+              "p00",
+              "p01"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1ti7-eh8b5",
+            "name": "3 品类 · 质感备选",
+            "group": 3,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "locks": [
+              "p20",
+              "p21"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1ti7-5hroq",
+            "name": "4 品类 · 舒适优选",
+            "group": 4,
+            "productIds": [
+              "p00",
+              "p01",
+              "p02",
+              "p13"
+            ],
+            "locks": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p00": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p01": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p02": {
+                "均码": 100
+              },
+              "p13": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 2,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          },
+          {
+            "id": "look-mtwb1ti7-hivik",
+            "name": "4 品类 · 质感备选",
+            "group": 4,
+            "productIds": [
+              "p20",
+              "p21",
+              "p22",
+              "p23"
+            ],
+            "locks": [
+              "p20",
+              "p21",
+              "p22"
+            ],
+            "manualLocks": [],
+            "selected": true,
+            "qty": 100,
+            "allocations": {
+              "p20": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p21": {
+                "M": 34,
+                "L": 33,
+                "XL": 33
+              },
+              "p22": {
+                "均码": 100
+              },
+              "p23": {
+                "39": 20,
+                "40": 20,
+                "41": 20,
+                "42": 20,
+                "43": 20
+              }
+            },
+            "reason": "符合企业团建 / 休闲，优先保留基础款递进；锁定项可手动解锁调整。",
+            "revision": 1,
+            "imageId": null,
+            "imageMode": "original",
+            "allocationsConfirmed": false
+          }
+        ]
+      },
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    }
+  ],
+  "errors": [],
+  "finishedAt": "2026-09-11T01:56:18.682Z",
+  "finalBaseline": {
+    "core.js": "b500a2fc3104e3f35210de980a117f03617a4d89a8a00cdc9845abe2b5254095",
+    "app.js": "90c60d98aa566a0cb08fd7fce24c3b0bdabe2273a019119188a701a4adc47ea6",
+    "style.css": "e0a6f8847d1598c39b727fb5731a87aa2fc4186a505173dc16c85cbb2b2e75b2",
+    "index.html": "d0f48ca8a438f0539e46082480bed4b9d43a287063c2c60eb30cd8d1b81ce0a0"
+  },
+  "sourceChangedDuringRun": false,
+  "summary": {
+    "passed": 0,
+    "failed": 13,
+    "total": 13
+  }
+}

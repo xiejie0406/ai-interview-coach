@@ -1,0 +1,299 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Aden Operator API",
+    "version": "1.0.0",
+    "description": "FEAT-ADEN-001 current synthetic CORE Operator surface. Body DTOs are external JSON Schema refs; this document owns HTTP routing, status, headers, security and parameters only."
+  },
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "x-aden-example-manifest": "../examples/manifest.json",
+  "tags": [
+    {"name": "Workspace"}, {"name": "Task"}, {"name": "Runner administration"},
+    {"name": "Projection"}, {"name": "Event"}, {"name": "Audit"}
+  ],
+  "security": [{"OperatorBearer": []}],
+  "paths": {
+    "/api/v1/aden/workspaces": {
+      "get": {
+        "operationId": "listWorkspaces",
+        "tags": ["Workspace"],
+        "x-aden-permission": "aden:workspace:list",
+        "responses": {
+          "200": {"description": "Current Operator memberships", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/WorkspaceListResponse"}}}},
+          "401": {"$ref": "#/components/responses/AuthRequired"},
+          "403": {"$ref": "#/components/responses/PermissionDenied"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/api/v1/aden/admin/workspaces": {
+      "post": {
+        "operationId": "createWorkspace",
+        "tags": ["Workspace"],
+        "x-aden-permission": "aden:workspace:create",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateWorkspaceRequest"}}}},
+        "responses": {
+          "201": {"description": "Workspace and initial OWNER created atomically", "headers": {"Location": {"$ref": "#/components/headers/Location"}, "ETag": {"$ref": "#/components/headers/ETag"}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/WorkspaceSnapshot"}}}},
+          "400": {"$ref": "#/components/responses/InvalidArgument"},
+          "401": {"$ref": "#/components/responses/AuthRequired"},
+          "403": {"$ref": "#/components/responses/PermissionDenied"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/api/v1/aden/workspaces/{workspaceId}/bootstrap": {
+      "get": {
+        "operationId": "getWorkspaceBootstrap",
+        "tags": ["Projection"],
+        "x-aden-permissions": ["aden:task:list", "aden:runner:list", "aden:capability:list", "aden:event:subscribe"],
+        "parameters": [
+          {"$ref": "#/components/parameters/WorkspaceId"},
+          {"name": "taskLimit", "in": "query", "required": false, "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 50}},
+          {"name": "taskCursor", "in": "query", "required": false, "schema": {"type": "string", "minLength": 16, "maxLength": 768}},
+          {"name": "capability", "in": "query", "required": false, "schema": {"type": "string", "enum": ["CORE", "WX", "PUR", "COL"]}}
+        ],
+        "responses": {
+          "200": {"description": "Repeatable-read multi-projection snapshot and workspace stream cutoff", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}, "Cache-Control": {"schema": {"type": "string", "const": "no-store"}}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/WorkspaceBootstrapSnapshot"}}}},
+          "400": {"$ref": "#/components/responses/InvalidArgument"},
+          "401": {"$ref": "#/components/responses/AuthRequired"},
+          "403": {"$ref": "#/components/responses/PermissionDenied"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/api/v1/aden/workspaces/{workspaceId}/capabilities": {
+      "get": {
+        "operationId": "listCapabilities",
+        "tags": ["Projection"],
+        "x-aden-permission": "aden:capability:list",
+        "parameters": [{"$ref": "#/components/parameters/WorkspaceId"}],
+        "responses": {
+          "200": {"description": "Four capability projections; external actions remain disabled", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CapabilityListResponse"}}}},
+          "401": {"$ref": "#/components/responses/AuthRequired"},
+          "403": {"$ref": "#/components/responses/PermissionDenied"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/api/v1/aden/workspaces/{workspaceId}/tasks": {
+      "get": {
+        "operationId": "listTasks",
+        "tags": ["Task"],
+        "x-aden-permission": "aden:task:list",
+        "parameters": [
+          {"$ref": "#/components/parameters/WorkspaceId"},
+          {"name": "cursor", "in": "query", "required": false, "schema": {"type": "string", "minLength": 16, "maxLength": 768}},
+          {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 50}},
+          {"name": "capability", "in": "query", "required": false, "schema": {"type": "string", "enum": ["CORE", "WX", "PUR", "COL"]}}
+        ],
+        "responses": {
+          "200": {"description": "Cursor page", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/TaskPage"}}}},
+          "400": {"$ref": "#/components/responses/InvalidArgument"},
+          "401": {"$ref": "#/components/responses/AuthRequired"},
+          "403": {"$ref": "#/components/responses/PermissionDenied"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      },
+      "post": {
+        "operationId": "createTask",
+        "tags": ["Task"],
+        "x-aden-permission": "aden:task:create",
+        "parameters": [{"$ref": "#/components/parameters/WorkspaceId"}, {"$ref": "#/components/parameters/IdempotencyKey"}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateTaskRequest"}}}},
+        "responses": {
+          "201": {"description": "DRAFT Task created", "headers": {"Location": {"$ref": "#/components/headers/Location"}, "ETag": {"$ref": "#/components/headers/ETag"}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/TaskSnapshot"}}}},
+          "400": {"$ref": "#/components/responses/InvalidArgument"},
+          "401": {"$ref": "#/components/responses/AuthRequired"},
+          "403": {"$ref": "#/components/responses/PermissionDenied"},
+          "409": {"$ref": "#/components/responses/Conflict"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/api/v1/aden/workspaces/{workspaceId}/tasks/{taskId}": {
+      "get": {
+        "operationId": "getTask",
+        "tags": ["Task"],
+        "x-aden-permission": "aden:task:query",
+        "parameters": [{"$ref": "#/components/parameters/WorkspaceId"}, {"$ref": "#/components/parameters/TaskId"}],
+        "responses": {
+          "200": {"description": "Authoritative Task snapshot; ETag is not a workspace stream cursor", "headers": {"ETag": {"$ref": "#/components/headers/ETag"}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/TaskSnapshot"}}}},
+          "401": {"$ref": "#/components/responses/AuthRequired"},
+          "403": {"$ref": "#/components/responses/PermissionDenied"},
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/api/v1/aden/workspaces/{workspaceId}/tasks/{taskId}/commands": {
+      "post": {
+        "operationId": "commandTask",
+        "tags": ["Task"],
+        "description": "SUBMIT_FOR_VALIDATION requires aden:task:command; REQUEST_CANCEL requires aden:task:cancel. A committed deterministic validation failure is HTTP 200 with FAILED Task. 422 means no Task mutation.",
+        "x-aden-command-permissions": {"SUBMIT_FOR_VALIDATION": "aden:task:command", "REQUEST_CANCEL": "aden:task:cancel"},
+        "parameters": [
+          {"$ref": "#/components/parameters/WorkspaceId"}, {"$ref": "#/components/parameters/TaskId"},
+          {"$ref": "#/components/parameters/IdempotencyKey"}, {"$ref": "#/components/parameters/IfMatch"}
+        ],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/OperatorTaskCommandRequest"}}}},
+        "responses": {
+          "200": {"description": "Command committed; may return QUEUED, FAILED, CANCEL_REQUESTED or CANCELED according to domain state", "headers": {"ETag": {"$ref": "#/components/headers/ETag"}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/TaskSnapshot"}}}},
+          "400": {"$ref": "#/components/responses/InvalidArgument"},
+          "401": {"$ref": "#/components/responses/AuthRequired"},
+          "403": {"$ref": "#/components/responses/PermissionDenied"},
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "409": {"$ref": "#/components/responses/Conflict"},
+          "412": {"$ref": "#/components/responses/VersionConflict"},
+          "422": {"$ref": "#/components/responses/ValidationPreconditionRejected"},
+          "428": {"$ref": "#/components/responses/PreconditionRequired"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/api/v1/aden/workspaces/{workspaceId}/events": {
+      "get": {
+        "operationId": "subscribeWorkspaceEvents",
+        "tags": ["Event"],
+        "x-aden-permission": "aden:event:subscribe",
+        "parameters": [
+          {"$ref": "#/components/parameters/WorkspaceId"},
+          {"name": "Last-Event-ID", "in": "header", "required": false, "description": "Opaque streamCursor from the last fully applied SSE event", "schema": {"type": "string", "minLength": 24, "maxLength": 768}},
+          {"name": "filter", "in": "query", "required": false, "schema": {"type": "string", "const": "workspace-all-v1", "default": "workspace-all-v1"}}
+        ],
+        "responses": {
+          "200": {"description": "SSE stream; each data field is one EventEnvelope and each SSE id is the opaque cursor after that event", "headers": {"Cache-Control": {"schema": {"type": "string", "const": "no-cache"}}, "X-Accel-Buffering": {"schema": {"type": "string", "const": "no"}}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"text/event-stream": {"schema": {"$ref": "#/components/schemas/EventEnvelope"}}}},
+          "400": {"$ref": "#/components/responses/InvalidCursor"},
+          "401": {"$ref": "#/components/responses/AuthRequired"},
+          "403": {"$ref": "#/components/responses/PermissionDenied"},
+          "410": {"$ref": "#/components/responses/ExpiredCursor"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/api/v1/aden/workspaces/{workspaceId}/audit-events": {
+      "get": {
+        "operationId": "listAuditEvents",
+        "tags": ["Audit"],
+        "x-aden-permission": "aden:audit:list",
+        "parameters": [{"$ref": "#/components/parameters/WorkspaceId"}, {"name": "cursor", "in": "query", "required": false, "schema": {"type": "string", "minLength": 16, "maxLength": 768}}, {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 50}}],
+        "responses": {
+          "200": {"description": "Minimal redacted audit page", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/AuditEventPage"}}}},
+          "400": {"$ref": "#/components/responses/InvalidArgument"},
+          "401": {"$ref": "#/components/responses/AuthRequired"},
+          "403": {"$ref": "#/components/responses/PermissionDenied"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/api/v1/aden/workspaces/{workspaceId}/runners": {
+      "get": {
+        "operationId": "listRunners",
+        "tags": ["Runner administration"],
+        "x-aden-permission": "aden:runner:list",
+        "parameters": [{"$ref": "#/components/parameters/WorkspaceId"}],
+        "responses": {
+          "200": {"description": "Redacted Runner summaries", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RunnerListResponse"}}}},
+          "401": {"$ref": "#/components/responses/AuthRequired"},
+          "403": {"$ref": "#/components/responses/PermissionDenied"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/api/v1/aden/workspaces/{workspaceId}/runners:enroll": {
+      "post": {
+        "operationId": "enrollRunner",
+        "tags": ["Runner administration"],
+        "x-aden-permission": "aden:runner:enroll",
+        "x-aden-workspace-role": "OWNER",
+        "parameters": [{"$ref": "#/components/parameters/WorkspaceId"}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/EnrollRunnerRequest"}}}},
+        "responses": {
+          "201": {"description": "Runner enrolled; credentialToken is returned once and must never be logged", "headers": {"Location": {"$ref": "#/components/headers/Location"}, "Cache-Control": {"schema": {"type": "string", "const": "no-store"}}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RunnerEnrollmentResponse"}}}},
+          "400": {"$ref": "#/components/responses/InvalidArgument"},
+          "401": {"$ref": "#/components/responses/AuthRequired"},
+          "403": {"$ref": "#/components/responses/PermissionDenied"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/api/v1/aden/workspaces/{workspaceId}/runners/{runnerId}:revoke": {
+      "post": {
+        "operationId": "revokeRunner",
+        "tags": ["Runner administration"],
+        "x-aden-permission": "aden:runner:revoke",
+        "x-aden-workspace-role": "OWNER",
+        "parameters": [{"$ref": "#/components/parameters/WorkspaceId"}, {"$ref": "#/components/parameters/RunnerId"}],
+        "responses": {
+          "204": {"description": "Credential and active Sessions revoked atomically", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}},
+          "401": {"$ref": "#/components/responses/AuthRequired"},
+          "403": {"$ref": "#/components/responses/PermissionDenied"},
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "409": {"$ref": "#/components/responses/Conflict"},
+          "429": {"$ref": "#/components/responses/RateLimited"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "OperatorBearer": {"type": "http", "scheme": "bearer", "bearerFormat": "RuoYi JWT", "description": "RuoYi LoginUser token. It is never accepted by Runner paths."}
+    },
+    "parameters": {
+      "WorkspaceId": {"name": "workspaceId", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}},
+      "TaskId": {"name": "taskId", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}},
+      "RunnerId": {"name": "runnerId", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}},
+      "IdempotencyKey": {"name": "Idempotency-Key", "in": "header", "required": true, "schema": {"type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"}},
+      "IfMatch": {"name": "If-Match", "in": "header", "required": true, "description": "Opaque strong Task ETag returned by the server", "schema": {"type": "string", "minLength": 8, "maxLength": 200, "pattern": "^\"task-[0-9a-f-]+-v[0-9]+\"$"}}
+    },
+    "headers": {
+      "CorrelationId": {"description": "Request correlation UUID", "schema": {"type": "string", "format": "uuid"}},
+      "ETag": {"description": "Opaque strong resource version tag", "schema": {"type": "string", "minLength": 8, "maxLength": 200}},
+      "Location": {"description": "Canonical path of the created resource", "schema": {"type": "string", "pattern": "^/api/v1/aden/"}},
+      "RetryAfter": {"description": "Bounded retry delay in seconds", "schema": {"type": "integer", "minimum": 1, "maximum": 300}}
+    },
+    "schemas": {
+      "ErrorEnvelope": {"$ref": "../schemas/current/common.schema.json#/$defs/ErrorEnvelope"},
+      "CreateWorkspaceRequest": {"$ref": "../schemas/current/operator.schema.json#/$defs/CreateWorkspaceRequest"},
+      "WorkspaceSnapshot": {"$ref": "../schemas/current/operator.schema.json#/$defs/WorkspaceSnapshot"},
+      "WorkspaceListResponse": {"$ref": "../schemas/current/operator.schema.json#/$defs/WorkspaceListResponse"},
+      "WorkspaceBootstrapSnapshot": {"$ref": "../schemas/current/operator.schema.json#/$defs/WorkspaceBootstrapSnapshot"},
+      "CapabilityListResponse": {"$ref": "../schemas/current/operator.schema.json#/$defs/CapabilityListResponse"},
+      "CreateTaskRequest": {"$ref": "../schemas/current/operator.schema.json#/$defs/CreateTaskRequest"},
+      "TaskSnapshot": {"$ref": "../schemas/current/operator.schema.json#/$defs/TaskSnapshot"},
+      "TaskPage": {"$ref": "../schemas/current/operator.schema.json#/$defs/TaskPage"},
+      "OperatorTaskCommandRequest": {"$ref": "../schemas/current/operator.schema.json#/$defs/OperatorTaskCommandRequest"},
+      "EventEnvelope": {"$ref": "../schemas/current/operator.schema.json#/$defs/EventEnvelope"},
+      "AuditEventPage": {"$ref": "../schemas/current/operator.schema.json#/$defs/AuditEventPage"},
+      "RunnerListResponse": {"$ref": "../schemas/current/operator.schema.json#/$defs/RunnerListResponse"},
+      "EnrollRunnerRequest": {"$ref": "../schemas/current/operator.schema.json#/$defs/EnrollRunnerRequest"},
+      "RunnerEnrollmentResponse": {"$ref": "../schemas/current/operator.schema.json#/$defs/RunnerEnrollmentResponse"}
+    },
+    "responses": {
+      "InvalidArgument": {"description": "Malformed or precondition input rejected without a Task mutation", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}},
+      "InvalidCursor": {"description": "Cursor malformed or bound to a different workspace/filter", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}},
+      "AuthRequired": {"description": "Operator authentication required; real HTTP 401", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}},
+      "PermissionDenied": {"description": "RuoYi permission, membership or Workspace role denied; real HTTP 403", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}},
+      "NotFound": {"description": "Resource absent or deliberately hidden to prevent enumeration", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}},
+      "Conflict": {"description": "State, idempotency or reliability conflict", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}},
+      "ExpiredCursor": {"description": "Cursor outside the retained replay window; client must bootstrap", "headers": {"Location": {"$ref": "#/components/headers/Location"}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}},
+      "VersionConflict": {"description": "If-Match does not match; reload snapshot", "headers": {"ETag": {"$ref": "#/components/headers/ETag"}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}},
+      "ValidationPreconditionRejected": {"description": "Pre-validation input rejection with no Task mutation. A committed business validation failure is HTTP 200 FAILED Task instead.", "headers": {"ETag": {"$ref": "#/components/headers/ETag"}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}},
+      "PreconditionRequired": {"description": "If-Match header required", "headers": {"X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}},
+      "RateLimited": {"description": "Bounded retry allowed", "headers": {"Retry-After": {"$ref": "#/components/headers/RetryAfter"}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}},
+      "Unavailable": {"description": "Dependency or audit unavailable", "headers": {"Retry-After": {"$ref": "#/components/headers/RetryAfter"}, "X-Correlation-ID": {"$ref": "#/components/headers/CorrelationId"}}, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorEnvelope"}}}}
+    }
+  }
+}

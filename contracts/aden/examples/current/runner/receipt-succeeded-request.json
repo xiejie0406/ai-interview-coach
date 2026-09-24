@@ -1,0 +1,13 @@
+{
+  "receiptId": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+  "sessionEpoch": "9007199254740992",
+  "fencingToken": "9007199254740992",
+  "receiptSequence": "2",
+  "kind": "SUCCEEDED",
+  "observedAt": "2026-09-12T12:00:20Z",
+  "data": {
+    "resultHash": "4444444444444444444444444444444444444444444444444444444444444444",
+    "finishedAt": "2026-09-12T12:00:20Z",
+    "summary": "合成执行完成，未产生外部副作用。"
+  }
+}

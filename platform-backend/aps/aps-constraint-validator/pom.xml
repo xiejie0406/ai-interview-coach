@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ruoyi</groupId>
+        <artifactId>aps</artifactId>
+        <version>3.9.2</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>aps-constraint-validator</artifactId>
+    <name>RuoYi :: APS :: Constraint Validator</name>
+    <description>与 OR-Tools 解算相互独立的硬约束复验器</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>aps-solver-contract</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>aps-constraint-validator-boundary</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <exclude>com.google.ortools:*</exclude>
+                                        <exclude>org.springframework:*</exclude>
+                                        <exclude>org.mybatis:*</exclude>
+                                        <exclude>org.mybatis.spring.boot:*</exclude>
+                                        <exclude>com.ruoyi:ruoyi-*</exclude>
+                                        <exclude>com.ruoyi:aps-domain</exclude>
+                                        <exclude>com.ruoyi:aps-application</exclude>
+                                        <exclude>com.ruoyi:aps-api</exclude>
+                                        <exclude>com.ruoyi:aps-infrastructure-mysql</exclude>
+                                        <exclude>com.ruoyi:aps-solver-ortools</exclude>
+                                        <exclude>com.ruoyi:aps-worker</exclude>
+                                    </excludes>
+                                    <searchTransitive>true</searchTransitive>
+                                    <message>aps-constraint-validator 必须独立于 OR-Tools、业务适配器和框架。</message>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

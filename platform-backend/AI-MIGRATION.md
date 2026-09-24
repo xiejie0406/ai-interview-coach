@@ -73,4 +73,4 @@
 - 新增 `platform.profile_version` 业务档案基线，`ProfileAccessPort` 只按 `ruoyi_user_id` 校验归属；不再读取旧 `identity.profile_version`。
 - RuoYi WebSocket 已接入迁移后的 `VoiceWebSocketHandler` 与一次性 ticket 校验；Provider/PG 未就绪时仍会明确失败，不伪造成功。
 
-Wave 02 证据与阻塞详见 [`docs/development-records/2026-08-23-ruoyi-convergence-wave-02.md`](../../docs/development-records/2026-08-23-ruoyi-convergence-wave-02.md)。本轮修复后模块编译和整包构建仍为 Pass；单体启动仍因未注入 `RUOYI_DB_PASSWORD` 被 MySQL 拒绝，AI 业务端点、PG、Provider、Quartz、SSE、WebSocket 握手和 RBAC 仍未取得运行证据。
+Wave 02 证据与阻塞详见 [`文档/开发记录/2026-08-23-若依收敛-批次02.md`](../文档/项目/面试项目/开发记录/若依集成/2026-08-23-若依收敛-批次02.md)。本轮修复后模块编译和整包构建仍为 Pass；单体启动仍因未注入 `RUOYI_DB_PASSWORD` 被 MySQL 拒绝，AI 业务端点、PG、Provider、Quartz、SSE、WebSocket 握手和 RBAC 仍未取得运行证据。

@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0",
+  "trial_id": "TO_BE_PROVIDED",
+  "authorization_manifest_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "fee_cap_cny": "0.00",
+  "expected_task_ids": [],
+  "tasks": []
+}

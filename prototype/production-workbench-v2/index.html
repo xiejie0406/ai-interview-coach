@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>序程 APS · 生产排程工作台</title>
+  <link rel="stylesheet" href="../business-suite-v1/shared/base.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="catalog.css">
+  <link rel="stylesheet" href="operations.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="主导航">
+      <a class="brand" href="#schedule"><span class="brand-mark"><i data-lucide="workflow"></i></span><span><span class="brand-name">序程 <small>APS</small></span><span class="brand-subtitle">生产计划与车间调度</span></span></a>
+      <div class="factory-name"><i data-lucide="factory"></i><span>华东一厂 <small>多车间协同</small></span></div>
+      <nav id="navigation"></nav>
+      <div class="sidebar-footer"><a href="../../文档/项目/生产排产项目/产品/产品需求文档.md" target="_blank" rel="noopener"><i data-lucide="file-text"></i>产品需求文档</a><a href="../business-suite-v1/index.html"><i data-lucide="panels-top-left"></i>三个项目总入口</a><div class="local-status"><span class="status-dot"></span>本地交互原型 <span>V2.0</span></div></div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar"><div class="topbar-left"><button class="icon-btn mobile-menu" data-toggle-nav aria-label="展开导航"><i data-lucide="menu"></i></button><div class="breadcrumb"><span>生产运营</span><i data-lucide="chevron-right"></i><strong id="crumb">排程工作台</strong></div></div><div class="topbar-right"><span id="header-version" class="badge info">正式计划 V01</span><span class="prototype-label">示例工厂</span><span class="avatar" title="生产计划员">林</span></div></header>
+      <main id="main" class="content" tabindex="-1"><div class="empty-state"><span class="spinner"></span><h2>正在载入生产计划</h2></div></main>
+    </div>
+  </div>
+  <script src="../business-suite-v1/shared/lucide.min.js"></script>
+  <script src="../business-suite-v1/shared/ui.js"></script>
+  <script src="vendor/solver.global.js"></script>
+  <script src="engine.js"></script>
+  <script>window.Views={};window.Actions={};window.PageEvents={};</script>
+  <script src="catalog.js"></script>
+  <script src="operations.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+{
+  "runId": "2026-09-10T16-59-25-720Z",
+  "startedAt": "2026-09-10T16-59-25-720Z",
+  "command": "C:\\Users\\admin\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe D:\\2025Ai\\26-05-23\\java-workspace\\prototype\\business-suite-v1\\02-agent-desktop-execution\\sourcing-v2\\verify.cjs 金额",
+  "exitCode": 0,
+  "environment": {
+    "node": "v24.19.0",
+    "playwright": "1.62.1",
+    "executablePath": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    "base": "http://127.0.0.1:8789/02-agent-desktop-execution/sourcing-v2/",
+    "locale": "zh-CN",
+    "timezone": "Asia/Shanghai",
+    "mode": "独立无登录态 Chrome，仅本地原型 UI；不是真实平台或生产验收",
+    "chromium": "152.0.7977.83"
+  },
+  "summary": {
+    "passed": 2,
+    "failed": 0
+  },
+  "results": [
+    {
+      "label": "金额 / 独立 VM 精确金额与所有比较约束（非浏览器）",
+      "status": "Pass",
+      "elapsedMs": 6,
+      "detail": {
+        "cost": 19850,
+        "packagingPrecision": 350,
+        "variants": [
+          {
+            "field": "shipping",
+            "value": null,
+            "reasons": [
+              "运费待确认"
+            ],
+            "total": null
+          },
+          {
+            "field": "taxBasis",
+            "value": null,
+            "reasons": [
+              "税费口径待确认"
+            ],
+            "total": null
+          },
+          {
+            "field": "currency",
+            "value": "USD",
+            "reasons": [
+              "币种不一致",
+              "金额精度或比较口径待核验"
+            ],
+            "total": null
+          },
+          {
+            "field": "quantity",
+            "value": 999,
+            "reasons": [
+              "数量口径不一致",
+              "金额精度或比较口径待核验"
+            ],
+            "total": null
+          },
+          {
+            "field": "unit",
+            "value": "米",
+            "reasons": [
+              "计量单位不一致",
+              "金额精度或比较口径待核验"
+            ],
+            "total": null
+          },
+          {
+            "field": "destination",
+            "value": "北京",
+            "reasons": [
+              "收货地不一致",
+              "金额精度或比较口径待核验"
+            ],
+            "total": null
+          },
+          {
+            "field": "specification",
+            "value": "其他规格",
+            "reasons": [
+              "规格条件不一致",
+              "金额精度或比较口径待核验"
+            ],
+            "total": null
+          },
+          {
+            "field": "moq",
+            "value": 1001,
+            "reasons": [
+              "未达到起订量"
+            ],
+            "total": 19850
+          },
+          {
+            "field": "validUntil",
+            "value": "2020-01-01",
+            "reasons": [
+              "报价已过期"
+            ],
+            "total": 19850
+          },
+          {
+            "field": "leadStartDate",
+            "value": null,
+            "reasons": [
+              "交期起算或运输条件待确认"
+            ],
+            "total": 19850
+          },
+          {
+            "field": "leadMilestone",
+            "value": "出货",
+            "reasons": [
+              "交期起算或运输条件待确认"
+            ],
+            "total": 19850
+          }
+        ],
+        "arrival": {
+          "valid": false,
+          "reasons": [
+            "预计到货超过最晚交货要求"
+          ],
+          "total": 19850,
+          "expectedArrival": "2026-09-19"
+        }
+      }
+    },
+    {
+      "label": "运行时 / JavaScript 与外部请求",
+      "status": "Pass",
+      "elapsedMs": 0,
+      "detail": {
+        "runtimeErrors": [],
+        "blockedRequests": []
+      }
+    }
+  ],
+  "screenshots": [],
+  "runtimeErrors": [],
+  "blockedRequests": [],
+  "limitations": [
+    "只验证本地演示数据和状态迁移；不验证真实商品采集、客服发送或回复获取。",
+    "生产 AC-18 跨空间服务端权限、AC-19 外部提示注入防护、AC-20 删除与备份数据生命周期未验证。",
+    "未验证原生 Windows Runner、网络在途发送、模型准确率、平台许可、性能 SLA。"
+  ]
+}

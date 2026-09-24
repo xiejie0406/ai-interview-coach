@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Aden current Runner DTOs",
+  "$defs": {
+    "CreateRunnerSessionRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocolVersion", "runnerVersion", "capacity", "capabilities"],
+      "properties": {
+        "protocolVersion": {"const": 1},
+        "runnerVersion": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"},
+        "capacity": {"type": "integer", "minimum": 1, "maximum": 32},
+        "capabilities": {"type": "array", "minItems": 1, "maxItems": 4, "uniqueItems": true, "items": {"$ref": "./common.schema.json#/$defs/CapabilityCode"}}
+      }
+    },
+    "RunnerSession": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runnerId", "workspaceId", "sessionId", "sessionToken", "sessionEpoch", "state", "expiresAt", "heartbeatAfterSeconds", "issuedAt"],
+      "properties": {
+        "runnerId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "workspaceId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "sessionId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "sessionToken": {"type": "string", "minLength": 64, "maxLength": 512, "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$", "writeOnly": true},
+        "sessionEpoch": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "state": {"const": "ACTIVE"},
+        "expiresAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"},
+        "heartbeatAfterSeconds": {"type": "integer", "minimum": 1, "maximum": 300},
+        "issuedAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"}
+      }
+    },
+    "SessionHeartbeatRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sessionEpoch", "heartbeatSequence", "observedAt", "activeDeliveryIds"],
+      "properties": {
+        "sessionEpoch": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "heartbeatSequence": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "observedAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"},
+        "activeDeliveryIds": {"type": "array", "maxItems": 32, "uniqueItems": true, "items": {"$ref": "./common.schema.json#/$defs/Uuid"}}
+      }
+    },
+    "SessionHeartbeatResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sessionId", "sessionEpoch", "state", "expiresAt", "serverTime", "cancelDeliveryIds"],
+      "properties": {
+        "sessionId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "sessionEpoch": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "state": {"const": "ACTIVE"},
+        "expiresAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"},
+        "serverTime": {"$ref": "./common.schema.json#/$defs/UtcDateTime"},
+        "cancelDeliveryIds": {"type": "array", "maxItems": 32, "uniqueItems": true, "items": {"$ref": "./common.schema.json#/$defs/Uuid"}}
+      }
+    },
+    "ClaimDeliveriesRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claimRequestId", "capabilities", "capacity", "batchLimit"],
+      "properties": {
+        "claimRequestId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "capabilities": {"type": "array", "minItems": 1, "maxItems": 4, "uniqueItems": true, "items": {"$ref": "./common.schema.json#/$defs/CapabilityCode"}},
+        "capacity": {"type": "integer", "minimum": 1, "maximum": 32},
+        "batchLimit": {"type": "integer", "minimum": 1, "maximum": 16}
+      }
+    },
+    "SyntheticRunInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fixtureId", "instruction", "expectedOutcome"],
+      "properties": {
+        "fixtureId": {"type": "string", "pattern": "^fixture:[a-z0-9][a-z0-9._-]{2,63}$"},
+        "instruction": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "expectedOutcome": {"type": "string", "enum": ["SUCCEED", "CANCEL_AT_SAFE_POINT"]}
+      }
+    },
+    "TaskPackage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "taskId", "stepId", "taskType", "capabilityCode", "attemptNo", "packageHash", "input", "externalActionsEnabled", "deadlineAt"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "taskId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "stepId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "taskType": {"const": "SYNTHETIC_CORE"},
+        "capabilityCode": {"const": "CORE"},
+        "attemptNo": {"type": "integer", "minimum": 1, "maximum": 100},
+        "packageHash": {"$ref": "./common.schema.json#/$defs/Sha256"},
+        "input": {"$ref": "#/$defs/SyntheticRunInput"},
+        "externalActionsEnabled": {"const": false},
+        "deadlineAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"}
+      }
+    },
+    "ClaimedDelivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deliveryId", "state", "fencingToken", "leaseUntil", "taskPackage"],
+      "properties": {
+        "deliveryId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "state": {"const": "LEASED"},
+        "fencingToken": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "leaseUntil": {"$ref": "./common.schema.json#/$defs/UtcDateTime"},
+        "taskPackage": {"$ref": "#/$defs/TaskPackage"}
+      }
+    },
+    "ClaimDeliveriesResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claimRequestId", "sessionId", "sessionEpoch", "items", "serverTime"],
+      "properties": {
+        "claimRequestId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "sessionId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "sessionEpoch": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "items": {"type": "array", "maxItems": 16, "items": {"$ref": "#/$defs/ClaimedDelivery"}},
+        "serverTime": {"$ref": "./common.schema.json#/$defs/UtcDateTime"}
+      }
+    },
+    "DeliveryHeartbeatRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sessionEpoch", "fencingToken", "heartbeatSequence", "observedAt"],
+      "properties": {
+        "sessionEpoch": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "fencingToken": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "heartbeatSequence": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "observedAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"}
+      }
+    },
+    "DeliveryHeartbeatResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deliveryId", "state", "fencingToken", "leaseUntil", "cancelRequested", "serverTime"],
+      "properties": {
+        "deliveryId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "state": {"$ref": "./common.schema.json#/$defs/DeliveryState"},
+        "fencingToken": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "leaseUntil": {"$ref": "./common.schema.json#/$defs/UtcDateTime"},
+        "cancelRequested": {"type": "boolean"},
+        "serverTime": {"$ref": "./common.schema.json#/$defs/UtcDateTime"}
+      }
+    },
+    "ReceiptCommon": {
+      "type": "object",
+      "required": ["receiptId", "sessionEpoch", "fencingToken", "receiptSequence", "kind", "observedAt", "data"],
+      "properties": {
+        "receiptId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "sessionEpoch": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "fencingToken": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "receiptSequence": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "kind": {"type": "string"},
+        "observedAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"},
+        "data": {"type": "object"}
+      }
+    },
+    "StartedReceipt": {
+      "allOf": [
+        {"$ref": "#/$defs/ReceiptCommon"},
+        {"type": "object", "properties": {"kind": {"const": "STARTED"}, "data": {"type": "object", "additionalProperties": false, "required": ["startedAt"], "properties": {"startedAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"}}}}}
+      ],
+      "unevaluatedProperties": false
+    },
+    "ProgressReceipt": {
+      "allOf": [
+        {"$ref": "#/$defs/ReceiptCommon"},
+        {"type": "object", "properties": {"kind": {"const": "PROGRESS"}, "data": {"type": "object", "additionalProperties": false, "required": ["progressPercent"], "properties": {"progressPercent": {"type": "integer", "minimum": 0, "maximum": 100}, "message": {"type": "string", "maxLength": 240}}}}}
+      ],
+      "unevaluatedProperties": false
+    },
+    "SucceededReceipt": {
+      "allOf": [
+        {"$ref": "#/$defs/ReceiptCommon"},
+        {"type": "object", "properties": {"kind": {"const": "SUCCEEDED"}, "data": {"type": "object", "additionalProperties": false, "required": ["resultHash", "finishedAt", "summary"], "properties": {"resultHash": {"$ref": "./common.schema.json#/$defs/Sha256"}, "finishedAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"}, "summary": {"type": "string", "minLength": 1, "maxLength": 500}}}}}
+      ],
+      "unevaluatedProperties": false
+    },
+    "FailedReceipt": {
+      "allOf": [
+        {"$ref": "#/$defs/ReceiptCommon"},
+        {"type": "object", "properties": {"kind": {"enum": ["FAILED_RETRYABLE", "FAILED_FINAL"]}, "data": {"type": "object", "additionalProperties": false, "required": ["reasonCode", "finishedAt"], "properties": {"reasonCode": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$"}, "finishedAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"}}}}}
+      ],
+      "unevaluatedProperties": false
+    },
+    "CanceledAtSafePointReceipt": {
+      "allOf": [
+        {"$ref": "#/$defs/ReceiptCommon"},
+        {"type": "object", "properties": {"kind": {"const": "CANCELED_AT_SAFE_POINT"}, "data": {"type": "object", "additionalProperties": false, "required": ["safePoint", "finishedAt"], "properties": {"safePoint": {"type": "string", "minLength": 1, "maxLength": 120}, "finishedAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"}}}}}
+      ],
+      "unevaluatedProperties": false
+    },
+    "OutcomeUnknownReceipt": {
+      "allOf": [
+        {"$ref": "#/$defs/ReceiptCommon"},
+        {"type": "object", "properties": {"kind": {"const": "OUTCOME_UNKNOWN"}, "data": {"type": "object", "additionalProperties": false, "required": ["reasonCode", "observedAt"], "properties": {"reasonCode": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$"}, "observedAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"}}}}}
+      ],
+      "unevaluatedProperties": false
+    },
+    "ReceiptRequest": {
+      "oneOf": [
+        {"$ref": "#/$defs/StartedReceipt"},
+        {"$ref": "#/$defs/ProgressReceipt"},
+        {"$ref": "#/$defs/SucceededReceipt"},
+        {"$ref": "#/$defs/FailedReceipt"},
+        {"$ref": "#/$defs/CanceledAtSafePointReceipt"},
+        {"$ref": "#/$defs/OutcomeUnknownReceipt"}
+      ]
+    },
+    "ReceiptResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receiptId", "disposition", "deliveryId", "deliveryState", "taskId", "taskState", "taskVersion", "lastReceiptSequence", "acceptedAt", "correlationId"],
+      "properties": {
+        "receiptId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "disposition": {"type": "string", "enum": ["ACCEPTED", "REPLAYED"]},
+        "deliveryId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "deliveryState": {"$ref": "./common.schema.json#/$defs/DeliveryState"},
+        "taskId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "taskState": {"$ref": "./common.schema.json#/$defs/TaskState"},
+        "taskVersion": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "lastReceiptSequence": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "acceptedAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"},
+        "correlationId": {"$ref": "./common.schema.json#/$defs/CorrelationId"}
+      }
+    }
+  }
+}

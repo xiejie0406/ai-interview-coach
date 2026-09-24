@@ -1,0 +1,2 @@
+<script setup lang="ts">const runtime = window.adenDesktop.getRuntimeInfo()</script>
+<template><section class="page-card"><p class="eyebrow">FEAT-ADEN-001</p><h1>关于 Aden</h1><p class="lede">RuoYi 是唯一中心控制面；Electron renderer 无 Node 和网络能力；Python Runner 不持有用户 Token 或业务数据库。</p><dl class="detail-list"><div><dt>版本</dt><dd>0.2.0</dd></div><div><dt>运行时</dt><dd>Electron {{ runtime.versions.electron }} / Chromium {{ runtime.versions.chrome }}</dd></div><div><dt>当前边界</dt><dd>合成 CORE，无真实外部副作用</dd></div></dl></section></template>

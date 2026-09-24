@@ -52,7 +52,14 @@ create table if not exists platform.profile_version (
         references platform.business_membership(tenant_id, ruoyi_user_id)
 );
 
--- 迁入后的 Repository 使用 RuoYi 专用列；旧 owner 列允许为空，仅供历史数据读取/保留。
+-- 仅历史 V7 基线包含 user_id。全新库已由 V1-V4 直接创建 RuoYi 列与外键，
+-- 必须跳过本兼容段，否则会访问不存在的旧列并添加重复约束。
+do $ownership_compatibility$
+begin
+if exists (
+    select 1 from information_schema.columns
+     where table_schema = 'interview' and table_name = 'plan' and column_name = 'user_id'
+) then
 alter table interview.plan add column if not exists ruoyi_user_id bigint;
 alter table interview.session add column if not exists ruoyi_user_id bigint;
 alter table interview.answer_version add column if not exists confirmed_by_ruoyi_user_id bigint;
@@ -121,6 +128,9 @@ alter table platform.outbox_event
 alter table platform.stream_head
     add constraint stream_head_business_tenant_fk foreign key (tenant_id)
         references platform.business_tenant(tenant_id) not valid;
+end if;
+end
+$ownership_compatibility$;
 
 comment on table platform.business_tenant is
     'RuoYi-backed AI business workspace; credentials and RBAC remain in MySQL RuoYi.';

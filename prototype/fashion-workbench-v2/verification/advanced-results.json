@@ -1,0 +1,43 @@
+{
+  "at": "2026-09-11T02:42:00.932Z",
+  "command": "node prototype/fashion-workbench-v2/advanced-test.cjs",
+  "sourceHashes": {
+    "core.js": "b9eef4fe429ab1a1d23691d27d18491f1a206f2404f1fa1fbdd92f08e195e24f",
+    "advanced.js": "69bee6b308bdb26b382e2593567ad6c9cc6d56b78fb17b9bdda922d4be6fde5c"
+  },
+  "scope": "内存合成夹具：模板与递进变更、手动锁定竞态、原子失败、图片及演示积分；不证明真实服务端并发",
+  "passed": 6,
+  "failed": 0,
+  "checks": [
+    {
+      "id": "ADV-01",
+      "name": "四档模板支持合法重排，重复/未知/错数量全部拒绝",
+      "result": "Pass"
+    },
+    {
+      "id": "ADV-02",
+      "name": "手动锁定预览标记冲突并跳过该候选，其余候选同步",
+      "result": "Pass"
+    },
+    {
+      "id": "ADV-03",
+      "name": "预览后出现新锁定冲突，整批不写且前序候选不部分生效",
+      "result": "Pass"
+    },
+    {
+      "id": "ADV-04",
+      "name": "预览后目标被移除，原子拒绝并保留有效版本",
+      "result": "Pass"
+    },
+    {
+      "id": "ADV-05",
+      "name": "同步使图片失效、返还预留演示积分、配比重新确认且保留历史快照",
+      "result": "Pass"
+    },
+    {
+      "id": "ADV-06",
+      "name": "运营角色不能执行销售递进同步，状态保持",
+      "result": "Pass"
+    }
+  ]
+}

@@ -1,0 +1,487 @@
+{
+  "at": "2026-09-10T16:57:05.985Z",
+  "results": [
+    {
+      "label": "首单工艺及人机计算",
+      "result": "Pass",
+      "detail": {
+        "issues": [],
+        "order": {
+          "id": "O-100",
+          "end": 1500,
+          "late": 960,
+          "good": 0,
+          "qty": 200
+        },
+        "transfer": {
+          "taskId": "T20",
+          "start": 60,
+          "end": 210,
+          "machineId": null,
+          "personId": "P9",
+          "segments": [
+            {
+              "start": 60,
+              "end": 90,
+              "kind": "run",
+              "machineId": null,
+              "personId": "P9",
+              "qty": 20
+            },
+            {
+              "start": 120,
+              "end": 150,
+              "kind": "run",
+              "machineId": null,
+              "personId": "P9",
+              "qty": 20
+            },
+            {
+              "start": 180,
+              "end": 210,
+              "kind": "run",
+              "machineId": null,
+              "personId": "P9",
+              "qty": 20
+            }
+          ],
+          "batchId": null
+        }
+      }
+    },
+    {
+      "label": "桌面 / schedule",
+      "result": "Pass",
+      "detail": {
+        "title": "排程工作台 · 序程 APS",
+        "heading": "排程工作台",
+        "text": 977,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 11
+      }
+    },
+    {
+      "label": "桌面 / orders",
+      "result": "Pass",
+      "detail": {
+        "title": "生产订单 · 序程 APS",
+        "heading": "生产订单",
+        "text": 442,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "桌面 / routes",
+      "result": "Pass",
+      "detail": {
+        "title": "工艺路线 · 序程 APS",
+        "heading": "工艺路线",
+        "text": 1169,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "桌面 / resources",
+      "result": "Pass",
+      "detail": {
+        "title": "工作中心与设备 · 序程 APS",
+        "heading": "设备与工作中心",
+        "text": 382,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "桌面 / people",
+      "result": "Pass",
+      "detail": {
+        "title": "人员与班次 · 序程 APS",
+        "heading": "人员与技能日历",
+        "text": 688,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "桌面 / batches",
+      "result": "Pass",
+      "detail": {
+        "title": "加工批次 · 序程 APS",
+        "heading": "共享加工批次",
+        "text": 201,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "桌面 / conflicts",
+      "result": "Pass",
+      "detail": {
+        "title": "约束与异常 · 序程 APS",
+        "heading": "约束与异常",
+        "text": 129,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "桌面 / execution",
+      "result": "Pass",
+      "detail": {
+        "title": "现场执行 · 序程 APS",
+        "heading": "现场执行",
+        "text": 2084,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "桌面 / daily",
+      "result": "Pass",
+      "detail": {
+        "title": "车间每日生产表 · 序程 APS",
+        "heading": "车间每日生产表",
+        "text": 1317,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "桌面 / capacity",
+      "result": "Pass",
+      "detail": {
+        "title": "人力累计产能 · 序程 APS",
+        "heading": "人力累计产能",
+        "text": 1190,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "桌面 / versions",
+      "result": "Pass",
+      "detail": {
+        "title": "计划版本 · 序程 APS",
+        "heading": "计划版本与影响",
+        "text": 451,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "桌面 / audit",
+      "result": "Pass",
+      "detail": {
+        "title": "操作记录 · 序程 APS",
+        "heading": "操作审计",
+        "text": 169,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "甘特视角 / machine",
+      "result": "Pass",
+      "detail": {
+        "title": "排程工作台 · 序程 APS",
+        "heading": "排程工作台",
+        "text": 977,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 11
+      }
+    },
+    {
+      "label": "甘特视角 / person",
+      "result": "Pass",
+      "detail": {
+        "title": "排程工作台 · 序程 APS",
+        "heading": "排程工作台",
+        "text": 1285,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 22
+      }
+    },
+    {
+      "label": "甘特视角 / workshop",
+      "result": "Pass",
+      "detail": {
+        "title": "排程工作台 · 序程 APS",
+        "heading": "排程工作台",
+        "text": 1368,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 17
+      }
+    },
+    {
+      "label": "任务抽屉与前置冲突拒绝",
+      "result": "Pass",
+      "detail": {
+        "message": "前置完成/合格数量门槛或等待时间未满足"
+      }
+    },
+    {
+      "label": "锁定与重排",
+      "result": "Pass",
+      "detail": {
+        "lock": "all",
+        "start": 0
+      }
+    },
+    {
+      "label": "发布确认与版本持久化",
+      "result": "Pass",
+      "detail": {
+        "version": "V02"
+      }
+    },
+    {
+      "label": "日报实际CSV下载",
+      "result": "Pass",
+      "detail": {
+        "bytes": 2191
+      }
+    },
+    {
+      "label": "人力累计表数据与导出",
+      "result": "Pass",
+      "detail": {
+        "title": "人力累计产能 · 序程 APS",
+        "heading": "人力累计产能",
+        "text": 1190,
+        "width": 1440,
+        "scroll": 1440,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "窄屏 / schedule",
+      "result": "Pass",
+      "detail": {
+        "title": "排程工作台 · 序程 APS",
+        "heading": "排程工作台",
+        "text": 977,
+        "width": 390,
+        "scroll": 390,
+        "icons": [],
+        "bars": 11
+      }
+    },
+    {
+      "label": "窄屏 / orders",
+      "result": "Pass",
+      "detail": {
+        "title": "生产订单 · 序程 APS",
+        "heading": "生产订单",
+        "text": 442,
+        "width": 390,
+        "scroll": 390,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "窄屏 / routes",
+      "result": "Pass",
+      "detail": {
+        "title": "工艺路线 · 序程 APS",
+        "heading": "工艺路线",
+        "text": 1169,
+        "width": 390,
+        "scroll": 390,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "窄屏 / resources",
+      "result": "Pass",
+      "detail": {
+        "title": "工作中心与设备 · 序程 APS",
+        "heading": "设备与工作中心",
+        "text": 382,
+        "width": 390,
+        "scroll": 390,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "窄屏 / people",
+      "result": "Pass",
+      "detail": {
+        "title": "人员与班次 · 序程 APS",
+        "heading": "人员与技能日历",
+        "text": 688,
+        "width": 390,
+        "scroll": 390,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "窄屏 / batches",
+      "result": "Pass",
+      "detail": {
+        "title": "加工批次 · 序程 APS",
+        "heading": "共享加工批次",
+        "text": 201,
+        "width": 390,
+        "scroll": 390,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "窄屏 / conflicts",
+      "result": "Pass",
+      "detail": {
+        "title": "约束与异常 · 序程 APS",
+        "heading": "约束与异常",
+        "text": 129,
+        "width": 390,
+        "scroll": 390,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "窄屏 / execution",
+      "result": "Pass",
+      "detail": {
+        "title": "现场执行 · 序程 APS",
+        "heading": "现场执行",
+        "text": 2084,
+        "width": 390,
+        "scroll": 390,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "窄屏 / daily",
+      "result": "Pass",
+      "detail": {
+        "title": "车间每日生产表 · 序程 APS",
+        "heading": "车间每日生产表",
+        "text": 1317,
+        "width": 390,
+        "scroll": 390,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "窄屏 / capacity",
+      "result": "Pass",
+      "detail": {
+        "title": "人力累计产能 · 序程 APS",
+        "heading": "人力累计产能",
+        "text": 1190,
+        "width": 390,
+        "scroll": 390,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "窄屏 / versions",
+      "result": "Pass",
+      "detail": {
+        "title": "计划版本 · 序程 APS",
+        "heading": "计划版本与影响",
+        "text": 513,
+        "width": 390,
+        "scroll": 390,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "窄屏 / audit",
+      "result": "Pass",
+      "detail": {
+        "title": "操作记录 · 序程 APS",
+        "heading": "操作审计",
+        "text": 384,
+        "width": 390,
+        "scroll": 390,
+        "icons": [],
+        "bars": 0
+      }
+    },
+    {
+      "label": "平板排程",
+      "result": "Pass",
+      "detail": {
+        "title": "排程工作台 · 序程 APS",
+        "heading": "排程工作台",
+        "text": 977,
+        "width": 768,
+        "scroll": 768,
+        "icons": [],
+        "bars": 11
+      }
+    },
+    {
+      "label": "横屏排程",
+      "result": "Pass",
+      "detail": {
+        "title": "排程工作台 · 序程 APS",
+        "heading": "排程工作台",
+        "text": 977,
+        "width": 900,
+        "scroll": 900,
+        "icons": [],
+        "bars": 11
+      }
+    },
+    {
+      "label": "日报打印媒体",
+      "result": "Pass",
+      "detail": {
+        "heading": "车间每日生产表"
+      }
+    },
+    {
+      "label": "浏览器运行异常",
+      "result": "Pass",
+      "detail": {
+        "errors": []
+      }
+    }
+  ],
+  "errors": []
+}

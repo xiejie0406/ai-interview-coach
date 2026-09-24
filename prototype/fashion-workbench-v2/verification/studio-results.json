@@ -1,0 +1,593 @@
+{
+  "at": "2026-09-11T03:04:19.943Z",
+  "command": "node prototype/fashion-workbench-v2/studio-browser-check.cjs",
+  "environment": {
+    "browser": "独立无登录态 Chrome，经捆绑 Playwright CJS 驱动",
+    "viewport": "1440×1000",
+    "externalWrites": false,
+    "paidCalls": false,
+    "url": "http://127.0.0.1:10714",
+    "browserVersion": "152.0.7977.83"
+  },
+  "baseline": {
+    "core.js": "b9eef4fe429ab1a1d23691d27d18491f1a206f2404f1fa1fbdd92f08e195e24f",
+    "app.js": "e4db96d3a3fc7054858d0f7e3ff517d771c86b766af159172bfb9a1dc8318bd0",
+    "style.css": "e0a6f8847d1598c39b727fb5731a87aa2fc4186a505173dc16c85cbb2b2e75b2",
+    "index.html": "d0f48ca8a438f0539e46082480bed4b9d43a287063c2c60eb30cd8d1b81ce0a0",
+    "advanced.js": "69bee6b308bdb26b382e2593567ad6c9cc6d56b78fb17b9bdda922d4be6fde5c"
+  },
+  "fixtures": [
+    {
+      "case": "ST-10",
+      "scope": "仅该新建隔离 context 的 F.state.settings.credits，使用 F.commit 将演示积分置为 0；之后均从页面发起。"
+    }
+  ],
+  "limitations": [
+    "模特来源为项目内预置样例，不证明真实模型调用或四 SKU 保真。",
+    "外部图输入为已有样例 PNG 的真实文件上传，验证上传、版本绑定及逐项人工复核工作流。",
+    "本测试不代替用户验收、服务端权限、真实费用结算或生产并发验证。"
+  ],
+  "cases": [
+    {
+      "id": "ST-01",
+      "name": "模特样例积分预留、成功结算与真实下载",
+      "steps": [
+        "选择匹配四品类搭配，创建两张模特样例",
+        "等待任务变为待复核，下载一张图片"
+      ],
+      "expected": "每张预留 1 积分；成功后预留结束且不退款；下载与明示的预置样例相同",
+      "result": "Pass",
+      "actual": {
+        "beforeCredits": 120,
+        "reservedCredits": 118,
+        "afterCredits": 118,
+        "jobs": [
+          {
+            "id": "image-mtwdhdws-haj6f",
+            "status": "review",
+            "source": "sample",
+            "reserved": false,
+            "cost": 0
+          },
+          {
+            "id": "image-mtwdhdwr-jfhq9",
+            "status": "review",
+            "source": "sample",
+            "reserved": false,
+            "cost": 0
+          }
+        ],
+        "file": {
+          "filename": "2026-09-11T03-04-19-942Z-model-sample.png",
+          "suggestedFilename": "搭配图-image-mtwdhdws-haj6f.png",
+          "size": 1519936,
+          "sha256": "e16a711be782e56ae31b8d27421e170cc6a0b4f75fb6a5fb29004b605aa664cb"
+        }
+      },
+      "artifacts": [
+        "2026-09-11T03-04-19-942Z-model-sample.png",
+        "2026-09-11T03-04-19-942Z-studio-model-review.png"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "ST-02",
+      "name": "创建入口重复点击阻断",
+      "steps": [
+        "创建一张模特任务后立即再次点击创建"
+      ],
+      "expected": "仍只有一个待处理任务，第二次点击不扣积分并展示重复提交提示",
+      "result": "Pass",
+      "actual": {
+        "jobCount": 1,
+        "credits": 119,
+        "jobId": "image-mtwdhgqp-to90y"
+      },
+      "artifacts": [],
+      "consoleErrors": []
+    },
+    {
+      "id": "ST-03",
+      "name": "排队取消只退款一次",
+      "steps": [
+        "创建一张任务并立即取消",
+        "等待超过原任务完成时间"
+      ],
+      "expected": "任务保持已取消、reserved=false，积分完全退回且旧定时器不改状态",
+      "result": "Pass",
+      "actual": {
+        "createdStatus": "queued",
+        "finalStatus": "cancelled",
+        "beforeCredits": 120,
+        "afterCredits": 120
+      },
+      "artifacts": [],
+      "consoleErrors": []
+    },
+    {
+      "id": "ST-04",
+      "name": "处理中取消释放积分",
+      "steps": [
+        "创建一张任务并等待处理中",
+        "点击取消，等待原完成时间"
+      ],
+      "expected": "运行中任务取消后退款，旧完成回调不生成图片",
+      "result": "Pass",
+      "actual": {
+        "finalStatus": "cancelled",
+        "image": null,
+        "beforeCredits": 120,
+        "afterCredits": 120
+      },
+      "artifacts": [],
+      "consoleErrors": []
+    },
+    {
+      "id": "ST-05",
+      "name": "失败退款、重试及重试入口防重复",
+      "steps": [
+        "选择不匹配预置示例的单品候选并等待失败",
+        "连续两次点击该失败任务的重新准备"
+      ],
+      "expected": "失败释放积分；重试保留历史，重复重试不创建第二个处理中任务",
+      "result": "Pass",
+      "actual": {
+        "oldJob": "image-mtwdhn7v-a1edi",
+        "newJob": "image-mtwdhopu-m6x3w",
+        "jobCount": 2,
+        "beforeCredits": 120,
+        "afterCredits": 120
+      },
+      "artifacts": [
+        "2026-09-11T03-04-19-942Z-studio-failed-retry.png"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "ST-06",
+      "name": "外部生成图真实文件上传与逐项审核",
+      "steps": [
+        "从上传按钮选择实际 PNG 文件",
+        "不勾选及只勾选部分项目分别尝试采用",
+        "全部项目确认后采用"
+      ],
+      "expected": "上传零积分；审核不完整时保持待复核，完整后绑定当前方案、商品版本和复核人",
+      "result": "Pass",
+      "actual": {
+        "source": "upload",
+        "status": "approved",
+        "reviewer": "sales",
+        "reviewedAt": "2026-09-11T03:04:39.767Z",
+        "productVersions": {
+          "p00": 1,
+          "p01": 1,
+          "p02": 1,
+          "p03": 1
+        },
+        "checks": 5,
+        "credits": 120
+      },
+      "artifacts": [
+        "2026-09-11T03-04-19-942Z-studio-upload-review.png"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "ST-07",
+      "name": "审核驳回须说明原因",
+      "steps": [
+        "上传实际 PNG 后打开复核",
+        "空原因驳回，再填写颜色不符原因驳回"
+      ],
+      "expected": "空原因不改变状态；有原因后记录驳回，不能绑定为当前采用图",
+      "result": "Pass",
+      "actual": {
+        "status": "rejected",
+        "reason": "帽子颜色不符，需重新生成"
+      },
+      "artifacts": [],
+      "consoleErrors": []
+    },
+    {
+      "id": "ST-08",
+      "name": "电商用途真实生成拼版且正确标记来源",
+      "steps": [
+        "选择电商展示图用途，创建一张",
+        "等待真实拼版完成，检查卡片及审核标签，下载文件"
+      ],
+      "expected": "source=composition；不扣积分，不标成 AI 或本地上传；输出 1200×900 的实际 JPG",
+      "result": "Pass",
+      "actual": {
+        "source": "composition",
+        "status": "review",
+        "credits": 120,
+        "dimensions": {
+          "width": 1200,
+          "height": 900,
+          "objectFit": "contain",
+          "renderedWidth": 334.65625,
+          "renderedHeight": 446.203125,
+          "src": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ"
+        },
+        "file": {
+          "filename": "2026-09-11T03-04-19-942Z-ecommerce-composition.jpg",
+          "suggestedFilename": "搭配图-image-mtwdhu5c-tdksc.jpg",
+          "size": 50016,
+          "sha256": "ceb2525e92ca896262800d30f2a0c23a7c681b7eef9404e5ee2f0dab711cbc1e"
+        }
+      },
+      "artifacts": [
+        "2026-09-11T03-04-19-942Z-ecommerce-composition.jpg",
+        "2026-09-11T03-04-19-942Z-studio-ecommerce-composition.png"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "ST-09",
+      "name": "拼版对话框键盘、焦点与图片比例",
+      "steps": [
+        "以键盘打开制作商品拼版，Tab 轮转并按 Escape",
+        "再次打开生成真实 JPG 并检查预览比例"
+      ],
+      "expected": "焦点保持在模态框内；Escape 后回到触发按钮；图片按原始比例显示",
+      "result": "Pass",
+      "actual": {
+        "focusAfterClose": "studio-board",
+        "tabChecks": 10,
+        "dimensions": {
+          "width": 1200,
+          "height": 900,
+          "objectFit": "fill",
+          "renderedWidth": 706,
+          "renderedHeight": 529.5,
+          "src": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ"
+        },
+        "file": {
+          "filename": "2026-09-11T03-04-19-942Z-manual-composition.jpg",
+          "suggestedFilename": "四品类商品拼版验证.jpg",
+          "size": 51918,
+          "sha256": "7d00914beb6a3fbeac3cc0d35b8774380e9e05481763ffbb4af082b521a4315f"
+        }
+      },
+      "artifacts": [
+        "2026-09-11T03-04-19-942Z-manual-composition.jpg",
+        "2026-09-11T03-04-19-942Z-studio-board-keyboard.png"
+      ],
+      "focusSequence": [
+        {
+          "inside": true,
+          "tag": "SELECT",
+          "id": "board-bg"
+        },
+        {
+          "inside": true,
+          "tag": "INPUT",
+          "id": "board-title"
+        },
+        {
+          "inside": true,
+          "tag": "BUTTON",
+          "id": "board-close"
+        },
+        {
+          "inside": true,
+          "tag": "BUTTON",
+          "id": "board-create"
+        },
+        {
+          "inside": true,
+          "tag": "BUTTON",
+          "id": "modal-x"
+        },
+        {
+          "inside": true,
+          "tag": "SELECT",
+          "id": "board-bg"
+        },
+        {
+          "inside": true,
+          "tag": "INPUT",
+          "id": "board-title"
+        },
+        {
+          "inside": true,
+          "tag": "BUTTON",
+          "id": "board-close"
+        },
+        {
+          "inside": true,
+          "tag": "BUTTON",
+          "id": "board-create"
+        },
+        {
+          "inside": true,
+          "tag": "BUTTON",
+          "id": "modal-x"
+        }
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "ST-10",
+      "name": "零积分异常夹具与免费拼版",
+      "steps": [
+        "仅本隔离页面将演示积分置零",
+        "从页面尝试创建四张模特图，再创建一张电商拼版"
+      ],
+      "expected": "模特整批阻断、不生成部分任务；零积分仍可完成免费拼版",
+      "result": "Pass",
+      "actual": {
+        "fixture": "仅 credits=0；操作通过真实 UI",
+        "finalCredits": 0,
+        "jobCount": 1,
+        "source": "composition"
+      },
+      "artifacts": [],
+      "consoleErrors": []
+    },
+    {
+      "id": "ST-11",
+      "name": "刷新中断恢复与退款",
+      "steps": [
+        "创建模特任务后立即刷新浏览器",
+        "回读持久化任务与积分"
+      ],
+      "expected": "未完成任务记为失败并释放预留，不能伪造成功",
+      "result": "Pass",
+      "actual": {
+        "status": "failed",
+        "message": "页面刷新中断了本地任务，演示积分已释放，可重新准备。",
+        "beforeCredits": 120,
+        "afterCredits": 120
+      },
+      "artifacts": [],
+      "consoleErrors": []
+    },
+    {
+      "id": "ST-12",
+      "name": "模特图在桌面与移动审核保持完整比例",
+      "steps": [
+        "生成模特样例，检查卡片图片的完整显示规则",
+        "打开复核，切换 390px 宽度检查图片与对话框"
+      ],
+      "expected": "卡片与审核图片使用 contain、文件完整解码，移动端无整页横向溢出",
+      "result": "Pass",
+      "actual": {
+        "card": {
+          "width": 1086,
+          "height": 1448,
+          "objectFit": "contain",
+          "renderedWidth": 334.65625,
+          "renderedHeight": 446.203125,
+          "src": "assets/model-olive.png"
+        },
+        "desktop": {
+          "width": 1086,
+          "height": 1448,
+          "objectFit": "contain",
+          "renderedWidth": 342,
+          "renderedHeight": 456,
+          "src": "assets/model-olive.png"
+        },
+        "mobile": {
+          "width": 1086,
+          "height": 1448,
+          "objectFit": "contain",
+          "renderedWidth": 322,
+          "renderedHeight": 350,
+          "src": "assets/model-olive.png"
+        }
+      },
+      "artifacts": [
+        "2026-09-11T03-04-19-942Z-studio-review-mobile.png"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "ST-13",
+      "name": "处理时重搭使旧图过期并释放预留",
+      "steps": [
+        "创建模特任务，立即通过搭配页保持锁定重搭",
+        "等待原任务完成时间，回读任务状态与积分"
+      ],
+      "expected": "候选变化后旧任务标为过期，未完成任务释放积分，不能把旧图写回新组合",
+      "result": "Pass",
+      "actual": {
+        "jobStatus": "stale",
+        "reserved": false,
+        "beforeCredits": 120,
+        "afterCredits": 120,
+        "oldProducts": [
+          "p00",
+          "p01",
+          "p02",
+          "p03"
+        ],
+        "newProducts": [
+          "p00",
+          "p01",
+          "p02",
+          "p13"
+        ]
+      },
+      "artifacts": [],
+      "consoleErrors": []
+    },
+    {
+      "id": "ST-14",
+      "name": "一至四品类拼版各自实际生成下载",
+      "steps": [
+        "依次选择1、2、3、4品类候选",
+        "每档打开拼版工具，生成并下载 JPG"
+      ],
+      "expected": "四个文件均实际解码为1200×900且内容不同，商品槽位数量准确，保留图片供视觉核对",
+      "result": "Pass",
+      "actual": {
+        "files": [
+          {
+            "group": 1,
+            "products": [
+              "p00"
+            ],
+            "file": {
+              "filename": "2026-09-11T03-04-19-942Z-composition-1-category.jpg",
+              "suggestedFilename": "1品类商品比例验证.jpg",
+              "size": 36645,
+              "sha256": "ff0e84ac07a60f6419722fe5a8d772e8eee6f18a903a1741085c9cc7bb7e7aba"
+            },
+            "dimensions": {
+              "width": 1200,
+              "height": 900,
+              "objectFit": "fill",
+              "renderedWidth": 706,
+              "renderedHeight": 529.5,
+              "src": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ"
+            }
+          },
+          {
+            "group": 2,
+            "products": [
+              "p00",
+              "p01"
+            ],
+            "file": {
+              "filename": "2026-09-11T03-04-19-942Z-composition-2-category.jpg",
+              "suggestedFilename": "2品类商品比例验证.jpg",
+              "size": 48624,
+              "sha256": "66eb248614a44153ce83b686665c8a8de8fa2cb167d2efd6cbc77ad1656e9028"
+            },
+            "dimensions": {
+              "width": 1200,
+              "height": 900,
+              "objectFit": "fill",
+              "renderedWidth": 706,
+              "renderedHeight": 529.5,
+              "src": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ"
+            }
+          },
+          {
+            "group": 3,
+            "products": [
+              "p00",
+              "p01",
+              "p02"
+            ],
+            "file": {
+              "filename": "2026-09-11T03-04-19-942Z-composition-3-category.jpg",
+              "suggestedFilename": "3品类商品比例验证.jpg",
+              "size": 42645,
+              "sha256": "961ca63a3d7ba36b1df4054e6b1f17f1765dc9bafb17ea5fd196ddcc62363f1c"
+            },
+            "dimensions": {
+              "width": 1200,
+              "height": 900,
+              "objectFit": "fill",
+              "renderedWidth": 706,
+              "renderedHeight": 529.5,
+              "src": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ"
+            }
+          },
+          {
+            "group": 4,
+            "products": [
+              "p00",
+              "p01",
+              "p02",
+              "p03"
+            ],
+            "file": {
+              "filename": "2026-09-11T03-04-19-942Z-composition-4-category.jpg",
+              "suggestedFilename": "4品类商品比例验证.jpg",
+              "size": 51482,
+              "sha256": "88e4e4c3fe33eeb74cf338f0ea09663bc7c99e24055daac0b5b70c6d0cd623de"
+            },
+            "dimensions": {
+              "width": 1200,
+              "height": 900,
+              "objectFit": "fill",
+              "renderedWidth": 706,
+              "renderedHeight": 529.5,
+              "src": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ"
+            }
+          }
+        ]
+      },
+      "artifacts": [
+        "2026-09-11T03-04-19-942Z-composition-1-category.jpg",
+        "2026-09-11T03-04-19-942Z-composition-2-category.jpg",
+        "2026-09-11T03-04-19-942Z-composition-3-category.jpg",
+        "2026-09-11T03-04-19-942Z-composition-4-category.jpg"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "ST-15",
+      "name": "同一工作区部分成功与失败保留",
+      "steps": [
+        "为支持的四品类和无预置图的单品分别提交模特任务",
+        "同时等待两项终态"
+      ],
+      "expected": "成功项保留待复核及样例图，失败项单独退款，总共只结算成功项1积分",
+      "result": "Pass",
+      "actual": {
+        "beforeCredits": 120,
+        "afterCredits": 119,
+        "jobs": [
+          {
+            "id": "image-mtwdi92j-h35ud",
+            "status": "failed",
+            "reserved": false,
+            "source": "sample"
+          },
+          {
+            "id": "image-mtwdi90k-5pdhi",
+            "status": "review",
+            "reserved": false,
+            "source": "sample"
+          }
+        ]
+      },
+      "artifacts": [
+        "2026-09-11T03-04-19-942Z-studio-partial-success.png"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "ST-16",
+      "name": "外部上传采用后换款使旧图失效并阻断下载",
+      "steps": [
+        "真实上传模特 PNG，逐项复核并采用",
+        "在搭配页保持锁定重搭，再尝试下载旧上传图"
+      ],
+      "expected": "原先采用的上传图变为stale，新搭配退回原图模式，旧图下载明确拒绝且不生成文件",
+      "result": "Pass",
+      "actual": {
+        "source": "upload",
+        "status": "stale",
+        "newImageMode": "original",
+        "oldRevision": 1,
+        "newRevision": 2,
+        "downloads": 0
+      },
+      "artifacts": [
+        "2026-09-11T03-04-19-942Z-studio-upload-stale.png"
+      ],
+      "consoleErrors": []
+    }
+  ],
+  "errors": [],
+  "finishedAt": "2026-09-11T03:05:06.569Z",
+  "finalBaseline": {
+    "core.js": "b9eef4fe429ab1a1d23691d27d18491f1a206f2404f1fa1fbdd92f08e195e24f",
+    "app.js": "e4db96d3a3fc7054858d0f7e3ff517d771c86b766af159172bfb9a1dc8318bd0",
+    "style.css": "e0a6f8847d1598c39b727fb5731a87aa2fc4186a505173dc16c85cbb2b2e75b2",
+    "index.html": "d0f48ca8a438f0539e46082480bed4b9d43a287063c2c60eb30cd8d1b81ce0a0",
+    "advanced.js": "69bee6b308bdb26b382e2593567ad6c9cc6d56b78fb17b9bdda922d4be6fde5c"
+  },
+  "sourceChangedDuringRun": false,
+  "summary": {
+    "passed": 16,
+    "failed": 0,
+    "total": 16
+  }
+}

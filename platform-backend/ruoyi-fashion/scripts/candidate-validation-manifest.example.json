@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "1.0",
+  "authorizationStatus": "not_provided",
+  "candidateEnvironment": {
+    "environmentId": "TO_BE_PROVIDED",
+    "owner": "TO_BE_PROVIDED",
+    "javaBaseUrl": "https://candidate.example.invalid",
+    "pythonRuntimeUrl": "https://runtime.candidate.example.invalid",
+    "mysqlDatabaseName": "TO_BE_PROVIDED",
+    "objectStorageRef": "config://TO_BE_PROVIDED",
+    "monitoringRef": "config://TO_BE_PROVIDED",
+    "backupRef": "config://TO_BE_PROVIDED"
+  },
+  "authorizations": {
+    "candidateEnvironmentWrite": false,
+    "providerCalls": false,
+    "testDataUse": false,
+    "approvedBy": "TO_BE_PROVIDED",
+    "approvedAt": "TO_BE_PROVIDED"
+  },
+  "provider": {
+    "textProviderCode": "TO_BE_PROVIDED",
+    "visualProviderCode": "TO_BE_PROVIDED",
+    "accountRef": "secret://TO_BE_PROVIDED",
+    "secretRef": "secret://TO_BE_PROVIDED",
+    "dataTermsRef": "TO_BE_PROVIDED"
+  },
+  "dataset": {
+    "manifestRef": "TO_BE_PROVIDED",
+    "approvedProductCount": 0,
+    "categoryCounts": {
+      "top": 0,
+      "bottom": 0,
+      "hat": 0,
+      "shoe": 0
+    },
+    "coverageTags": [
+      "solid",
+      "stripe",
+      "plaid",
+      "logo",
+      "small_text",
+      "dark",
+      "light",
+      "flat_lay",
+      "mannequin"
+    ]
+  },
+  "trial": {
+    "taskCount": 40,
+    "tasksPerCategory": 10,
+    "candidatesPerFirstRound": 3,
+    "maxRetryRounds": 1,
+    "minimumDeliverableTasksPerCategory": 8,
+    "preserveAllFailures": true,
+    "feeCapCny": 0,
+    "stopConditions": [
+      "security_violation",
+      "fee_cap_reached",
+      "unknown_unresolved",
+      "category_below_8_of_10",
+      "critical_identity_error",
+      "four_category_missing_item",
+      "recovery_inconsistent",
+      "performance_gate_failed"
+    ]
+  },
+  "desktop": {
+    "application": "TO_BE_PROVIDED",
+    "version": "TO_BE_PROVIDED",
+    "downloadPathRef": "TO_BE_PROVIDED"
+  },
+  "uat": {
+    "owner": "TO_BE_PROVIDED",
+    "role": "TO_BE_PROVIDED",
+    "window": "TO_BE_PROVIDED",
+    "decisionAuthority": false
+  },
+  "release": {
+    "authorized": false
+  }
+}

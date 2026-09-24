@@ -1,45 +1,52 @@
-# AI Interview Coach
+# Java AI 多项目工作区
 
-> 项目状态：RuoYi 单平台收敛中
+> 文档类型：工作区入口
 > 文档状态：Draft
-> 风险等级：L3
-> 当前阶段：8 审查验证 / 9 用户验收
-> 更新时间：2026-08-30
+> 更新时间：2026-09-12
 
-面向 Java 开发者转型 AI 应用与 Agent 开发的面试训练系统。账号、Token、菜单权限和业务后端已经统一到 RuoYi。
+本仓库同时承载一套共享若依平台资料和四个相互独立的业务项目。各项目的需求、状态、数据库边界、验证和归档不得相互继承；需要复用若依时，只复用明确的身份、权限、菜单或工程能力，不把另一个项目的业务规则当成共享规则。
+
+## 文档分类
+
+| 分类 | 唯一入口 | 说明 |
+|---|---|---|
+| 若依框架 | [若依框架资料](文档/若依框架/README.md) | 上游基线、共享工程入口和各项目若依集成导航；不维护业务项目状态 |
+| 面试项目 | [面试项目文档](文档/项目/面试项目/README.md) | Java 转 AI / Agent 岗位的题库、文字面试、语音面试和评测规划 |
+| 智能选品项目 | [智能选品项目文档](文档/项目/智能选品项目/README.md) | 服装商品库、智能搭配、图片生成、销售报价和演示文稿交付 |
+| 智能体桌面端项目 | [智能体桌面端项目文档](文档/项目/智能体桌面端项目/README.md) | Aden 桌面执行底座、采购询价、信息采集和受限执行端 |
+| 生产排产项目 | [生产排产项目文档](文档/项目/生产排产项目/README.md) | 有限产能排程、车间调度、人员设备资源和生产反馈 |
+
+总阅读入口见[工作区文档总览](文档/README.md)，四个业务项目的横向边界见[项目文档索引](文档/项目/README.md)。
 
 ## 当前工程
 
 | 目录 | 职责 |
 |---|---|
-| `platform-backend/` | 唯一 RuoYi Java 后端；`ruoyi-admin` 聚合 `ruoyi-interview` |
-| `admin-web/` | RuoYi 管理端 |
-| `portal-web/` | 用户 Portal Web |
-| `mobile/` | 移动端工程；V2 原生语音延期 |
-| `ruoyi-app/` | RuoYi-App 上游基线 |
-| `ruoyi-backend/` | RuoYi 后端上游基线 |
-| `ruoyi-vue3-frontend/` | RuoYi-Vue3 上游基线 |
-| `contracts/` | OpenAPI / AsyncAPI 契约 |
-| `docs/` | 规格、设计、验证和迁移记录 |
+| `platform-backend/` | 共享若依 Java 后端；当前聚合面试和 Aden 业务模块 |
+| `admin-web/` | 共享若依管理端 |
+| `portal-web/`、`mobile/` | 面试项目的用户端工程 |
+| `aden-desktop/` | Aden 的 Electron / Vue 桌面端 |
+| `fashion-ai-runtime/` | 智能选品项目唯一 Python AI Runtime |
+| `contracts/` | 共享机器契约；具体所有权由子目录和项目文档说明 |
+| `prototype/` | 各项目可运行原型；它是工程资产，不是当前需求或验证的默认事实源 |
+| `ruoyi-backend/`、`ruoyi-vue3-frontend/`、`ruoyi-app/` | 若依上游基线，不作为业务功能首选修改位置 |
+| `文档/` | 共享规范、五类导航、项目事实、迁移记录和历史归档 |
 
-旧 `frontend/`、`backend/` 已于 2026-08-30 删除；原 `apps/` 下的七个工程已提升到仓库根目录，`apps/` 已删除。历史文档中的 `apps/...` 路径表示提升前的目录结构。
-
-## 本地入口
-
-- 后端：`platform-backend/bin/run-local.ps1`，默认端口 `8081`
-- Admin：在 `admin-web/` 执行 `npm run dev -- --host 127.0.0.1`，默认端口 `5173`
-- Portal：在 `portal-web/` 执行 `npm run dev -- --host 127.0.0.1`，默认端口 `5174`
+旧 `frontend/`、`backend/` 已删除，原 `apps/` 下工程已提升到仓库根目录。旧路径只按对应归档或迁移记录解释。
 
 ## 当前边界
 
-已迁入并取得局部运行证据：RuoYi 登录权限、题库、文字面试，以及 Portal Web 语音链路代码。真实 Provider、对象存储、完整 WS/SSE 联机、Admin 全工作流和业务 owner 最终 UAT 仍需单独结论。
+- 面试项目以若依账号、JWT、菜单和权限为平台事实，以 PostgreSQL 保存面试业务事实。
+- 智能选品项目以 Java / MySQL 保存正式业务事实，Python 只返回结构化智能候选；当前生产 Feature 仍在开发和验证阶段。
+- 智能体桌面端项目以若依作为唯一中心控制面，桌面端和 Runner 不形成第二套业务真相；真实账号、采集和外部发送仍未授权。
+- 生产排产项目已有需求、数据库设计和本地交互原型，尚无可据此宣称完成的生产实现。
 
-明确不在当前 V2 范围：评测报告、学习计划/Dashboard、单题练习、计费支付、隐私导出/删除、运营状态和原生移动端语音。
+各项目更细的状态只从项目控制页、Feature 控制页和验证记录读取，不能根据文件或代码存在推断。
 
-## 文档入口
+## 面试项目本地入口
 
-- [迁移状态与待办](docs/reference/migration-status-and-todo.md)
-- [RuoYi 题库与语音收敛计划](docs/architecture/ruoyi-qbank-voice-convergence-plan.md)
-- [旧项目删除记录](docs/development-records/2026-08-30-legacy-project-convergence.md)
-- [根目录提升记录](docs/development-records/2026-08-30-apps-root-convergence.md)
-- [项目规范索引](docs/specs/README.md)
+- 后端：`platform-backend/bin/run-local.ps1`，默认端口 `8081`
+- 管理端：在 `admin-web/` 执行 `npm run dev -- --host 127.0.0.1`，默认端口 `5173`
+- 用户端：在 `portal-web/` 执行 `npm run dev -- --host 127.0.0.1`，默认端口 `5174`
+
+这些命令只说明现有本地入口，不代表当前环境、数据库、Provider 或完整业务链路已经验证通过。
