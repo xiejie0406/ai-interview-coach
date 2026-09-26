@@ -159,10 +159,10 @@ try {
     $mysqldExe = Join-Path $MySqlHome 'bin\mysqld.exe'
     $mysqlExe = Join-Path $MySqlHome 'bin\mysql.exe'
     $mysqlAdminExe = Join-Path $MySqlHome 'bin\mysqladmin.exe'
-    $ruoyiSql = Join-Path $repositoryRoot 'platform-backend\sql\ry_20260417.sql'
-    $workerJar = Join-Path $repositoryRoot 'platform-backend\aps\aps-worker\target\aps-worker-3.9.2.jar'
-    $apiJar = Join-Path $repositoryRoot 'platform-backend\ruoyi-admin\target\ruoyi-admin.jar'
-    $frontendRoot = Join-Path $repositoryRoot 'admin-web'
+    $ruoyiSql = Join-Path $repositoryRoot 'ruoyi-backend\sql\ry_20260417.sql'
+    $workerJar = Join-Path $repositoryRoot 'ruoyi-backend\aps\aps-worker\target\aps-worker-3.9.2.jar'
+    $apiJar = Join-Path $repositoryRoot 'ruoyi-backend\ruoyi-admin\target\ruoyi-admin.jar'
+    $frontendRoot = Join-Path $repositoryRoot 'frontend/admin-web'
 
     $requiredFiles = @($javaExe, $jarExe, $mavenExe, $mysqldExe, $mysqlExe, $mysqlAdminExe, $ruoyiSql)
     $missingFiles = @($requiredFiles | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })
@@ -171,7 +171,7 @@ try {
         throw 'Missing prerequisites'
     }
     if (-not (Test-Path -LiteralPath (Join-Path $frontendRoot 'node_modules') -PathType Container)) {
-        Add-Result -Name prerequisites -Status FAIL -Detail 'admin-web/node_modules 不存在，不能复验锁定的前端制品'
+        Add-Result -Name prerequisites -Status FAIL -Detail 'frontend/admin-web/node_modules 不存在，不能复验锁定的前端制品'
         throw 'Missing frontend dependencies'
     }
 
@@ -220,7 +220,7 @@ try {
 
     if ($failures -eq 0) {
         [void](Invoke-LoggedCommand -Name 'ortools-jni-smoke' -FilePath $mavenExe -ArgumentList @(
-            '-f', (Join-Path $repositoryRoot 'platform-backend\aps\pom.xml'),
+            '-f', (Join-Path $repositoryRoot 'ruoyi-backend\aps\pom.xml'),
             '-pl', 'aps-solver-ortools', '-am',
             '-Dtest=OrToolsNativeSmokeTest', '-Dsurefire.failIfNoSpecifiedTests=false',
             'test', '--no-transfer-progress'
@@ -229,7 +229,7 @@ try {
 
     if ($failures -eq 0) {
         [void](Invoke-LoggedCommand -Name 'backend-package' -FilePath $mavenExe -ArgumentList @(
-            '-f', (Join-Path $repositoryRoot 'platform-backend\pom.xml'),
+            '-f', (Join-Path $repositoryRoot 'ruoyi-backend\pom.xml'),
             '-pl', 'ruoyi-admin,aps/aps-worker', '-am',
             '-DskipTests', 'package', '--no-transfer-progress'
         ))

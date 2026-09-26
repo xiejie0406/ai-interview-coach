@@ -1,0 +1,493 @@
+
+[seed] ruoyi-backend/ruoyi-fashion/scripts/seed_local_demo.py
+140:             f"WHERE dict_type='{dict_type}' AND dict_value='{code}');"
+141:         )
+142:     for index, kind in enumerate(("product", "price", "stock"), 1):
+143:         statements.append(
+144:             "INSERT INTO fq_import_batch "
+145:             "(id,batch_no,import_type,operation_type,source_code,warehouse_code,"
+146:             "mapping_snapshot,scope_json,as_of,request_key,expected_count,actual_count,"
+147:             "status,published_at,create_by,create_time,update_by,update_time,row_version) "
+148:             f"VALUES ({BASE + 100 + index},'DEMO-LOCAL-{kind.upper()}',"
+149:             f"'{kind}','import','{SOURCE}','MAIN',JSON_OBJECT(),JSON_OBJECT(),"
+150:             f"NOW(3),'demo-local-{kind}-20260926',4,4,'success',NOW(3),"
+151:             "1,NOW(3),1,NOW(3),1);"
+152:         )
+153:     statements.append(
+154:         "INSERT INTO fq_customer (id,code,name,customer_type,salesperson_id,"
+155:         "collaborator_ids,status,create_by,create_time,update_by,update_time,row_version) "
+169:         }]
+170:         statements.append(
+171:             "INSERT INTO fq_product (id,source_code,sku_code,style_code,name,"
+172:             "category_code,color_code,color_name,size_code,size_system,unit,sale_price,"
+173:             "currency,tax_mode,price_as_of,last_price_import_batch_id,tags_json,"
+174:             "main_image_key,images_json,visual_version,attributes_confirmed,"
+175:             "attributes_confirmed_by,attributes_confirmed_at,last_product_import_batch_id,"
+176:             "status,create_by,create_time,update_by,update_time,row_version) VALUES ("
+177:             f"{BASE + 400 + index},'{SOURCE}','DEMO-SKU-{kind.upper()}',"
+178:             f"'DEMO-STYLE-{kind.upper()}',{sql_string(name)},'{category}',"
+179:             f"'{color_code}',{sql_string(color_name)},'M','LETTER','件',{price},"
+180:             f"'CNY','included',NOW(3),{BASE + 102},JSON_ARRAY('本机演示'),"
+181:             f"{sql_string(object_key)},{sql_string(json.dumps(image, ensure_ascii=False))},"
+182:             f"1,1,1,NOW(3),{BASE + 101},'active',1,NOW(3),1,NOW(3),1);"
+183:         )
+184:         statements.append(
+185:             "INSERT INTO fq_stock (id,product_id,warehouse_code,available_qty,"
+186:             "as_of,confirmation_type,last_import_batch_id,create_by,create_time,"
+187:             "update_by,update_time,row_version) VALUES ("
+188:             f"{BASE + 500 + index},{BASE + 400 + index},'MAIN',50,NOW(3),"
+189:             f"'import',{BASE + 103},1,NOW(3),1,NOW(3),1);"
+190:         )
+191:     groups = [
+
+[import] frontend/admin-web/src/views/fashion/import/index.vue
+1: <template>
+2:   <div class="app-container fashion-import">
+3:     <el-alert title="普通商品资料导入不会修改当前价格或库存。请先预览差异，确认无行级错误后再发布。" type="warning" :closable="false" show-icon class="mb20" />
+4:     <el-card shadow="never">
+5:       <el-form label-width="110px">
+6:         <el-form-item label="商品模板"><a :href="productTemplateUrl()" target="_blank">下载 CSV 模板</a></el-form-item>
+7:         <el-form-item label="来源范围"><el-select v-model="sourceCode" style="width:240px"><el-option v-for="item in sources" :key="item.value" :label="item.label" :value="item.value" /></el-select></el-form-item>
+8:         <el-form-item label="业务时间"><el-date-picker v-model="asOf" type="datetime" /></el-form-item>
+9:         <el-form-item label="文件"><input type="file" accept=".csv,.xlsx" @change="selectFile"></el-form-item>
+10:         <el-form-item label="显式清空"><el-checkbox-group v-model="clearFields"><el-checkbox value="brand">品牌</el-checkbox><el-checkbox value="material">材质</el-checkbox><el-checkbox value="jdItemId">京东 ID</el-checkbox><el-checkbox value="jdUrl">京东链接</el-checkbox></el-checkbox-group></el-form-item>
+11:         <el-form-item><el-button type="primary" :loading="loading" :disabled="!file || !sourceCode" v-hasPermi="['fashion:product:import']" @click="preview">校验并预览</el-button></el-form-item>
+12:       </el-form>
+13:     </el-card>
+14:     <el-card v-if="batch" shadow="never" class="mt20">
+15:       <template #header><div class="header"><span>{{ batch.batchNo }} · {{ batch.status }}</span><el-button type="success" :disabled="batch.status !== 'validated'" v-hasPermi="['fashion:product:import']" @click="publish">确认生效</el-button></div></template>
+16:       <el-descriptions :column="3" border><el-descriptions-item label="数据行">{{ batch.actualCount }}</el-descriptions-item><el-descriptions-item label="错误行">{{ batch.errorCount }}</el-descriptions-item><el-descriptions-item label="文件摘要"><code>{{ batch.fileHash.slice(0,16) }}…</code></el-descriptions-item></el-descriptions>
+17:       <el-table :data="batch.details" class="mt20" empty-text="没有数据行">
+18:         <el-table-column prop="sourceRowNo" label="文件行" width="80" /><el-table-column prop="businessKey" label="来源 / SKU" min-width="190" />
+19:         <el-table-column prop="changeType" label="差异" width="100" /><el-table-column prop="status" label="状态" width="90" />
+20:         <el-table-column label="行级错误" min-width="280"><template #default="{ row }"><div v-for="error in row.errors" :key="`${error.field}-${error.code}`" class="row-error">{{ error.field }}：{{ error.message }}</div><span v-if="!row.errors.length">—</span></template></el-table-column>
+21:       </el-table>
+22:     </el-card>
+23:   </div>
+24: </template>
+25: 
+26: <script setup lang="ts">
+27: import { onMounted, ref } from 'vue'
+28: import { ElMessage } from 'element-plus'
+29: import { getDicts } from '@/api/system/dict/data'
+30: import { previewProductImport, productTemplateUrl, publishProductImport } from '@/api/fashion/importBatch'
+31: import type { ImportBatchView } from '@/api/fashion/types'
+32: interface Option { label:string; value:string }
+33: const sources=ref<Option[]>([]), sourceCode=ref(''), asOf=ref(new Date()), clearFields=ref<string[]>([]), file=ref<File>(), loading=ref(false), batch=ref<ImportBatchView>()
+34: function selectFile(event: Event){ file.value=(event.target as HTMLInputElement).files?.[0] }
+35: async function preview(){ if(!file.value)return; loading.value=true; try{ const response=await previewProductImport({file:file.value,sourceCode:sourceCode.value,asOf:asOf.value.toISOString(),clearFields:clearFields.value}); batch.value=response.data; ElMessage.success(response.data.errorCount?'预览完成，请修正行错':'预览通过，可确认生效') } finally{loading.value=false} }
+36: async function publish(){ if(!batch.value)return; const response=await publishProductImport(batch.value.batchId,batch.value.rowVersion); batch.value=response.data; ElMessage.success('商品资料已原子发布') }
+37: onMounted(async()=>{const response=await getDicts('fashion_product_source');sources.value=(response.data??[]).filter((item:any)=>String(item.status)==='0').map((item:any)=>({label:String(item.dictLabel),value:String(item.dictValue)}))})
+38: </script>
+39: <style scoped>.header{display:flex;justify-content:space-between;align-items:center}.mt20{margin-top:20px}.row-error{color:var(--el-color-danger);line-height:1.5}</style>
+
+[product] frontend/admin-web/src/views/fashion/product/index.vue
+33:       <el-button type="primary" plain icon="Plus" v-hasPermi="['fashion:product:edit']" @click="openCreate">新增 SKU</el-button>
+34:       <el-button icon="Refresh" @click="loadProducts">刷新</el-button>
+35:     </div>
+36:     <el-table v-loading="loading" :data="page.items" empty-text="没有符合条件的商品">
+37:       <el-table-column label="款色分组" min-width="190">
+38:         <template #default="{ row }"><strong>{{ row.sourceCode }} / {{ row.styleCode }}</strong><br><span>{{ row.colorName }}（{{ row.colorCode }}）</span></template>
+39:       </el-table-column>
+40:       <el-table-column label="SKU / 尺码" min-width="150"><template #default="{ row }"><code>{{ row.skuCode }}</code><br>{{ row.sizeSystem }} {{ row.sizeCode }}</template></el-table-column>
+41:       <el-table-column prop="name" label="商品" min-width="180" show-overflow-tooltip />
+42:       <el-table-column prop="categoryCode" label="品类" width="100"><template #default="{ row }">{{ labelOf(dictionaries.category, row.categoryCode) }}</template></el-table-column>
+43:       <el-table-column label="当前价" width="110"><template #default="{ row }">{{ row.salePrice == null ? '缺价' : `¥${row.salePrice}` }}</template></el-table-column>
+44:       <el-table-column label="完整性" min-width="180">
+45:         <template #default="{ row }">
+46:           <el-tag v-if="!row.incompleteReasons.length" type="success">可用</el-tag>
+47:           <el-tag v-for="reason in row.incompleteReasons" v-else :key="reason" type="warning" class="reason-tag">{{ reasonLabel(reason) }}</el-tag>
+48:         </template>
+49:       </el-table-column>
+50:       <el-table-column label="状态" width="90"><template #default="{ row }"><el-tag :type="row.status === 'active' ? 'success' : 'info'">{{ statusLabel(row.status) }}</el-tag></template></el-table-column>
+51:       <el-table-column label="操作" width="300" fixed="right">
+52:         <template #default="{ row }">
+53:           <el-tooltip :content="aiCapability.enabled ? '生成待人工确认的商品属性建议' : capabilityReason(aiCapability.reason)" placement="top">
+54:             <span><el-button link type="success" :disabled="!aiCapability.enabled" v-hasPermi="['fashion:ai:run:execute']" @click="suggestAttributes(row)">AI 属性建议</el-button></span>
+55:           </el-tooltip>
+56:           <el-button link type="primary" v-hasPermi="['fashion:product:edit']" @click="rename(row)">改名</el-button>
+57:           <el-button link type="primary" v-hasPermi="['fashion:product:edit']" @click="toggleStatus(row)">{{ row.status === 'active' ? '下架' : '上架' }}</el-button>
+58:         </template>
+59:       </el-table-column>
+60:     </el-table>
+61:     <pagination v-show="page.total > 0" :total="page.total" v-model:page="query.page" v-model:limit="query.pageSize" @pagination="loadProducts" />
+62: 
+63:     <el-dialog v-model="createVisible" title="新增 SKU 商品" width="760px" append-to-body>
+64:       <el-form label-width="100px" :model="createForm">
+65:         <el-row :gutter="16">
+66:           <el-col v-for="field in createFields" :key="field.key" :span="12">
+67:             <el-form-item :label="field.label" :required="field.required">
+68:               <el-select v-if="field.dict" v-model="createForm[field.key]" filterable style="width:100%">
+69:                 <el-option v-for="item in dictionaries[field.dict]" :key="item.value" :label="item.label" :value="item.value" />
+70:               </el-select>
+71:               <el-input v-else v-model="createForm[field.key]" />
+72:             </el-form-item>
+73:           </el-col>
+74:         </el-row>
+75:       </el-form>
+76:       <template #footer><el-button @click="createVisible=false">取消</el-button><el-button type="primary" :loading="saving" @click="submitCreate">保存草稿</el-button></template>
+77:     </el-dialog>
+78: 
+79:     <el-dialog v-model="suggestionVisible" title="AI 商品属性建议" width="680px" append-to-body @closed="stopPolling">
+80:       <el-alert title="AI 只生成候选属性；点击“确认采用”前不会修改商品。价格、库存、客户信息不进入该任务。" type="info" :closable="false" show-icon class="mb20" />
+81:       <el-descriptions v-if="activeRun" :column="2" border>
+82:         <el-descriptions-item label="任务号">{{ activeRun.runNo }}</el-descriptions-item>
+83:         <el-descriptions-item label="状态"><el-tag :type="runStatusType(activeRun.status)">{{ runStatusLabel(activeRun.status) }}</el-tag></el-descriptions-item>
+84:         <el-descriptions-item label="尝试次数">{{ activeRun.runAttempt }}</el-descriptions-item>
+85:         <el-descriptions-item label="采用状态">{{ activeRun.applyStatus === 'applied' ? '已采用' : '待确认' }}</el-descriptions-item>
+86:       </el-descriptions>
+130:   { key: 'styleCode', label: '款号', required: true }, { key: 'name', label: '商品名', required: true },
+131:   { key: 'categoryCode', label: '品类', required: true, dict: 'category' }, { key: 'colorCode', label: '颜色编码', required: true, dict: 'color' },
+132:   { key: 'colorName', label: '颜色名称', required: true }, { key: 'sizeCode', label: '尺码', required: true },
+133:   { key: 'sizeSystem', label: '尺码制式', required: true }, { key: 'unit', label: '单位', required: true, dict: 'unit' },
+134:   { key: 'season', label: '季节', required: true, dict: 'season' }, { key: 'brand', label: '品牌', required: false },
+135:   { key: 'material', label: '材质', required: false }, { key: 'jdItemId', label: '京东商品 ID', required: false },
+136:   { key: 'jdUrl', label: '京东 HTTPS 链接', required: false }
+137: ]
+138: 
+139: async function loadDictionaries() {
+140:   await Promise.all((Object.keys(dictTypes) as DictionaryKey[]).map(async key => {
+141:     const response = await getDicts(dictTypes[key])
+142:     dictionaries[key] = (response.data ?? []).filter((item: any) => String(item.status) === '0').map((item: any) => ({ label: String(item.dictLabel), value: String(item.dictValue) }))
+143:   }))
+144: }
+145: async function loadProducts() {
+146:   controller?.abort(); controller = new AbortController(); loading.value = true
+147:   try {
+148:     const response = await listProducts({ ...query }, controller.signal)
+149:     page.items = response.data.items; page.total = response.data.total
+150:   } finally { loading.value = false }
+151: }
+152: async function loadAiCapability() {
+153:   try { Object.assign(aiCapability, (await getProductAttributeCapability()).data) }
+154:   catch { Object.assign(aiCapability, { enabled: false, reason: 'capability_unavailable' }) }
+155: }
+
+[schema] ruoyi-backend/ruoyi-fashion/src/main/resources/db/fashion-migration/V1__create_fashion_schema.sql
+279: create table fq_product (
+280:     id bigint not null,
+281:     source_code varchar(64) not null,
+282:     sku_code varchar(64) not null,
+283:     style_code varchar(64) not null,
+284:     name varchar(120) not null,
+285:     category_code varchar(32) not null,
+286:     color_code varchar(32) not null,
+287:     color_name varchar(32) not null,
+288:     size_code varchar(32) not null,
+289:     size_system varchar(16) not null,
+290:     unit varchar(16) not null,
+291:     sale_price decimal(16,2) null,
+292:     currency char(3) not null default 'CNY',
+293:     tax_mode varchar(16) not null default 'included',
+294:     price_as_of datetime(3) null,
+295:     last_price_import_batch_id bigint null,
+296:     brand varchar(80) null,
+297:     material varchar(255) null,
+298:     season varchar(32) not null default '四季',
+299:     tags_json json not null default (json_array()),
+300:     main_image_key varchar(512) null,
+301:     images_json json not null default (json_array()),
+302:     visual_version bigint not null default 1,
+303:     last_ai_run_id bigint null,
+304:     attributes_confirmed tinyint not null default 0,
+305:     attributes_confirmed_by bigint null,
+306:     attributes_confirmed_at datetime(3) null,
+307:     jd_item_id varchar(64) null,
+308:     jd_url varchar(2048) null,
+309:     last_product_import_batch_id bigint null,
+310:     status varchar(16) not null default 'draft',
+311:     create_by bigint not null,
+312:     create_time datetime(3) not null,
+313:     update_by bigint not null,
+314:     update_time datetime(3) not null,
+315:     row_version bigint not null default 1,
+316:     primary key (id),
+317:     unique key uk_fq_product_sku (source_code, sku_code),
+318:     unique key uk_fq_product_variant (source_code, style_code, color_code, size_system, size_code),
+319:     key idx_fq_product_category_status (category_code, status),
+320:     key idx_fq_product_style_color (source_code, style_code, color_code),
+321:     key idx_fq_product_price_time (price_as_of, status),
+322:     constraint fk_fq_product_price_batch foreign key (last_price_import_batch_id) references fq_import_batch (id) on delete restrict,
+323:     constraint fk_fq_product_ai_run foreign key (last_ai_run_id) references fq_ai_run (id) on delete restrict,
+324:     constraint fk_fq_product_import_batch foreign key (last_product_import_batch_id) references fq_import_batch (id) on delete restrict,
+325:     constraint ck_fq_product_price check (sale_price is null or sale_price >= 0),
+326:     constraint ck_fq_product_price_source check ((sale_price is null and price_as_of is null and last_price_import_batch_id is null) or (sale_price is not null and price_as_of is not null and last_price_import_batch_id is not null)),
+327:     constraint ck_fq_product_currency check (currency = 'CNY'),
+328:     constraint ck_fq_product_tax check (tax_mode in ('included','excluded')),
+329:     constraint ck_fq_product_visual check (visual_version >= 1),
+330:     constraint ck_fq_product_confirmed check (attributes_confirmed in (0,1)),
+331:     constraint ck_fq_product_status check (status in ('draft','active','inactive')),
+332:     constraint ck_fq_product_row check (row_version >= 1)
+333: ) engine=innodb default charset=utf8mb4 collate=utf8mb4_unicode_ci comment='商品资料表';
+334: 
+335: create table fq_stock (
+336:     id bigint not null,
+337:     product_id bigint not null,
+338:     warehouse_code varchar(64) not null,
+339:     available_qty int not null,
+340:     as_of datetime(3) not null,
+341:     confirmation_type varchar(16) not null default 'import',
+342:     verified_by bigint null,
+343:     evidence_note varchar(1000) null,
+344:     last_import_batch_id bigint not null,
+345:     create_by bigint not null,
+346:     create_time datetime(3) not null,
+347:     update_by bigint not null,
+348:     update_time datetime(3) not null,
+349:     row_version bigint not null default 1,
+350:     primary key (id),
+351:     unique key uk_fq_stock_product_warehouse (product_id, warehouse_code),
+352:     key idx_fq_stock_warehouse_time (warehouse_code, as_of),
+353:     constraint fk_fq_stock_product foreign key (product_id) references fq_product (id) on delete restrict,
+354:     constraint fk_fq_stock_batch foreign key (last_import_batch_id) references fq_import_batch (id) on delete restrict,
+355:     constraint ck_fq_stock_qty check (available_qty >= 0),
+356:     constraint ck_fq_stock_type check (confirmation_type in ('import','manual_verify','restore')),
+357:     constraint ck_fq_stock_manual check (confirmation_type <> 'manual_verify' or (verified_by is not null and evidence_note is not null)),
+358:     constraint ck_fq_stock_row check (row_version >= 1)
+359: ) engine=innodb default charset=utf8mb4 collate=utf8mb4_unicode_ci comment='商品库存表';
+360: 
+
+[price_stock] frontend/admin-web/src/views/fashion/import/components/CatalogValueImportPanel.vue
+1: <template>
+2:   <div class="app-container catalog-import">
+3:     <el-alert :title="notice" type="warning" :closable="false" show-icon class="mb20" />
+4:     <el-card shadow="never">
+5:       <template #header><strong>{{ title }}</strong></template>
+6:       <el-form label-width="120px">
+7:         <el-form-item label="固定模板"><a :href="catalogTemplateUrl(kind)" target="_blank">下载 CSV 模板</a></el-form-item>
+8:         <el-form-item label="来源范围">
+9:           <el-select v-model="sourceCode" style="width:240px"><el-option v-for="item in sources" :key="item.value" :label="item.label" :value="item.value" /></el-select>
+10:         </el-form-item>
+11:         <el-form-item label="品类子范围">
+12:           <el-select v-model="categoryCode" clearable placeholder="全部在售 SKU" style="width:240px"><el-option v-for="item in categories" :key="item.value" :label="item.label" :value="item.value" /></el-select>
+13:           <span class="scope-tip">这是范围全量，不是全库更新。</span>
+14:         </el-form-item>
+15:         <el-form-item v-if="kind==='stock'" label="库存仓库">
+16:           <el-select v-model="warehouseCode" style="width:240px"><el-option v-for="item in warehouses" :key="item.value" :label="item.label" :value="item.value" /></el-select>
+17:         </el-form-item>
+18:         <el-form-item label="业务时间"><el-date-picker v-model="asOf" type="datetime" /></el-form-item>
+19:         <el-form-item label="全量文件"><input type="file" accept=".csv,.xlsx" @change="selectFile"></el-form-item>
+20:         <el-form-item>
+21:           <el-button type="primary" :loading="loading" :disabled="!canPreview" v-hasPermi="[permission]" @click="preview">严格校验并预览</el-button>
+22:         </el-form-item>
+23:       </el-form>
+24:     </el-card>
+25: 
+26:     <el-card v-if="batch" shadow="never" class="mt20">
+27:       <template #header>
+28:         <div class="header"><span>{{ batch.batchNo }} · {{ statusLabel(batch.status) }}</span>
+29:           <div>
+30:             <el-button v-if="batch.status==='conflict'" :loading="loading" @click="preview">按当前数据重新校验</el-button>
+31:             <el-button v-if="batch.status==='success'" v-hasPermi="['fashion:import:restore']" @click="createRestore">生成恢复预览</el-button>
+32:             <el-button type="success" :disabled="batch.status!=='validated'" :loading="loading" v-hasPermi="[permission]" @click="publish">确认原子发布</el-button>
+33:           </div>
+34:         </div>
+35:       </template>
+36:       <el-descriptions :column="4" border>
+37:         <el-descriptions-item label="范围应覆盖">{{ batch.expectedCount }}</el-descriptions-item>
+38:         <el-descriptions-item label="文件实际行">{{ batch.actualCount }}</el-descriptions-item>
+39:         <el-descriptions-item label="阻断项">{{ batch.errorCount }}</el-descriptions-item>
+40:         <el-descriptions-item label="操作">{{ batch.operationType==='restore'?'历史恢复':'全量导入' }}</el-descriptions-item>
+41:       </el-descriptions>
+42:       <el-alert v-if="batch.errorMessage" :title="batch.errorMessage" type="error" :closable="false" class="mt20" />
+43:       <el-table :data="batch.details" class="mt20" empty-text="没有导入明细">
+44:         <el-table-column prop="sourceRowNo" label="文件行" width="80"><template #default="{row}">{{ row.rowType==='missing'?'缺失':row.sourceRowNo }}</template></el-table-column>
+45:         <el-table-column prop="businessKey" label="来源 / SKU" min-width="180" />
+46:         <el-table-column prop="changeType" label="差异" width="100" />
+47:         <el-table-column label="原值" min-width="180"><template #default="{row}"><code>{{ compact(row.beforeData) }}</code></template></el-table-column>
+48:         <el-table-column label="拟生效值" min-width="180"><template #default="{row}"><code>{{ compact(row.normalizedData) }}</code></template></el-table-column>
+49:         <el-table-column label="行级错误" min-width="260"><template #default="{row}"><div v-for="error in row.errors" :key="`${error.field}-${error.code}`" class="row-error">{{ error.field }}：{{ error.message }}</div><span v-if="!row.errors.length">—</span></template></el-table-column>
+50:       </el-table>
+51:     </el-card>
+52:   </div>
+53: </template>
+54: 
+55: <script setup lang="ts">
+56: import { computed, onMounted, ref } from 'vue'
+57: import { ElMessage, ElMessageBox } from 'element-plus'
+74: function selectFile(event:Event){file.value=(event.target as HTMLInputElement).files?.[0]}
+75: function mapOptions(response:any):Option[]{return (response.data??[]).filter((item:any)=>String(item.status)==='0').map((item:any)=>({label:String(item.dictLabel),value:String(item.dictValue)}))}
+76: async function preview(){if(!file.value)return;loading.value=true;try{const response=await previewCatalogImport({kind,file:file.value,sourceCode:sourceCode.value,categoryCode:categoryCode.value||undefined,warehouseCode:kind==='stock'?warehouseCode.value:undefined,asOf:asOf.value.toISOString()});batch.value=response.data;ElMessage.success(response.data.errorCount?'校验完成，整批尚不可发布':'严格全量校验通过')}finally{loading.value=false}}
+77: async function publish(){if(!batch.value)return;await ElMessageBox.confirm(`确认原子发布 ${batch.value.expectedCount} 个范围 SKU？`,'发布确认',{type:'warning'});loading.value=true;try{const response=await publishCatalogImport(kind,batch.value.batchId,batch.value.rowVersion);batch.value=response.data;ElMessage.success(kind==='price'?'当前价格已全部生效':'当前库存已全部生效')}finally{loading.value=false}}
+78: async function createRestore(){if(!batch.value)return;const source=batch.value;const response=await restoreCatalogImport(kind,source.batchId,globalThis.crypto?.randomUUID?.()??`${Date.now()}-${source.batchId}`,`从批次 ${source.batchNo} 恢复`);batch.value=response.data;ElMessage.warning('已生成新的恢复预览，请核对前后值后再发布')}
+79: function compact(value?:Record<string,unknown>){if(!value)return '—';const keys=kind==='price'?['salePrice','currency','taxMode','asOf']:['availableQty','asOf'];return keys.filter(key=>value[key]!==undefined).map(key=>`${key}=${String(value[key])}`).join(' · ')||'无当前值'}
+80: function statusLabel(status:string){return ({validated:'待发布',invalid:'校验未通过',publishing:'发布中',success:'已成功',conflict:'数据冲突'} as Record<string,string>)[status]??status}
+81: onMounted(async()=>{const [source,category,warehouse]=await Promise.all([getDicts('fashion_product_source'),getDicts('fashion_product_category'),getDicts('fashion_warehouse')]);sources.value=mapOptions(source);categories.value=mapOptions(category);warehouses.value=mapOptions(warehouse);sourceCode.value=sources.value[0]?.value??'';warehouseCode.value=warehouses.value[0]?.value??''})
+82: </script>
+83: 
+84: <style scoped>.header{display:flex;justify-content:space-between;align-items:center;gap:16px}.mt20{margin-top:20px}.mb20{margin-bottom:20px}.scope-tip{margin-left:12px;color:var(--el-text-color-secondary)}.row-error{color:var(--el-color-danger);line-height:1.5}code{white-space:normal;word-break:break-word}</style>
+
+[quote] frontend/admin-web/src/views/fashion/quote/index.vue
+1: <template>
+2:   <div class="app-container">
+3:     <el-alert title="方案是可修改草稿；复制会生成新版本，关闭后不可再编辑。切换客户会清空旧需求确认并重新校验当前价格事实。" type="info" :closable="false" show-icon class="mb20" />
+4:     <el-form :inline="true" :model="query" @submit.prevent="load">
+5:       <el-form-item label="关键词"><el-input v-model="query.keyword" clearable placeholder="方案号、标题、客户" /></el-form-item>
+6:       <el-form-item label="状态"><el-select v-model="query.status" clearable style="width:130px"><el-option label="草稿" value="draft" /><el-option label="已确认" value="confirmed" /><el-option label="已作废" value="void" /><el-option label="已关闭" value="closed" /></el-select></el-form-item>
+7:       <el-form-item><el-button type="primary" icon="Search" @click="load">查询</el-button></el-form-item>
+8:     </el-form>
+9:     <div class="toolbar mb8"><el-button type="primary" plain icon="Plus" v-hasPermi="['fashion:quote:add']" @click="openCreate">新建方案</el-button><el-button icon="Refresh" @click="load">刷新</el-button></div>
+10:     <el-table v-loading="loading" :data="page.items" empty-text="没有可见方案">
+11:       <el-table-column label="方案" min-width="180"><template #default="{row}"><strong>{{row.title}}</strong><br><code>{{row.quoteNo}} / V{{row.versionNo}}</code></template></el-table-column>
+12:       <el-table-column prop="customerName" label="客户" min-width="140" /><el-table-column prop="requestedQty" label="套数" width="80" />
+13:       <el-table-column label="预算" width="130"><template #default="{row}">{{row.budget==null?'未填写':`¥${row.budget} / ${row.budgetBasis==='total'?'总额':'每套'}`}}</template></el-table-column>
+14:       <el-table-column label="需求" min-width="120"><template #default="{row}"><el-tag :type="row.requirementConfirmed?'success':'warning'">{{row.requirementConfirmed?'已确认':'待确认'}}</el-tag></template></el-table-column>
+15:       <el-table-column label="状态" width="90"><template #default="{row}"><el-tag :type="statusType(row.status)">{{statusLabel(row.status)}}</el-tag></template></el-table-column>
+16:       <el-table-column label="操作" width="360" fixed="right"><template #default="{row}"><el-button link type="primary" @click="workbench(row)">工作台</el-button><el-button link type="primary" v-hasPermi="['fashion:quote:query']" @click="openPricing(row)">报价</el-button><el-button v-if="row.status==='confirmed'" link type="success" v-hasPermi="['fashion:quote:export']" @click="delivery(row)">交付</el-button><el-button v-if="row.status==='draft'" link type="primary" v-hasPermi="['fashion:quote:edit']" @click="openEdit(row)">编辑</el-button><el-button link type="primary" v-hasPermi="['fashion:quote:add']" @click="copy(row)">复制版本</el-button><el-button v-if="row.status==='draft'" link type="danger" v-hasPermi="['fashion:quote:edit']" @click="close(row)">关闭</el-button></template></el-table-column>
+17:     </el-table>
+18:     <pagination v-show="page.total>0" :total="page.total" v-model:page="query.page" v-model:limit="query.pageSize" @pagination="load" />
+
+[workbench] frontend/admin-web/src/views/fashion/workbench/index.vue
+20:       <template v-if="requirementRun.output"><el-divider content-position="left">待确认结构化草稿</el-divider><pre>{{JSON.stringify(requirementRun.output,null,2)}}</pre><el-button v-if="requirementRun.status==='succeeded'&&requirementRun.applyStatus!=='applied'" type="success" :loading="applying" v-hasPermi="['fashion:ai:run:apply']" @click="applyRequirement">采用需求并标记人工确认</el-button></template>
+21:     </el-card>
+22: 
+23:     <el-card v-if="workspace" shadow="never" class="mt20">
+24:       <template #header><div class="header"><span>一至四品类选品搭配</span><div><el-tag>{{workspace.preview.selection_mode==='progressive'?'递进档位':'独立档位'}}</el-tag><el-button class="ml8" type="primary" :disabled="!canStartSelection" :loading="selectionStarting" v-hasPermi="['fashion:ai:run:execute']" @click="startSelection()">生成搭配</el-button></div></div></template>
+25:       <el-alert v-if="!selectionCapability.enabled" :title="selectionCapabilityText" type="warning" :closable="false" show-icon />
+26:       <el-alert v-else-if="!quote?.requirementConfirmed" title="先确认需求，再冻结候选并生成搭配。" type="warning" :closable="false" show-icon />
+27:       <el-alert v-if="workspace.preview.shortages.length" title="存在候选不足" type="warning" :closable="false" show-icon class="mt12"><template #default><div v-for="item in workspace.preview.shortages" :key="item.category_code">{{item.category_code}}：{{item.reason}}</div></template></el-alert>
+28: 
+29:       <el-divider content-position="left">冻结候选（{{workspace.preview.frozen_candidates.length}} 个颜色款 / SKU 明细不另建表）</el-divider>
+30:       <el-tabs>
+31:         <el-tab-pane v-for="group in candidateGroups" :key="group.category" :label="`${group.category} ${group.items.length}`">
+32:           <div class="candidate-grid"><el-card v-for="candidate in group.items" :key="candidate.candidate_ref" shadow="hover" class="candidate-card">
+33:             <div class="header"><strong>{{candidate.product_name}}</strong><el-tag size="small">{{candidate.color_name}}</el-tag></div>
+34:             <div class="muted">{{candidate.source_ref}} / {{candidate.style_ref}}</div>
+35:             <div>¥{{money(candidate.conservative_unit_price_minor)}} / 套 · 可用 {{candidate.total_available_qty}}</div>
+36:             <div class="size-list"><el-tag v-for="sku in candidate.variants" :key="sku.product_ref" size="small" type="info">{{sku.size_code}} {{sku.available_qty}}</el-tag></div>
+37:           </el-card></div>
+38:         </el-tab-pane>
+39:       </el-tabs>
+40: 
+41:       <el-divider content-position="left">当前组合</el-divider>
+42:       <el-empty v-if="!selectedCombinations.length" description="尚未采用搭配" />
+43:       <el-card v-for="combo in selectedCombinations" :key="combo.id" shadow="never" class="combo-card">
+44:         <template #header><div class="header"><div><strong>{{combo.name}}</strong> <el-tag>{{combo.categoryCount}} 品类</el-tag></div><el-button size="small" :disabled="!selectionCapability.enabled" @click="startSelection(combo)">保持锁定重搭</el-button></div></template>
+45:         <div class="muted">{{combo.reason}} · visualHash {{combo.visualHash.slice(0,12)}}…</div>
+46:         <el-table :data="slotRows(combo)" size="small">
+47:           <el-table-column prop="slotCode" label="槽位" width="90" /><el-table-column prop="categoryCode" label="品类" width="100" /><el-table-column prop="productName" label="颜色款" /><el-table-column prop="colorName" label="颜色" width="90" /><el-table-column label="尺码初始分配"><template #default="{row}"><el-tag v-for="size in row.sizes" :key="size.skuCode" size="small" type="info">{{size.sizeCode}} × {{size.qty}}</el-tag></template></el-table-column>
+48:           <el-table-column label="操作" width="190"><template #default="{row}"><el-button link type="primary" v-hasPermi="['fashion:quote:edit']" @click="toggleLock(combo,row.slotCode)">{{combo.lockedSlots.includes(row.slotCode)?'解锁':'锁定'}}</el-button><el-button link type="primary" :disabled="combo.lockedSlots.includes(row.slotCode)" v-hasPermi="['fashion:quote:edit']" @click="openReplace(combo,row)">替换</el-button></template></el-table-column>
+49:         </el-table>
+50:       </el-card>
+51:     </el-card>
+52: 
+53:     <el-card v-if="selectionRun" shadow="never" class="mt20">
+54:       <template #header><div class="header"><span>搭配任务 {{selectionRun.runNo}}</span><el-tag :type="statusType(selectionRun.status)">{{statusText(selectionRun.status)}}</el-tag></div></template>
+55:       <el-alert v-if="selectionIsStale" title="方案版本已变化：此结果只能查看，不能覆盖当前组合。请重新生成。" type="error" :closable="false" show-icon class="mb12" />
+56:       <el-descriptions :column="3" border><el-descriptions-item label="尝试次数">{{selectionRun.runAttempt}}</el-descriptions-item><el-descriptions-item label="步骤">{{selectionRun.currentStepNo}}</el-descriptions-item><el-descriptions-item label="采用状态">{{selectionRun.applyStatus}}</el-descriptions-item><el-descriptions-item v-if="selectionRun.errorCode" label="错误码">{{selectionRun.errorCode}}</el-descriptions-item><el-descriptions-item v-if="selectionRun.errorMessage" label="说明">{{selectionRun.errorMessage}}</el-descriptions-item></el-descriptions>
+57:       <template v-if="selectionRun.output"><el-divider content-position="left">待采用搭配</el-divider><div v-for="tier in selectionOutputTiers" :key="tier.category_count" class="tier-result"><strong>{{tier.category_count}} 品类</strong><span>：{{tier.combinations?.length??0}} / {{tier.requested_candidate_count}} 个候选</span><div v-for="combo in tier.combinations" :key="combo.combo_key">{{combo.name}} · ¥{{money(combo.conservative_unit_price_minor)}} · {{combo.reason}}</div><div v-for="reason in tier.shortage_reasons" :key="reason" class="warning">候选不足：{{reason}}</div></div><div class="actions"><el-button type="success" :disabled="selectionIsStale||selectionRun.status!=='succeeded'||selectionRun.applyStatus==='applied'" :loading="selectionApplying" v-hasPermi="['fashion:ai:run:apply']" @click="applySelection">采用全部候选组合</el-button><el-button v-if="isPending(selectionRun)" type="danger" plain @click="cancelTask(selectionRun,'selection')">取消任务</el-button></div></template>
+58:     </el-card>
+59: 
+60:     <el-drawer v-model="replaceVisible" title="替换颜色款" size="45%">
+61:       <el-alert title="只显示同品类且仍满足当前价格、库存、预算、图片和排除项的 Java 候选。" type="info" :closable="false" show-icon />
+62:       <el-card v-for="candidate in replaceCandidates" :key="candidate.candidate_ref" shadow="never" class="mt12"><div class="header"><div><strong>{{candidate.product_name}}</strong><div>{{candidate.color_name}} · ¥{{money(candidate.conservative_unit_price_minor)}} · 库存 {{candidate.total_available_qty}}</div></div><el-button type="primary" :loading="replacing" @click="replaceWith(candidate.candidate_ref)">选择</el-button></div></el-card>
+63:     </el-drawer>
+64:   </div>
+83: const selectionCapabilityText=computed(()=>capabilityText(selectionCapability.value,'选品搭配','selection_agent_not_published'))
+84: const budgetPerSetText=computed(()=>workspace.value?.preview.budget_maximum_per_set_minor?`¥${money(workspace.value.preview.budget_maximum_per_set_minor)}`:'未限制')
+85: const canStartSelection=computed(()=>Boolean(selectionCapability.value.enabled&&quote.value?.status==='draft'&&quote.value.requirementConfirmed&&workspace.value?.preview.frozen_candidates.length))
+86: const selectedCombinations=computed(()=>workspace.value?.combinations.filter(combo=>combo.selected)??[])
+87: const candidateGroups=computed(()=>{const groups=new Map<string,FrozenSelectionCandidate[]>();for(const item of workspace.value?.preview.frozen_candidates??[]){const values=groups.get(item.category_code)??[];values.push(item);groups.set(item.category_code,values)}return [...groups].map(([category,items])=>({category,items}))})
+88: const selectionOutputTiers=computed(()=>((selectionRun.value?.output?.tiers??[]) as SelectionTierOutput[]))
+89: const selectionIsStale=computed(()=>Boolean(selectionRun.value&&quote.value&&selectionRun.value.quoteRowVersion!==quote.value.rowVersion))
+90: const replaceCandidates=computed(()=>workspace.value?.preview.frozen_candidates.filter(item=>item.category_code===replaceSlot.value?.categoryCode)??[])
+91: async function loadCapabilities(){const [requirement,selection]=await Promise.all([getRequirementCapability(),getSelectionCapability()]);requirementCapability.value=requirement.data;selectionCapability.value=selection.data}
+92: async function loadAll(){if(!quoteId.value.trim())return;loading.value=true;try{const [quoteResponse,workspaceResponse]=await Promise.all([getQuote(quoteId.value.trim()),getSelectionWorkspace(quoteId.value.trim())]);quote.value=quoteResponse.data;workspace.value=workspaceResponse.data;sourceText.value=quoteResponse.data.requirementText??'';await router.replace({query:{...route.query,quoteId:quoteId.value.trim()}})}finally{loading.value=false}}
+93: function requestKey(prefix:string){return `${prefix}-${globalThis.crypto?.randomUUID?.()??`${Date.now()}-${Math.random().toString(36).slice(2)}`}`}
+94: async function startRequirement(){if(!quote.value)return;starting.value=true;try{const r=await createRequirementRun(quote.value.id,sourceText.value.trim(),requestKey('requirement'));requirementRun.value=r.data;ElMessage.success('需求分析任务已创建');schedule('requirement')}finally{starting.value=false}}
+95: async function startSelection(base?:SelectionCombo){if(!quote.value)return;selectionStarting.value=true;try{const r=await createSelectionRun(quote.value.id,requestKey('selection'),base?.id,base?.visualHash);selectionRun.value=r.data;ElMessage.success(base?'保持锁定重搭任务已创建':'选品搭配任务已创建');schedule('selection')}finally{selectionStarting.value=false}}
+
+[demo] python/fashion-ai-runtime/src/fashion_ai/application/demo_provider.py
+84: class DemoSelectionRanker:
+85:     async def rank(self, command: SelectionStylingRequest) -> SelectionStylingResult:
+86:         source = command.input
+87:         candidates = sorted(
+88:             source.frozen_candidates,
+89:             key=lambda item: (item.conservative_unit_price_minor, item.candidate_ref),
+90:         )
+91:         locks = {item.slot_index: item.candidate_ref for item in source.locks}
+92:         previous: dict[int, str] = {}
+93:         tiers: list[dict[str, object]] = []
+94:         for tier in source.tiers:
+95:             chosen: dict[int, FrozenSelectionCandidate] = {}
+96:             for slot in tier.slots:
+97:                 required_ref = locks.get(slot.slot_index)
+98:                 if source.selection_mode == "progressive":
+99:                     required_ref = required_ref or previous.get(slot.slot_index)
+100:                 match = next(
+101:                     (
+102:                         candidate
+103:                         for candidate in candidates
+104:                         if candidate.category_code == slot.category
+105:                         and candidate.candidate_ref not in {
+106:                             item.candidate_ref for item in chosen.values()
+107:                         }
+108:                         and (
+109:                             required_ref is None
+110:                             or candidate.candidate_ref == required_ref
+111:                         )
+112:                     ),
+113:                     None,
+114:                 )
+115:                 if match is None:
+116:                     break
+117:                 chosen[slot.slot_index] = match
+118:             combinations: list[dict[str, object]] = []
+119:             if len(chosen) == tier.category_count:
+120:                 price = sum(
+
+[mock] frontend/admin-web/tests/e2e/fashion/catalog-flow.spec.ts
+24:   const writes: string[] = []
+25:   await page.route('**/dev-api/**', async (route: Route) => {
+26:     const request = route.request()
+27:     const url = new URL(request.url())
+28:     const path = url.pathname.replace('/dev-api', '')
+29:     const method = request.method()
+30:     const ok = (data: unknown) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) })
+31: 
+32:     if (path === '/captchaImage') return ok({ code: 200, captchaEnabled: false })
+33:     if (path === '/login' && method === 'POST') return ok({ code: 200, token: 'fashion-e2e-token' })
+34:     if (path === '/getInfo') return ok({
+35:       code: 200,
+36:       user: { userId: 1, userName: 'operator', nickName: '商品运营', avatar: '' },
+37:       roles: ['fashion_operator'],
+38:       permissions: ['fashion:product:list', 'fashion:product:query', 'fashion:product:edit',
+39:         'fashion:product:import', 'fashion:product:image', 'fashion:ai:run:list',
+40:         'fashion:ai:run:execute', 'fashion:ai:run:apply'],
+41:       isDefaultModifyPwd: false, isPasswordExpired: false, pwdChrtype: 0
+42:     })
+43:     if (path === '/getRouters') return ok({ code: 200, data: [{
+44:       name: 'Fashion', path: '/fashion', component: 'Layout', redirect: 'noRedirect', alwaysShow: true,
+45:       meta: { title: '智能选品', icon: 'shopping' },
+
+[template] ruoyi-backend/ruoyi-fashion/src/main/java/com/ruoyi/fashion/controller/rest/importing/FashionProductImportController.java
+45:     }
+46: 
+47:     @PreAuthorize("@ss.hasPermi('fashion:product:import')")
+48:     @GetMapping("/template")
+49:     public ResponseEntity<byte[]> template() throws IOException {
+50:         byte[] content;
+51:         try (java.io.InputStream input = new ClassPathResource("fashion/import-templates/product-v1.csv")
+52:                 .getInputStream()) {
+53:             content = input.readAllBytes();
+54:         }
+55:         return ResponseEntity.ok()
+56:                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=fashion-product-v1.csv")
+57:                 .contentType(MediaType.parseMediaType("text/csv;charset=UTF-8"))
+58:                 .body(content);
+59:     }
+
+[auth] ruoyi-backend/ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java
+235:      * @param request
+236:      * @return token
+237:      */
+238:     private String getToken(HttpServletRequest request)
+239:     {
+240:         String token = request.getHeader(header);
+241:         if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.TOKEN_PREFIX))
+242:         {
+243:             token = token.replace(Constants.TOKEN_PREFIX, "");
+244:         }
+245:         return token;
+246:     }
+247: 

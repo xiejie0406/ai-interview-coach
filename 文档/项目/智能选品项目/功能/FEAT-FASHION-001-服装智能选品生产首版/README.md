@@ -9,17 +9,19 @@
 
 ## 1. 当前结论
 
+**2026-09-26 当前更新：用户不接受本机演示版本，要求先核对整改计划再实施。** 已核实真实电商导入证据缺失、服装属性及维护能力不足、缺独立库存中心、方案选品交互不足。当前进入受影响范围的规格/整改计划核对；[验收记录](验收记录.md)维护本轮 6 项复核与用户决定，[任务清单第 15 节](任务清单.md)维护六阶段整改建议。以下 2026-09-13 工程结果为历史基线，不能据此宣称当前业务版本通过。2026-09-26 本机已安装表/字典/菜单，Python 显式 demo 仅可验证演示链路。
+
 本 Feature 已完成从商品与数据、客户需求、1～4 品类选品与人工搭配、图片工作台、确定性报价到 PPTX/CSV/ZIP/JPG 交付的生产代码闭环。当前处于 **Stage 8 审查验证 / InProgress**；`IMP-01`～`IMP-09` 已经 Completed / Pass，`IMP-10` 的本地容量、并发、重启、逻辑恢复、安全、文件检查、候选输入离线预检和共享后台 18 模块聚合打包已通过；生产候选环境、真实 Provider 质量试点和正式 UAT 尚无执行条件，因此为 WaitingForApproval / Blocked。当前 `ReleaseReady=No`，尚未发布。
 
 P0 恰好落在三个代码项目中：
 
 | 代码项目 | P0 落点 | 权威职责 | 当前事实 |
 | --- | --- | --- | --- |
-| `platform-backend/` | Maven 模块 `ruoyi-fashion` | 身份与 RBAC、MySQL 业务事实、商品当前价、库存、方案、报价、事务、预算、业务幂等、审计和 AI 结果采用；物理落表只采用数据库设计 v2.3 的 16 张表 | 九个业务模块及文件/运维 API 已完成；129 项 Java 回归、本地 10 万级容量、20 并发、恢复、完整 Java 进程重启（含重启前后 AI Worker 自动处理已超时 Run）及 Java↔Python 真网络/Python 重启已取证；共享后台 18/18 模块聚合打包通过 |
-| `admin-web/` | `fashion` 功能模块 | 内部销售和商品运营页面，只调用 Java API | 设置、商品、数据、客户、方案、Agent、选品、图片、报价、交付和运维页面已完成；11 files / 37 tests、构建及 Chrome 7/7 通过，浏览器证据使用 Mock Java API |
-| `fashion-ai-runtime/` | 唯一 Python 3.12 AI Runtime | 需求解析、候选排序、搭配、提示、Provider 适配、护栏、trace 和 eval | 严格契约、候选、安全护栏、40 任务 evaluator 及候选就绪最终离线门已完成，151 tests、Ruff、Pyright 通过；Provider 仍 disabled，真实质量试点和 UAT NotRun |
+| `ruoyi-backend/` | Maven 模块 `ruoyi-fashion` | 身份与 RBAC、MySQL 业务事实、商品当前价、库存、方案、报价、事务、预算、业务幂等、审计和 AI 结果采用；物理落表只采用数据库设计 v2.3 的 16 张表 | 九个业务模块及文件/运维 API 已完成；129 项 Java 回归、本地 10 万级容量、20 并发、恢复、完整 Java 进程重启（含重启前后 AI Worker 自动处理已超时 Run）及 Java↔Python 真网络/Python 重启已取证；共享后台 18/18 模块聚合打包通过 |
+| `frontend/admin-web/` | `fashion` 功能模块 | 内部销售和商品运营页面，只调用 Java API | 设置、商品、数据、客户、方案、Agent、选品、图片、报价、交付和运维页面已完成；11 files / 37 tests、构建及 Chrome 7/7 通过，浏览器证据使用 Mock Java API |
+| `python/fashion-ai-runtime/` | 唯一 Python 3.12 AI Runtime | 需求解析、候选排序、搭配、提示、Provider 适配、护栏、trace 和 eval | 严格契约、候选、安全护栏、40 任务 evaluator 及候选就绪最终离线门已完成，151 tests、Ruff、Pyright 通过；Provider 仍 disabled，真实质量试点和 UAT NotRun |
 
-`contracts/fashion/` 是三个项目共享的契约目录，不是第四个部署项目。P0 不纳入 `portal-web/`、`mobile/` 或浏览器扩展；浏览器不得直接调用 Python Runtime。
+`contracts/fashion/` 是三个项目共享的契约目录，不是第四个部署项目。P0 不纳入 `frontend/portal-web/`、`miniapp/interview-mobile/` 或浏览器扩展；浏览器不得直接调用 Python Runtime。
 
 ## 2. 唯一事实源与入口
 

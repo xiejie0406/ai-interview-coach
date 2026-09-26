@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>平台密钥、AI 密钥与 AI 角色 · 线框图</title>
+  <style>
+    :root{font-family:system-ui,"Microsoft YaHei",sans-serif;color:#27313f;background:#f3f5f8}
+    *{box-sizing:border-box}body{margin:0}.shell{display:flex;min-height:100vh}.nav{width:218px;background:#fff;border-right:1px solid #dce2e9;padding:24px 12px;flex-shrink:0}.brand{font-weight:700;padding:0 14px 22px;border-bottom:1px solid #e3e8ee}.group{font-size:12px;color:#68788a;padding:22px 14px 8px}.nav a{display:block;padding:11px 14px;margin:3px 0;border-radius:6px;color:#35485c;text-decoration:none}.nav a:hover,.nav a:focus-visible{background:#e9f0f8;outline:2px solid #8aadda}.nav a.active{background:#e7f0fc;color:#1758a6;font-weight:700}.main{flex:1;min-width:0;padding:24px 32px 48px}.top{color:#6b7888;font-size:13px;margin-bottom:18px}.page{display:none}.page:target{display:block}body:not(:has(.page:target)) #platform{display:block}.card{background:#fff;border:1px solid #dce2e9;border-radius:8px;padding:22px;margin-bottom:16px}.heading{display:flex;align-items:center;justify-content:space-between;gap:16px}.heading h1{font-size:24px;margin:0}.hint{margin:10px 0 0;color:#68788a;font-size:14px;line-height:1.5}.button{background:#2367b7;color:white;border:1px solid #2367b7;border-radius:5px;padding:9px 15px;font:inherit;font-size:14px;cursor:default}.button.secondary{background:#fff;color:#265889;border-color:#aab9c9}.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.field{padding:9px 12px;border:1px solid #bdc9d5;border-radius:5px;min-width:160px;background:#fff;color:#58697c;font-size:14px}.tablewrap{overflow:auto;margin-top:18px}table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px}th,td{padding:14px 12px;text-align:left;border-bottom:1px solid #e3e8ee}th{background:#f7f9fc;color:#526273;font-weight:600}td:last-child{white-space:nowrap;color:#2367b7}.tag{display:inline-block;border:1px solid #bfcedd;border-radius:12px;padding:2px 9px;color:#4e647a;font-size:12px}.tag.active{background:#e8f5eb;border-color:#aed9b8;color:#286543}.tag.pending{background:#fff8e9;border-color:#f2d99d;color:#8a630d}.split{display:grid;grid-template-columns:1fr 1fr;gap:16px}.subheading{font-size:17px;margin:0 0 16px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.formgrid label{display:block;font-size:13px;color:#3e4d5b}.formgrid .field{display:block;width:100%;margin-top:7px}.full{grid-column:1/-1}.textarea{height:90px}.footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.note{font-size:13px;line-height:1.6;color:#566779;background:#f6f8fb;border-left:3px solid #91a9c2;padding:10px 13px;margin-top:18px}.steps{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.step{padding:7px 13px;border-radius:18px;background:#ecf0f5;color:#526273;font-size:13px}.step.on{background:#e7f0fc;color:#1758a6;font-weight:700}@media(max-width:950px){.split{grid-template-columns:1fr}.main{padding:18px}}@media(max-width:650px){.shell{display:block}.nav{width:auto;border-right:0;border-bottom:1px solid #dce2e9;padding:12px}.brand{padding:4px 8px 10px}.group{padding:12px 8px 4px}.nav a{display:inline-block;padding:8px 10px}.main{padding:14px}.formgrid{grid-template-columns:1fr}.heading{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <nav class="nav" aria-label="线框图导航">
+      <div class="brand">若依后台 · 三模块草案</div>
+      <div class="group">系统管理</div>
+      <a href="#platform">平台密钥</a>
+      <div class="group">AI 基础设施</div>
+      <a href="#ai-keys">AI 密钥</a>
+      <a href="#ai-roles">AI 角色</a>
+      <div class="group">现有入口</div>
+      <a href="#permissions">角色管理（操作员授权）</a>
+    </nav>
+    <main class="main">
+      <div class="top">线框图 v0.2　·　仅使用示例数据　·　此页不连接接口</div>
+      <section class="page" id="platform">
+        <div class="card">
+          <div class="heading"><h1>平台密钥</h1><button class="button">新增平台密钥</button></div>
+          <p class="hint">管理平台签名、服务间认证和业务加密等非 AI 凭据。列表显示接入进度，避免把“已入库”误认为“服务已切换”。</p>
+          <div class="toolbar"><span class="field">用途或别名</span><span class="field">所属服务 ▾</span><span class="field">类别 ▾</span><span class="field">接入状态 ▾</span><button class="button secondary">查询</button></div>
+          <div class="tablewrap"><table><thead><tr><th>所属服务</th><th>用途</th><th>类别</th><th>接入状态</th><th>最近轮换</th><th>操作</th></tr></thead><tbody><tr><td>Fashion</td><td>Java ↔ Python 认证</td><td>服务间认证</td><td><span class="tag pending">待接入</span></td><td>—</td><td>详情　接入说明</td></tr><tr><td>面试</td><td>敏感数据加密</td><td>业务加密</td><td><span class="tag">环境配置中</span></td><td>—</td><td>详情　接入说明</td></tr><tr><td>若依</td><td>JWT 签名</td><td>平台签名</td><td><span class="tag">环境配置中</span></td><td>—</td><td>详情　接入说明</td></tr></tbody></table></div>
+          <div class="note">MySQL 连接凭据与库内密文根密钥需要独立自举来源；页面会明确标注，不会伪装成已从同库读取。</div>
+        </div>
+        <div class="split"><div class="card"><h2 class="subheading">凭据详情</h2><p>固定用途：fashion.service-auth</p><p>消费服务：ruoyi-fashion、fashion-ai-runtime</p><p>当前版本：待接入　　轮换方式：双端交叠</p><p class="note">密钥正文不会在详情、日志或导出中显示。</p></div><div class="card"><h2 class="subheading">已接入后可用操作</h2><div class="steps"><span class="step on">录入新版本</span><span class="step">验证双端</span><span class="step">切换当前版本</span></div><p>轮换、停用和恢复均需填写原因并留下无值审计。</p></div></div>
+      </section>
+      <section class="page" id="ai-keys">
+        <div class="card">
+          <div class="heading"><h1>AI 密钥</h1><button class="button">新增 AI 密钥</button></div>
+          <p class="hint">管理模型、语音、图像等 Provider 的凭据；AI 角色只引用此处的用途标识。</p>
+          <div class="toolbar"><span class="field">项目 ▾</span><span class="field">供应商 ▾</span><span class="field">能力 ▾</span><span class="field">状态 ▾</span><button class="button secondary">查询</button></div>
+          <div class="tablewrap"><table><thead><tr><th>项目</th><th>供应商</th><th>能力</th><th>凭据组</th><th>状态</th><th>操作</th></tr></thead><tbody><tr><td>面试</td><td>DeepSeek</td><td>对话模型</td><td>API Key</td><td><span class="tag pending">待接入</span></td><td>录入　详情</td></tr><tr><td>面试</td><td>火山引擎</td><td>语音</td><td>API Key</td><td><span class="tag pending">待接入</span></td><td>录入　详情</td></tr><tr><td>面试</td><td>火山引擎</td><td>语音</td><td>App ID + Token</td><td><span class="tag pending">待接入</span></td><td>录入　详情</td></tr></tbody></table></div>
+        </div>
+        <div class="card"><h2 class="subheading">录入 / 轮换弹窗示意</h2><div class="formgrid"><label>项目 *<span class="field">面试项目 ▾</span></label><label>供应商 *<span class="field">火山引擎 ▾</span></label><label>能力 *<span class="field">语音 ▾</span></label><label>鉴权模式 *<span class="field">API Key　○ App ID + Access Token</span></label><label class="full">新密钥 *<span class="field">••••••••••••••••••••••••</span></label><label class="full">变更原因 *<span class="field">请输入轮换原因</span></label></div><div class="note">切换鉴权模式会清空原输入；保存后不能回看或导出。App ID 与 Access Token 必须作为一组原子保存。</div><div class="footer"><button class="button secondary">取消</button><button class="button">保存为待启用</button></div></div>
+      </section>
+      <section class="page" id="ai-roles">
+        <div class="card"><div class="heading"><h1>AI 角色</h1><button class="button">新增 AI 角色</button></div><p class="hint">管理助手的人设、提示词、模型与版本；这里的角色不是若依用户权限角色。</p><div class="toolbar"><span class="field">项目 ▾</span><span class="field">名称或编码</span><span class="field">状态 ▾</span><button class="button secondary">查询</button></div><div class="tablewrap"><table><thead><tr><th>项目</th><th>角色</th><th>用途</th><th>当前发布版本</th><th>状态</th><th>操作</th></tr></thead><tbody><tr><td>面试</td><td>面试官</td><td>提问与追问</td><td>未发布</td><td><span class="tag">草稿</span></td><td>编辑　版本</td></tr><tr><td>面试</td><td>评估官</td><td>评测与反馈</td><td>未发布</td><td><span class="tag">草稿</span></td><td>编辑　版本</td></tr><tr><td>选品</td><td>需求分析师</td><td>需求提炼</td><td>已有业务版本</td><td><span class="tag pending">待映射</span></td><td>接入计划</td></tr></tbody></table></div></div>
+        <div class="card"><h2 class="subheading">新建角色版本</h2><div class="steps"><span class="step on">填写草稿</span><span class="step">校验引用</span><span class="step">发布不可变版本</span></div><div class="formgrid"><label>角色名称 *<span class="field">面试官</span></label><label>项目与用途 *<span class="field">面试 · 提问与追问</span></label><label class="full">人设与目标 *<span class="field">描述身份、目标和边界</span></label><label class="full">系统提示词 *<span class="field textarea">输入系统提示词……</span></label><label>模型 *<span class="field">DeepSeek / 模型 ▾</span></label><label>AI 密钥引用 *<span class="field">选择用途别名 ▾</span></label><label class="full">高级配置<span class="field">参数、工具许可、输入输出约束、护栏 ▾</span></label></div><div class="note">发布后不能原地修改；新运行固定引用版本和配置哈希。选择 AI 密钥只引用标识，不会把密钥正文写入角色。</div><div class="footer"><button class="button secondary">保存草稿</button><button class="button">发布版本</button></div></div>
+      </section>
+      <section class="page" id="permissions"><div class="card"><h1>现有角色管理：操作员授权</h1><p class="hint">此入口只决定谁能操作三个后台模块，不创建 AI 助手角色。</p><div class="split"><div><h2 class="subheading">平台密钥权限</h2><p>□ 查看　□ 录入与轮换　□ 启停　□ 审计</p><h2 class="subheading">AI 密钥权限</h2><p>□ 查看　□ 录入与轮换　□ 启停　□ 审计</p></div><div><h2 class="subheading">AI 角色权限</h2><p>□ 查看　□ 编辑草稿　□ 发布/切回版本</p><div class="note">前端按钮隐藏和后端接口权限校验同时生效；默认不向普通角色授予新权限。</div></div></div></div></section>
+    </main>
+  </div>
+  <script>function active(){const h=location.hash||'#platform';document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')===h))}addEventListener('hashchange',active);active()</script>
+</body>
+</html>

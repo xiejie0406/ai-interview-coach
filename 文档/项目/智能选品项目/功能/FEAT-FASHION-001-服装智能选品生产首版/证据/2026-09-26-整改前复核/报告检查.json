@@ -1,0 +1,18 @@
+{
+  "time": "2026-09-26T10:03:28.239766+08:00",
+  "static": "Pass",
+  "uatIds": [
+    "REV-00",
+    "REV-01",
+    "REV-02",
+    "REV-03",
+    "REV-04",
+    "REV-05",
+    "REV-06"
+  ],
+  "links": 24,
+  "missingLinks": [],
+  "visual": "Blocked",
+  "reason": "Codex IAB security policy blocked local file:// URL; no alternate browser/HTTP workaround attempted",
+  "screenshotReadback": "登录采证受阻.png 已使用 view_image 回读；仅证明登录阻塞，非业务页面证据"
+}

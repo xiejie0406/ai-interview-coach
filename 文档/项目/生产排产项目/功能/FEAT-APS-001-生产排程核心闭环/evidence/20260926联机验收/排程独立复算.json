@@ -1,0 +1,9 @@
+{
+  "jobs": 6,
+  "segments": 12,
+  "allocations": 24,
+  "overlaps": [],
+  "outsideCalendar": [],
+  "dependencyViolations": [],
+  "durationViolations": []
+}

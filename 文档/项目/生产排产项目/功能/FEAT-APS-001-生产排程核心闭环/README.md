@@ -48,12 +48,12 @@
 
 | 工程 | P0 职责 | 当前事实 |
 | --- | --- | --- |
-| `platform-backend/` | 新增 APS Maven 聚合模块、业务 API、MySQL 持久化、独立校验器、OR-Tools Worker；由 `ruoyi-admin` 装配 HTTP 与 RuoYi 权限 | M01～M29 已形成应用纵切片；执行 run、M26 实际段、报工、质量、数量流转、冲正、返工/补产、执行水位及输入事实已接入；阶段化执行和多阶段/可中断后续 carry 已通过求解器、独立校验和隔离 MySQL 回归 |
-| `admin-web/` | 新增 APS 管理页面、三类甘特、版本比较、执行和报表页面；浏览器只访问 Java API | 资源/路线/订单、排程工作台、现场执行和 `views/aps/reports` 已接入；报表页覆盖日冻结对比、人员去重/峰值、UNKNOWN ETA、CSV 和打印 |
+| `ruoyi-backend/` | 新增 APS Maven 聚合模块、业务 API、MySQL 持久化、独立校验器、OR-Tools Worker；由 `ruoyi-admin` 装配 HTTP 与 RuoYi 权限 | M01～M29 已形成应用纵切片；执行 run、M26 实际段、报工、质量、数量流转、冲正、返工/补产、执行水位及输入事实已接入；阶段化执行和多阶段/可中断后续 carry 已通过求解器、独立校验和隔离 MySQL 回归 |
+| `frontend/admin-web/` | 新增 APS 管理页面、三类甘特、版本比较、执行和报表页面；浏览器只访问 Java API | 资源/路线/订单、排程工作台、现场执行和 `views/aps/reports` 已接入；报表页覆盖日冻结对比、人员去重/峰值、UNKNOWN ETA、CSV 和打印 |
 | `contracts/aps/` | 保存 REST OpenAPI、Solver 输入/结果/校验 JSON Schema 与黄金样例 | v1 Solver、计划、执行与 6 个报表查询/导出路径已通过统一门；外部下达不在 P0 |
 | `scripts/aps/` | 保存隔离迁移检查、黄金回归、容量基准和恢复演练脚本 | 已有结构门、migration 静态门、本机隔离 MySQL 迁移/恢复演练、可重复容量基准及 Windows 目标运行时验证脚本；目标基线已锁定 |
 
-`ruoyi-backend/`、`ruoyi-vue3-frontend/`、`ruoyi-app/` 是上游基线，不是本 Feature 的修改目标。原型只作为交互和验收输入，不直接搬运其 `localStorage` 状态或 `javascript-lp-solver` 实现。
+`ruoyi-backend/_reference/ruoyi-original/`、`frontend/_reference/ruoyi-vue3-frontend/`、`miniapp/_reference/ruoyi-app/` 是上游基线，不是本 Feature 的修改目标。活跃 Java 工程位于 `ruoyi-backend/`。原型只作为交互和验收输入，不直接搬运其 `localStorage` 状态或 `javascript-lp-solver` 实现。
 
 ## 5. 已批准开工基线
 

@@ -51,6 +51,8 @@ MySQL 8.0.16+ / InnoDB
 
 首版不引入 Python 求解服务，也不同时维护 OR-Tools 与 Timefold 两套生产模型。API 与 Worker 统一使用 Java 17，匹配共享 Maven 父工程；OR-Tools 的精确版本、原生库、CPU 和内存被隔离在独立 Worker 进程。业务 API 与 Worker 可以部署在同一主机，但必须可独立限流、停止和重启。P0 只允许一个 Worker 实例，不能把“进程分离”写成已经支持多实例扩缩。
 
+2026-09-25 的共享若依装配调整使 APS Java HTTP API 默认随 `ruoyi-admin` 启用；`APS_ENABLED=false` 可关闭整个 APS 模块。默认启用要求先配置独立 `APS_DB_URL`、`APS_DB_USERNAME`、报表站点码 `APS_SITE_CODE` 并准备已迁移的 APS schema，缺项应明确启动失败；若单独关闭报表，可不配置站点码。Flyway 迁移与求解 Worker 仍各自默认关闭，Worker 继续是同一 Maven 工程中的独立 Java 进程；详见[共享 Java 模块装配说明](../../../若依框架/Java业务模块统一装配.md)。
+
 这是独立生产排程产品的技术基线，不改动当前 AI Interview Coach 的业务数据库或进程。需要复用 RuoYi 身份时只通过稳定用户 / 部门 ID 和授权接口关联，不把 APS 求解模型嵌入身份库。
 
 消息队列不是首版强制依赖。单实例雏形以 `aps_plan_version.request_id` 防止重复创建求解请求，并在计划版本保存输入快照和结果状态；尚未建立可供多 Worker 抢占、续租和接管的独立命令表。需要多实例自动重试或接入外部命令前，必须补充经评审的租约/幂等模型，不能把普通状态轮询冒充可靠队列。即使后续增加消息中间件，MySQL 仍是唯一权威业务事实源。

@@ -2,8 +2,8 @@
 
 > 文档类型：Feature 控制页；版本：0.13.0；文档状态：Approved  
 > Feature：FEAT-ADEN-001；当前切片风险：L2；完整 Aden 产品风险：L3  
-> 创建：2026-09-12；更新：2026-09-13  
-> 当前标记：Stage 8 审查验证 / Completed；IMP-01～10 Completed；Stage 9 用户验收 NotStarted  
+> 创建：2026-09-12；更新：2026-09-25
+> 当前标记：Stage 8 审查验证 / Completed；IMP-01～10 Completed；Stage 9 合成场景已执行，用户接受决定待确认
 > owner：用户负责产品方向与高风险授权；Codex 负责方案、实现与技术验证；独立安全复核人待指定  
 > 批准记录：2026-09-11 用户明确要求 Aden 后端采用 RuoYi；2026-09-12 用户要求先完成 Python Agent、智能体桌面端和 RuoYi 后端三份详细架构文档及十阶段实施文档；同日用户明确要求“收敛下，分这 10 个阶段进行开工，进入编码实现”。十阶段执行包和其中列明的安全本地源码、依赖、构建与验证范围已获批准；真实账号 / 数据、真实 Provider、桌面控制、外部发送、生产数据库、部署、发布与 Git 写操作仍未授权。
 
@@ -25,15 +25,16 @@
 | 技术路线决定与退出条件 | [ADR-ADEN-001 工程与安全边界决策](../../决策/ADR-ADEN-001-工程与安全边界决策.md) | Approved；记录 5 项需要独立生命周期的决定 |
 | 唯一实施任务与阶段门 | [任务清单.md](任务清单.md) | Approved；IMP-01～10 Completed |
 | 已运行命令、结果与限制 | [验证记录.md](验证记录.md) | 技术验证 Completed；用户验收不在该文档代签 |
+| Stage 9 场景与用户决定 | [验收记录.md](验收记录.md)、[HTML 验收报告](证据/2026-09-25-合成验收/verification-report.html) | 2026-09-25 隔离合成场景已执行；用户决定待确认 |
 | 三模块产品范围 | [Aden 项目控制页](../../README.md) | Approved 文档基线 / 完整产品仍为 L3 |
-| 当前源码入口 | [桌面工程](../../../../../aden-desktop/README.md)、[RuoYi Aden 模块](../../../../../platform-backend/ruoyi-aden/pom.xml) | 当前 L2 合成 CORE 已实现并通过技术验证；不代表真实连接器或生产能力 |
+| 当前源码入口 | [桌面工程](../../../../../frontend/desktop/aden-desktop/README.md)、[RuoYi Aden 模块](../../../../../ruoyi-backend/ruoyi-aden/pom.xml) | 当前 L2 合成 CORE 已实现并通过技术验证；不代表真实连接器或生产能力 |
 
 ## 3. 当前真实状态
 
 | 组成 | 实现事实 | 验证事实 | 下一门 |
 | --- | --- | --- | --- |
-| `platform-backend/ruoyi-aden` | Workspace bootstrap、Task REST / ETag、Runner / Capability / Audit 投影、Outbox publisher、可恢复 SSE 与调度均已完成 | 554 个无数据库 Java 测试、20 个本机 MySQL 8.0.46 测试及 18 模块干净聚合构建通过，详见[验证记录](验证记录.md) | Stage 9 合成 UAT |
-| `aden-desktop` | Electron main / preload 安全传输与 renderer 登录、Workspace、共享 Task Center、详情、能力总览已完成 | 12 个文件 / 55 个 Vitest、TypeScript strict、CJS preload bundle、实窗 smoke 和真实纵向 E2E 通过 | Stage 9 人工 captcha-enabled / 交互验收 |
+| `ruoyi-backend/ruoyi-aden` | Workspace bootstrap、Task REST / ETag、Runner / Capability / Audit 投影、Outbox publisher、可恢复 SSE 与调度均已完成 | 2026-09-13 的 554 Java、20 MySQL 与干净构建通过；2026-09-25 的 554 Java 报告零失败、隔离 E2E 通过，但本轮干净构建失败且原有 JAR 被占用 | 用户接受决定；解除 JAR 占用后重做当前工作树干净构建 |
+| `aden-desktop` | Electron main / preload 安全传输与 renderer 登录、Workspace、共享 Task Center、详情、能力总览已完成 | 2026-09-25 的 55 项测试、合成 E2E、图片验证码登录与退出通过，详见[验收记录](验收记录.md) | 用户查看界面并形成接受决定 |
 | `aden-agent-runtime` | IMP-07 已完成九包离线 Fake 候选链、三类产品 Family 禁用注册、Scope / 引用 / 敏感字段策略与取消 / 失租 / fence 门禁 | pytest 31/31、Ruff、严格 Pyright、确定性 CLI 和 0.2.0 wheel / sdist 构建通过 | 当前保持 provider-disabled；真实 Agent 服务端链另开 Feature |
 | `aden-runner` | 六包低权限 simulator 已完成 canonical Session / claim / split heartbeat / receipt、确定性故障点及独立进程 E2E | pytest 28/28、Ruff 全通过、Pyright 0 error / 0 warning | 真实 Runner 能力另开 L3 Feature |
 | `contracts/aden` | current OpenAPI / JSON Schema 是三端唯一边界，Java、Python 与 TypeScript 已消费；TypeScript 类型可重复生成 | 4 Schema、2 OpenAPI、26 正例 / 9 反例、三语言探针与生成漂移门通过 | 后续版本继续做兼容审查，不反向漂移 |
@@ -41,7 +42,7 @@
 | API / SSE | Workspace、Operator Task、Runner v1、投影和 SSE 已实现；Electron main 已实现安全消费、恢复与 ack 背压 | 契约、权限、错误、游标、Outbox、慢消费者、桌面 transport、真实 MySQL 投影与跨进程 E2E 通过 | 多实例 fan-out 不在本 Feature |
 | WX / PUR / COL 真实连接器 | 未纳入本切片 | NotRun | 分别通过 G0/G1 后另开执行包 |
 
-本轮已经联启 RuoYi、Redis、MySQL、Python Runner 与 Electron，并完成本地合成成功/取消纵向 E2E；运行时按 PID + TCP listener 核验三项服务均仅监听随机 loopback 端口，结束后进程与一次性目录已清理，`MySQL80` 保持停止。该结论不包含人工 captcha-enabled UAT、实机安装、签名、升级、真实账号、UIA 或任何外部连接器验证。
+2026-09-13 的技术封板联启 RuoYi、Redis、MySQL、Python Runner 与 Electron，并完成本地合成成功/取消纵向 E2E，结束后清理一次性目录。2026-09-25 又在新隔离环境完成图片验证码登录；当前该环境和可见窗口暂留供用户体验，窗口关闭后自动清理。两轮结论均不包含实机安装、签名、升级、真实账号、UIA 或任何外部连接器验证。
 
 ## 4. 当前决定与限制
 
@@ -59,4 +60,4 @@ Stage 7 开发实现和 Stage 8 审查验证均已完成。[任务清单.md](任
 
 Stage 8 出口已满足：合成任务端到端可恢复；重复领取与回执不会重复推进；取消只在 Runner 安全点确认；Workspace 越权、断线恢复、静态与运行网络边界均有证据；P0 AC 的技术验证为 Pass。
 
-下一门为 Stage 9：用户按合成场景验收桌面交互，其中真实 captcha-enabled 手工输入仍为 `NotRun`。用户验收决定为“待确认”；上线就绪因无部署目标为 `Skipped`；发布事实 `NotReleased`。
+Stage 9 的本地合成场景已于 2026-09-25 执行：真实验证码登录、Workspace 展示、成功与安全取消任务、退出均取得证据，详见[验收记录](验收记录.md)。用户仍需在保留的窗口查看交互并作接受决定；当前为“待确认”。本轮后端干净构建在 `ruoyi-admin` 阶段失败，同时发现原有 `8081` 进程锁定目标 JAR；未保留完整 Maven 错误文本，不能确认唯一根因。隔离运行复用 2026-09-13 的后端产物，不能据此声明当前整个工作树的干净构建通过。上线就绪因无部署目标为 `Skipped`；发布事实 `NotReleased`。

@@ -20,7 +20,7 @@
 5. Python 首期保持无业务状态、可横向扩容。对话、Run、Step、审批、幂等和任务状态由 Java 的 Agent Control 持久化；Python 不另建一套会话真相库。
 6. 首选 Python 内核为 FastAPI + Pydantic v2 + PydanticAI Core + 显式 Workflow + HTTPX + OpenTelemetry + pytest/Pydantic Evals。首期不同时叠加 LangGraph、CrewAI 或另一套 checkpoint。
 7. 生图是付费、长时间、可出现“结果未知”的外部任务。它必须由 Java 先建立持久任务和预算预留，再由 Python 适配供应商；不能在一个 HTTP Agent 循环里等待到底。
-8. 服装 AI 只维护一个 `fashion-ai-runtime/` Python 代码项目；需求解析、选品搭配、视觉理解、生图适配和评测均在该项目内按包分层，不能为每个 Agent 再拆一个服务或仓库。需要独立伸缩时，可由同一镜像启动 API 与 Worker 两种进程。
+8. 服装 AI 只维护一个 `python/fashion-ai-runtime/` Python 代码项目；需求解析、选品搭配、视觉理解、生图适配和评测均在该项目内按包分层，不能为每个 Agent 再拆一个服务或仓库。需要独立伸缩时，可由同一镜像启动 API 与 Worker 两种进程。
 
 因此，“AI 相关都用 Python”需要改成更准确的工程表述：
 
@@ -193,10 +193,10 @@ PydanticAI Core 负责 Agent Loop 和类型化工具，不等于通用耐久工�
 
 ## 7 Python 工程结构
 
-实际唯一工程目录为 `fashion-ai-runtime/`，真实 Python 包名为 `fashion_ai`；不得按旧示意另建 `ai-runtime/src/fashion_agent` 第二套目录：
+实际唯一工程目录为 `python/fashion-ai-runtime/`，真实 Python 包名为 `fashion_ai`；不得按旧示意另建 `ai-runtime/src/fashion_agent` 第二套目录：
 
 ~~~text
-fashion-ai-runtime/
+python/fashion-ai-runtime/
 ├─ pyproject.toml
 ├─ uv.lock / 选定工具的等价锁文件
 ├─ README.md
@@ -1001,11 +1001,11 @@ Orchestrator 返回 ProposedImageAction
 
 ## 27 当前完成范围与限制
 
-截至 2026-09-12，市场框架调研、项目化技术设计、`fashion-ai-runtime/` 的 fail-closed 契约骨架，以及 `contracts/fashion/ai-runtime.openapi.yaml` 已落盘。依赖只安装在工作区隔离环境，默认 Provider 固定为 disabled；定向测试结果与命令见 [FEAT-FASHION-001 验证记录](../功能/FEAT-FASHION-001-服装智能选品生产首版/验证记录.md)。这只证明当前模型、路由、错误信封和提交契约在已测输入下工作，不代表真实 Agent 或 Provider 可用。
+截至 2026-09-12，市场框架调研、项目化技术设计、`python/fashion-ai-runtime/` 的 fail-closed 契约骨架，以及 `contracts/fashion/ai-runtime.openapi.yaml` 已落盘。依赖只安装在工作区隔离环境，默认 Provider 固定为 disabled；定向测试结果与命令见 [FEAT-FASHION-001 验证记录](../功能/FEAT-FASHION-001-服装智能选品生产首版/验证记录.md)。这只证明当前模型、路由、错误信封和提交契约在已测输入下工作，不代表真实 Agent 或 Provider 可用。
 
 尚未完成：
 
-- `platform-backend/ruoyi-fashion`、`admin-web` 服装页面和 MySQL 迁移；
+- `ruoyi-backend/ruoyi-fashion`、`admin-web` 服装页面和 MySQL 迁移；
 - Java/Python 服务认证、解析前请求体上限、通用 Agent Run 租约、fencing、幂等持久化和预算闭环；
 - 真实 PydanticAI Analyzer、模型及图像 Provider、业务 Tool Gateway 和评测集；
 - 启动共享网络服务、使用真实商品/客户/图片账号或发生供应商费用；

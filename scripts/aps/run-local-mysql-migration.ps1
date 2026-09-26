@@ -71,7 +71,7 @@ try {
     $env:APS_TEST_MYSQL_ADMIN_URL = "jdbc:mysql://127.0.0.1:$port/mysql"
     $env:APS_TEST_MYSQL_USERNAME = 'root'
     $env:APS_TEST_MYSQL_PASSWORD = ''
-    mvn -f platform-backend/aps/pom.xml -pl aps-infrastructure-mysql -am clean test --no-transfer-progress
+    mvn -f ruoyi-backend/aps/pom.xml -pl aps-infrastructure-mysql -am clean test --no-transfer-progress
     if ($LASTEXITCODE -ne 0) {
         throw "APS MySQL migration tests failed with exit code $LASTEXITCODE"
     }
@@ -106,7 +106,7 @@ CREATE TABLE $permissionSchema.sys_menu (
     & $mysql --protocol=tcp -h 127.0.0.1 -P $port -u root --default-character-set=utf8mb4 -e $createPermissionSchema
     if ($LASTEXITCODE -ne 0) { throw 'Failed to create the isolated sys_menu test schema.' }
 
-    $permissionSql = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\platform-backend\sql\aps-permissions.sql')).Replace('\', '/')
+    $permissionSql = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\ruoyi-backend\sql\aps-permissions.sql')).Replace('\', '/')
     & $mysql --protocol=tcp -h 127.0.0.1 -P $port -u root --default-character-set=utf8mb4 "--database=$permissionSchema" -e "source $permissionSql"
     if ($LASTEXITCODE -ne 0) { throw 'The first APS permission SQL execution failed.' }
     & $mysql --protocol=tcp -h 127.0.0.1 -P $port -u root --default-character-set=utf8mb4 "--database=$permissionSchema" -e "source $permissionSql"
@@ -117,7 +117,7 @@ CREATE TABLE $permissionSchema.sys_menu (
 
     $recoverySource = 'aps_imp02_recovery_source'
     $recoveryTarget = 'aps_imp02_recovery_target'
-    $migrationSql = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\platform-backend\aps\aps-infrastructure-mysql\src\main\resources\db\migration\aps\V001__aps_baseline.sql')).Replace('\', '/')
+    $migrationSql = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\ruoyi-backend\aps\aps-infrastructure-mysql\src\main\resources\db\migration\aps\V001__aps_baseline.sql')).Replace('\', '/')
     & $mysql --protocol=tcp -h 127.0.0.1 -P $port -u root --default-character-set=utf8mb4 -e "CREATE DATABASE $recoverySource CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci; CREATE DATABASE $recoveryTarget CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;"
     if ($LASTEXITCODE -ne 0) { throw 'Failed to create recovery drill schemas.' }
     & $mysql --protocol=tcp -h 127.0.0.1 -P $port -u root --default-character-set=utf8mb4 "--database=$recoverySource" -e "source $migrationSql"

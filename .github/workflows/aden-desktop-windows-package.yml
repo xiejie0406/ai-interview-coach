@@ -1,0 +1,56 @@
+name: Aden desktop Windows package
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package-release-candidate:
+    runs-on: windows-2022
+    defaults:
+      run:
+        working-directory: frontend/desktop/aden-desktop
+        shell: pwsh
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/desktop/aden-desktop/package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --registry=https://registry.npmjs.org --replace-registry-host=always
+
+      - name: Run desktop tests
+        run: npm test
+
+      - name: Build unsigned release candidate
+        run: npm run pack:release-candidate
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: Verify package and write checksum
+        run: |
+          $installer = @(Get-ChildItem 'dist/release/Aden-*-Setup.exe' -File)
+          if ($installer.Count -ne 1) { throw '预期恰好一个 Aden 候选安装器' }
+          if (-not (Test-Path 'dist/release/win-unpacked/resources/app.asar')) { throw '缺少 app.asar' }
+          if (Test-Path 'dist/release/win-unpacked/resources/app/local-test.json') { throw '发布候选误包含本地测试配置' }
+          $hash = (Get-FileHash -LiteralPath $installer[0].FullName -Algorithm SHA256).Hash
+          "$hash  $($installer[0].Name)" | Set-Content 'dist/release/SHA256.txt' -Encoding ascii
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: aden-desktop-release-candidate-${{ github.run_number }}
+          path: |
+            frontend/desktop/aden-desktop/dist/release/Aden-*-Setup.exe
+            frontend/desktop/aden-desktop/dist/release/SHA256.txt
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0

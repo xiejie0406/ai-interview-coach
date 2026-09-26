@@ -1,0 +1,14 @@
+# 自动化测试 profile 只允许绑定本机，避免测试服务暴露到局域网。
+server:
+  address: 127.0.0.1
+
+aden:
+  enabled: false
+
+# 单元测试 profile 不连接各业务真实数据库，也不启动进程内任务。
+interview:
+  enabled: false
+fashion:
+  enabled: false
+aps:
+  enabled: false

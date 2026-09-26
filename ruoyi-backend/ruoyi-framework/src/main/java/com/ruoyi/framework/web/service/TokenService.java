@@ -19,9 +19,11 @@ import com.ruoyi.common.utils.http.UserAgentUtils;
 import com.ruoyi.common.utils.ip.AddressUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.common.utils.uuid.IdUtils;
+import com.ruoyi.system.secret.ManagedSecretService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -38,9 +40,9 @@ public class TokenService
     @Value("${token.header}")
     private String header;
 
-    // 令牌秘钥
-    @Value("${token.secret}")
-    private String secret;
+    // 运行期唯一签名密钥来源：平台密钥模块。
+    @Autowired
+    private ManagedSecretService managedSecrets;
 
     // 令牌有效期（默认30分钟）
     @Value("${token.expireTime}")
@@ -63,7 +65,23 @@ public class TokenService
     public LoginUser getLoginUser(HttpServletRequest request)
     {
         // 获取请求携带的令牌
-        String token = getToken(request);
+        return getLoginUserByToken(getToken(request));
+    }
+
+    /**
+     * 从 RuoYi 原生 Bearer token 解析登录主体。
+     *
+     * WebSocket 浏览器握手无法自定义 Authorization header，语音模块会把同一个
+     * token 放在受控的 Sec-WebSocket-Protocol 子协议中，再复用这里的 JWT/Redis
+     * 校验；这不是第二套 session 或认证事实源。
+     */
+    public LoginUser getLoginUserByToken(String rawToken)
+    {
+        String token = rawToken;
+        if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.TOKEN_PREFIX))
+        {
+            token = token.replace(Constants.TOKEN_PREFIX, "");
+        }
         if (StringUtils.isNotEmpty(token))
         {
             try
@@ -77,7 +95,8 @@ public class TokenService
             }
             catch (Exception e)
             {
-                log.error("获取用户信息异常'{}'", e.getMessage());
+                // 不把异常文本（可能包含外部令牌解析片段）写入日志。
+                log.warn("获取用户身份失败：令牌无效或已过期");
             }
         }
         return null;
@@ -180,7 +199,8 @@ public class TokenService
     {
         String token = Jwts.builder()
                 .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, secret).compact();
+                .signWith(SignatureAlgorithm.HS512,
+                        managedSecrets.require("PLATFORM", "platform.ruoyi.jwt")).compact();
         return token;
     }
 
@@ -192,10 +212,16 @@ public class TokenService
      */
     private Claims parseToken(String token)
     {
-        return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
+        String active = managedSecrets.require("PLATFORM", "platform.ruoyi.jwt");
+        try
+        {
+            return Jwts.parser().setSigningKey(active).parseClaimsJws(token).getBody();
+        }
+        catch (SignatureException oldSignature)
+        {
+            String previous = managedSecrets.require("PLATFORM", "platform.ruoyi.jwt.previous");
+            return Jwts.parser().setSigningKey(previous).parseClaimsJws(token).getBody();
+        }
     }
 
     /**

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aden Local Test 安装版逐项验收报告</title>
+  <style>
+    :root { color-scheme: light; font-family: "Microsoft YaHei", "Segoe UI", sans-serif; color: #18342a; background: #f2f5f1; }
+    * { box-sizing: border-box; }
+    body { margin: 0; line-height: 1.65; }
+    header { background: #173d30; color: #fff; padding: 42px max(28px, calc((100vw - 1120px) / 2)); }
+    header h1 { font-size: clamp(27px, 3vw, 40px); margin: 6px 0 12px; line-height: 1.25; }
+    header p { margin: 0; color: #d4e9dc; }
+    main { max-width: 1120px; margin: 28px auto 72px; padding: 0 22px; }
+    h2 { margin: 0 0 16px; font-size: 23px; }
+    h3 { margin: 0 0 9px; font-size: 19px; }
+    p { margin: 7px 0; }
+    a { color: #11684c; text-underline-offset: 3px; }
+    .panel, .case { background: #fff; border: 1px solid #d8e4da; border-radius: 14px; box-shadow: 0 3px 16px #18342a0b; padding: 24px; margin-bottom: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(225px, 1fr)); gap: 12px; }
+    .metric { background: #eef5ef; border-radius: 10px; padding: 14px 16px; }
+    .metric strong { font-size: 27px; display: block; line-height: 1.2; }
+    .meta { display: grid; grid-template-columns: 145px 1fr; gap: 6px 12px; margin: 0; }
+    .meta dt { font-weight: 700; color: #466354; }
+    .meta dd { margin: 0; overflow-wrap: anywhere; }
+    .case { border-left: 6px solid #2b7856; }
+    .case.fail { border-left-color: #c2693a; }
+    .case.blocked { border-left-color: #877545; }
+    .case.notrun { border-left-color: #8b9892; }
+    .case-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+    .id { font-size: 13px; color: #557162; letter-spacing: .04em; font-weight: 700; }
+    .badge { display: inline-block; min-width: 74px; text-align: center; border-radius: 999px; padding: 3px 10px; background: #d9eee1; color: #195038; font-size: 13px; font-weight: 700; }
+    .fail .badge { background: #fff0e6; color: #8c3d19; }
+    .blocked .badge { background: #f5efda; color: #6b581e; }
+    .notrun .badge { background: #e9eeeb; color: #42564b; }
+    .detail { display: grid; grid-template-columns: 112px 1fr; gap: 5px 12px; margin-top: 16px; }
+    .detail strong { color: #466354; }
+    .detail span { overflow-wrap: anywhere; }
+    .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 16px; }
+    figure { margin: 0; border: 1px solid #d9e3dc; border-radius: 10px; overflow: hidden; background: #f7faf7; }
+    figure a { display: block; }
+    figure img { width: 100%; height: 230px; object-fit: contain; display: block; }
+    figcaption { font-size: 13px; padding: 9px 12px; background: #f2f6f2; }
+    code { background: #eef2ee; border-radius: 4px; padding: 1px 4px; overflow-wrap: anywhere; }
+    .warning { background: #fff5e9; border: 1px solid #ecd7bd; border-radius: 10px; padding: 14px 18px; }
+    @media (max-width: 630px) { .meta, .detail { grid-template-columns: 1fr; } .case-head { display: block; } .badge { margin-top: 8px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>FEAT-ADEN-002 · 2026-09-26</div>
+    <h1>Aden Local Test 安装版逐项验收</h1>
+    <p>技术执行与截图证据报告 · 用户接受决定：待确认</p>
+  </header>
+  <main>
+    <section class="panel">
+      <h2>本轮结果</h2>
+      <div class="grid">
+        <div class="metric"><strong>7</strong>清单项</div>
+        <div class="metric"><strong>6</strong>Pass</div>
+        <div class="metric"><strong>0</strong>Fail / Blocked</div>
+        <div class="metric"><strong>1</strong>NotRun（云端构建）</div>
+      </div>
+      <p class="warning">本地安装包、配置限制、代码同步及安装版合成登录与两种任务状态均已按清单复验。云端 GitHub Actions 仍未推送和运行；发布候选包未签名、未完成 GUI 启动验证，不构成线上发布就绪。</p>
+      <dl class="meta">
+        <dt>对象</dt><dd>Aden Desktop 0.2.0，最终本地安装器 SHA-256：<code>CA87EEB704A2D3D01D809928622FF87DB8C3B5770FF7296941788BDA35EBB742</code></dd>
+        <dt>环境与数据</dt><dd>Windows 11 10.0.26200 x64；当前用户安装；隔离临时 MySQL、Redis、RuoYi 与 Runner simulator；合成操作员、1 个 Workspace、2 项合成任务。临时服务和数据库在每轮结束后清理。</dd>
+        <dt>操作通道</dt><dd>安装版 UI：Playwright 1.55.1 控制 Electron 44.3.0，独立临时 user-data-dir，窗口 1360 × 860；Electron Chromium 内核的具体版本未取得。报告查看：尝试 Codex 内置浏览器打开本地文件，被 URL 安全策略拒绝；未切换其他浏览器或服务绕过。</dd>
+        <dt>证据基线</dt><dd><a href="验收清单.md">逐项清单</a>、<a href="../../验证记录.md">验证记录</a>、本目录实际截图。报告按清单手工整理；失败记录和复验差异保留在验证记录中。</dd>
+        <dt>网络与控制台</dt><dd>业务 REST/SSE 由 Electron main 向随机本机回环服务发起；renderer 不直接联网。本轮未保存完整 Network trace；最终复验输出 <code>ADEN_SYNTHETIC_E2E_OK</code>，Playwright 未报告 renderer 未处理异常。合成样本的两种终态另见 <a href="screenshots/e2e-result.json">E2E 结果 JSON</a>。</dd>
+      </dl>
+    </section>
+
+    <section class="case" id="ADEN-PKG-UAT-01">
+      <div class="case-head"><div><div class="id">ADEN-PKG-UAT-01 · AC-01</div><h3>当前用户安装与代码目录</h3></div><span class="badge">Pass</span></div>
+      <div class="detail"><strong>输入/步骤</strong><span>最终 Local Test NSIS 安装器；以 <code>/S</code> 安装并回读 HKCU/HKLM、安装目录与主进程哈希。</span><strong>预期</strong><span>当前用户可安装，正式版不被覆盖；<code>resources/app/out</code> 的编译代码可读。</span><strong>实际</strong><span>安装退出码 0，HKCU 卸载项 1、HKLM 0；安装目录为 <code>C:\Users\admin\AppData\Local\Programs\Aden Local Test</code>，main 文件与最终包内哈希相同，安装版 smoke 退出码 0。</span><strong>截图状态</strong><span>不适用：以安装器哈希、注册表、文件回读和启动退出码为证据。</span><strong>入口/问题</strong><span><a href="../../验证记录.md">命令与时间记录</a>；本地安装器未签名，使用默认 Electron 图标。</span></div>
+    </section>
+
+    <section class="case" id="ADEN-PKG-UAT-02">
+      <div class="case-head"><div><div class="id">ADEN-PKG-UAT-02 · AC-02</div><h3>本地 API 配置安全边界</h3></div><span class="badge">Pass</span></div>
+      <div class="detail"><strong>输入/步骤</strong><span>安装目录 <code>local-test.json</code> 的回环地址；配置矩阵分别尝试回环、LAN、公网 HTTP/HTTPS 及含凭据、query、fragment 的地址。</span><strong>预期</strong><span>本地版只接受精确回环主机，release 仍只接受 HTTPS。</span><strong>实际</strong><span><code>npm.cmd test -- tests/runtime-config.test.ts</code> 6/6 通过；安装配置回读为默认回环地址，E2E 临时修改后已恢复。</span><strong>截图状态</strong><span>不适用：以测试输出和配置回读为证据。</span><strong>入口/问题</strong><span><a href="../../验证记录.md">配置验证记录</a>；未进行真实公网连接。</span></div>
+    </section>
+
+    <section class="case" id="ADEN-PKG-UAT-03">
+      <div class="case-head"><div><div class="id">ADEN-PKG-UAT-03 · AC-04</div><h3>安装版登录、工作区和退出</h3></div><span class="badge">Pass</span></div>
+      <div class="detail"><strong>输入/步骤</strong><span>合成操作员在已安装 exe 的登录页进入 Workspace，完成任务流程后退出回登录页。</span><strong>预期</strong><span>页面从安装目录加载，登录后 Workspace 为 LIVE，退出回登录页，三步均有截图。</span><strong>实际</strong><span>从 <code>file:///C:/Users/admin/AppData/Local/Programs/Aden%20Local%20Test/resources/app/out/renderer/index.html</code> 加载；登录成功，Workspace LIVE，退出后显示空白登录表单。</span><strong>截图状态</strong><span>已截图：登录页、工作区、退出页三张逐张回读。</span><strong>问题/复验</strong><span>前次截图流程中断和共享 Maven 迁移 CLI 变化保留在<a href="../../验证记录.md">验证记录</a>；09:44 使用稳定隔离 JAR 复验通过。</span></div>
+      <div class="shots"><figure><a href="screenshots/ADEN-PKG-UAT-03-login.png" target="_blank"><img src="screenshots/ADEN-PKG-UAT-03-login.png" alt="Aden 安装版登录页"></a><figcaption>步骤 1：安装版登录页，账号字段为空，未暴露凭据</figcaption></figure><figure><a href="screenshots/ADEN-PKG-UAT-03-workspace.png" target="_blank"><img src="screenshots/ADEN-PKG-UAT-03-workspace.png" alt="Aden Workspace 已连接"></a><figcaption>步骤 2：合成 Workspace 进入任务中心，左侧连接状态 LIVE</figcaption></figure><figure><a href="screenshots/ADEN-PKG-UAT-03-logout.png" target="_blank"><img src="screenshots/ADEN-PKG-UAT-03-logout.png" alt="退出后回到登录页"></a><figcaption>步骤 3：退出后回到登录页，表单为空</figcaption></figure></div>
+    </section>
+
+    <section class="case" id="ADEN-PKG-UAT-04">
+      <div class="case-head"><div><div class="id">ADEN-PKG-UAT-04 · AC-04</div><h3>合成任务成功</h3></div><span class="badge">Pass</span></div>
+      <div class="detail"><strong>输入/步骤</strong><span>合成任务“E2E 正常成功”创建、提交，由 Runner simulator 执行。</span><strong>预期</strong><span>安装版任务卡显示 SUCCEEDED，且该状态有可回读截图。</span><strong>实际</strong><span>任务卡显示 SUCCEEDED；<a href="screenshots/e2e-result.json">E2E 结果</a>记录成功终态，最终整条链路输出 <code>ADEN_SYNTHETIC_E2E_OK</code>。</span><strong>截图状态</strong><span>已截图：SUCCEEDED 字样与任务标题清晰可辨。</span><strong>问题/复验</strong><span>前次全页截图超时；改为可见区域并关闭动画后 09:44 复验通过。截图时连接徽标短暂为 CONNECTING，任务卡终态不受影响。</span></div>
+      <div class="shots"><figure><a href="screenshots/ADEN-PKG-UAT-04-succeeded.png" target="_blank"><img src="screenshots/ADEN-PKG-UAT-04-succeeded.png" alt="合成任务 SUCCEEDED 状态"></a><figcaption>任务“E2E 正常成功”显示 SUCCEEDED；点击查看原图</figcaption></figure></div>
+    </section>
+
+    <section class="case" id="ADEN-PKG-UAT-05">
+      <div class="case-head"><div><div class="id">ADEN-PKG-UAT-05 · AC-04</div><h3>合成任务安全点取消</h3></div><span class="badge">Pass</span></div>
+      <div class="detail"><strong>输入/步骤</strong><span>创建、提交第二项合成任务，点击“请求取消”，由 Runner simulator 执行取消。</span><strong>预期</strong><span>任务卡显示 CANCELED，并截图。</span><strong>实际</strong><span>任务“E2E 安全点取消”显示 CANCELED；<a href="screenshots/e2e-result.json">E2E 结果</a>记录取消终态，最终整条链路输出 <code>ADEN_SYNTHETIC_E2E_OK</code>。</span><strong>截图状态</strong><span>已截图：CANCELED 字样、任务标题及连接 LIVE 清晰可辨。</span><strong>问题/复验</strong><span>前次被共享 Maven 迁移 CLI 变化阻断；09:44 稳定隔离 JAR 复验通过，原阻断记录仍保留。</span></div>
+      <div class="shots"><figure><a href="screenshots/ADEN-PKG-UAT-05-canceled.png" target="_blank"><img src="screenshots/ADEN-PKG-UAT-05-canceled.png" alt="合成任务 CANCELED 状态"></a><figcaption>任务“E2E 安全点取消”显示 CANCELED；点击查看原图</figcaption></figure></div>
+    </section>
+
+    <section class="case" id="ADEN-PKG-UAT-06">
+      <div class="case-head"><div><div class="id">ADEN-PKG-UAT-06 · AC-03 / AC-05</div><h3>代码同步与发布形态候选</h3></div><span class="badge">Pass</span></div>
+      <div class="detail"><strong>输入/步骤</strong><span>退出安装版后运行 <code>sync-local-install.ps1</code>，比较 main/preload/renderer 哈希，再做安装版 smoke；检查最终 release candidate 的 ASAR、本地配置及签名。</span><strong>预期</strong><span>三个代码入口与构建一致，旧版保留可恢复；候选包使用 ASAR 且不含本地配置。</span><strong>实际</strong><span>三入口哈希全一致，保留 1 个 <code>out-backup-*</code>，同步后 smoke 退出码 0；release candidate 包含 <code>app.asar</code>，不含 <code>local-test.json</code>，安装器 122,221,872 字节，Authenticode 状态 NotSigned。</span><strong>截图状态</strong><span>不适用：使用文件哈希、备份目录、启动码和包结构回读。</span><strong>问题/边界</strong><span>本项 Pass 只表示清单中的同步与结构断言成立。尝试运行未安装的 release candidate exe 被自动执行策略拒绝；无签名、HTTPS 目标、更新与回滚验收，尚不可对外发布。</span></div>
+    </section>
+
+    <section class="case notrun" id="ADEN-PKG-UAT-07">
+      <div class="case-head"><div><div class="id">ADEN-PKG-UAT-07 · AC-06</div><h3>云端手动构建候选安装器</h3></div><span class="badge">NotRun</span></div>
+      <div class="detail"><strong>输入/步骤</strong><span>仓库新增手动 GitHub Actions Windows 工作流；计划在云端运行测试和 release candidate 构建，下载 artifact 并核对 SHA-256。</span><strong>预期</strong><span>云端作业成功，安装器与哈希文件可回读；不部署、不发布。</span><strong>实际</strong><span>工作流 YAML 静态解析通过：手动触发、只读仓库权限、7 个步骤。当前文件只在工作区，未提交、未推送、未触发云端作业，尚无 run URL 或 artifact。</span><strong>截图状态</strong><span>不适用：实际运行时以 GitHub Actions 日志和下载产物哈希为证据。</span><strong>问题/下一步</strong><span>需要用户另行授权 Git 提交/推送及云端运行后才能验证；本项保持 NotRun，不把配置存在当成线上打包通过。</span></div>
+    </section>
+
+    <section class="panel">
+      <h2>未覆盖与下一步</h2>
+      <p>安装版逐项 UI 复验已完成；前几轮的 Runner 首次构建超时、共享后端薄 JAR、截图超时及迁移 CLI 参数冲突均保留在<a href="../../验证记录.md">验证记录</a>，最终 09:44 复验已逐项通过。</p>
+      <p>云端工作流未推送和运行；发布候选包的 GUI 运行、代码签名、应用图标、HTTPS 服务配置、更新与回退、用户接受决定均未完成。用户决定保持“待确认”；本报告不构成上线就绪或发布授权。</p>
+      <p>报告核验：Codex 内置浏览器拒绝本地 <code>file://</code> URL，提示 Browser use URL policy blocks this action，并禁止通过替代浏览器或间接服务绕过。报告视觉检查未执行；静态清单/截图链接检查不代替浏览器视觉检查。</p>
+    </section>
+  </main>
+</body>
+</html>

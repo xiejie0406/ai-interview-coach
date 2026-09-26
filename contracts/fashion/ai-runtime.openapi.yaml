@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Fashion AI Runtime Internal API
-  description: AI 智能选品内部 Python 运行时；当前 Provider 未启用。
+  description: AI 智能选品内部 Python 运行时；demo 仅用于本机试用。
   version: 0.1.0
 paths:
   /health:
@@ -748,11 +748,15 @@ components:
           title: Versions
         status:
           type: string
-          const: unavailable
+          enum:
+          - available
+          - unavailable
           title: Status
         reason:
           type: string
-          const: provider_disabled
+          enum:
+          - provider_disabled
+          - demo_mode
           title: Reason
       additionalProperties: false
       type: object
@@ -1547,11 +1551,12 @@ components:
       properties:
         mode:
           type: string
-          const: disabled
+          enum:
+          - disabled
+          - demo
           title: Mode
         enabled:
           type: boolean
-          const: false
           title: Enabled
       additionalProperties: false
       type: object

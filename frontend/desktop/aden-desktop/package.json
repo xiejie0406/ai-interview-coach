@@ -1,0 +1,39 @@
+{
+  "name": "aden-desktop",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Aden Windows 桌面智能执行平台",
+  "main": "out/main/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "npm run contracts:generate:check && npm run typecheck && electron-vite build && node scripts/check-build.mjs",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json && vue-tsc --noEmit -p tsconfig.test.json",
+    "contracts:generate": "node scripts/generate-contract-types.mjs",
+    "contracts:generate:check": "node scripts/generate-contract-types.mjs --check",
+    "contracts:check": "npm run contracts:generate:check && vitest run tests/aden-consumer-contract.test.ts",
+    "test": "vitest run",
+    "smoke:electron": "node scripts/electron-smoke.mjs",
+    "pack:local": "node scripts/package.mjs local-test",
+    "pack:release-candidate": "node scripts/package.mjs release"
+  },
+  "dependencies": {
+    "pinia": "3.0.4",
+    "vue": "3.5.26",
+    "vue-router": "4.6.4"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.3",
+    "@vitejs/plugin-vue": "5.2.4",
+    "@vue/test-utils": "2.4.6",
+    "electron": "44.3.0",
+    "electron-builder": "26.16.1",
+    "electron-vite": "5.0.0",
+    "jsdom": "26.1.0",
+    "playwright": "1.55.1",
+    "typescript": "5.7.3",
+    "vite": "6.4.1",
+    "vitest": "3.2.7",
+    "vue-tsc": "2.2.0"
+  }
+}

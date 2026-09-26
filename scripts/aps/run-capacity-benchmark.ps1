@@ -20,7 +20,7 @@ if ($JavaHome) {
 }
 
 Write-Output "APS capacity benchmark profile=$Profile counts=$counts resources=$Resources maxSolveSeconds=$MaxSolveSeconds threads=$Threads seed=$Seed javaHome=$env:JAVA_HOME"
-mvn -f platform-backend/aps/pom.xml -pl aps-solver-ortools -am `
+mvn -f ruoyi-backend/aps/pom.xml -pl aps-solver-ortools -am `
     '-Dtest=ApsCapacityBenchmarkTest' '-Dsurefire.failIfNoSpecifiedTests=false' `
     '-Daps.benchmark=true' "-Daps.benchmark.counts=$counts" "-Daps.benchmark.resources=$Resources" `
     "-Daps.benchmark.maxSolveSeconds=$MaxSolveSeconds" "-Daps.benchmark.threads=$Threads" `

@@ -1,9 +1,0 @@
-# 本地开发 profile：开放已实现的面试业务和公开题库 REST，外部调用仍需启动参数显式开启。
-server:
-  # 合成联调只监听本机；不改变其他 profile 的绑定策略。
-  address: 127.0.0.1
-
-interview:
-  foundation-safety:
-    business-rest-endpoints-enabled: true
-    catalog-rest-endpoints-enabled: true

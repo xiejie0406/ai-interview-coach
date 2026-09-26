@@ -1,0 +1,121 @@
+{
+  "time": "2026-09-26T09:33:27.606988+08:00",
+  "object": "FEAT-FASHION-001 本机版本整改前复核",
+  "version": "2026-09-26 工作区未提交版本；不以历史工程 Pass 代表现状",
+  "userDecision": "不接受当前演示版本（用户明确反馈）",
+  "scope": "代码与既有证据复核；按最新规范切换内置浏览器后登录仍受阻；本轮未实施业务改造、采集或导入真实商品",
+  "environment": {
+    "time": "2026-09-26T01:25:27.377Z",
+    "tool": "installed Playwright",
+    "browser": "153.0.8010.53",
+    "headless": true,
+    "viewport": "1440x1000",
+    "context": "new isolated context; no imported session",
+    "url": "http://127.0.0.1:5173/login?redirect=/fashion/product",
+    "status": "Blocked",
+    "reason": "captchaEnabled=true; no CAPTCHA solved; no authentication bypass",
+    "screenshot": "登录采证受阻.png",
+    "mask": "验证码图片及口令区域遮盖",
+    "network": [
+      {
+        "path": "/dev-api/captchaImage",
+        "status": 200
+      }
+    ],
+    "errors": []
+  },
+  "iabFollowup": {
+    "time": "2026-09-26T09:33:27.606439+08:00",
+    "tool": "cua_repl / Codex In-app Browser",
+    "browserId": "1",
+    "tabs": [
+      "8",
+      "3"
+    ],
+    "mode": "IAB；内核版本与无头状态未知",
+    "isolation": "仅本任务标签；不宣称 Cookie 和服务完全隔离",
+    "status": "Blocked",
+    "actual": "按用户最新规范切换 IAB。新标签及本任务旧标签进入商品页都跳转验证码登录页；已请求用户完成登录。旧工作台残留 DOM/截图不算本轮联机成功。",
+    "screenshotStatus": "业务页待登录后补齐；先前独立浏览器的已遮盖登录截图作为历史阻塞证据保留"
+  },
+  "rows": [
+    {
+      "id": "REV-01",
+      "title": "电商来源与样本",
+      "result": "Fail",
+      "shot": "不适用",
+      "input": "上轮 DEMO-LOCAL 样本和生成脚本",
+      "steps": "核对样本定义、写入方式与来源证据",
+      "expected": "真实电商商品可追溯到 URL、规格、采集时间及导入批次",
+      "actual": "脚本定义 4 个合成商品并直接 INSERT 商品、库存和成功状态批次；每 SKU 演示库存为 50。这些批次不是页面上传 Excel 的执行证据。没有本轮真实电商采集/导入证据。",
+      "issue": "需采集真实商品并保留原始证据，通过实际页面导入；合成库存和改价样本单独标记。",
+      "source": "seed",
+      "entry": "ruoyi-backend/ruoyi-fashion/scripts/seed_local_demo.py"
+    },
+    {
+      "id": "REV-02",
+      "title": "商品 Excel 导入",
+      "result": "Blocked",
+      "shot": "受阻（登录验证码）",
+      "input": "现有导入页面、CSV 模板、CSV/XLSX 解析代码",
+      "steps": "检查上传、预览、确认及模板下载代码；尝试浏览器进入；规范更新后切换内置浏览器",
+      "expected": "真实样本 Excel 经预览、发布、刷新回读，与输入逐行一致",
+      "actual": "静态核查存在 .csv/.xlsx 上传、预览和确认 API；页面只提供 CSV 模板，API 有 mapping 参数但页面没有列映射交互。模板普通链接与后端请求头鉴权存在接法疑点，待联机复现。独立浏览器及后续内置浏览器登录均受验证码阻塞，真实商品 Excel 上传/发布未执行。",
+      "issue": "补 XLSX 模板、列映射、可追溯历史和下载结果；复现并修正模板下载；按 FIX-02 真正导入。",
+      "source": "import/template/auth",
+      "entry": "http://127.0.0.1:5173/fashion/import"
+    },
+    {
+      "id": "REV-03",
+      "title": "服装字段完整性与维护",
+      "result": "Fail",
+      "shot": "受阻（登录验证码）",
+      "input": "商品表、商品列表与 15 个新增表单字段",
+      "steps": "核对字段、详情/编辑入口及筛选条件",
+      "expected": "服装核心属性可录入、查看、编辑、筛选，颜色尺码独立维护",
+      "actual": "已有来源、SKU、款号、名称、品类、颜色、尺码、尺码制式、单位、季节、品牌、材质、京东 ID/URL。缺少结构化人群、面料成分、版型、领型、袖长、厚薄、弹力、裤型等。列表操作主要为 AI 属性建议、改名、上下架，缺完整商品详情/编辑。tags JSON 不等于这些字段可维护。",
+      "issue": "按品类补字段，并同时贯通详情、编辑、查询、模板和选品，见 FIX-01/02。",
+      "source": "product/schema",
+      "entry": "http://127.0.0.1:5173/fashion/product"
+    },
+    {
+      "id": "REV-04",
+      "title": "价格 Excel 更新",
+      "result": "Blocked",
+      "shot": "受阻（登录验证码）",
+      "input": "现有价格导入面板及严格范围全量服务",
+      "steps": "检查范围、差异、发布、恢复实现；尝试页面验证",
+      "expected": "两轮实际 Excel 更新有新旧价格对账、库存不变及错误批次不生效证据",
+      "actual": "静态实现支持来源＋品类范围、业务时间、差异预览、发布和当前成功批次恢复；缺少便于重新打开旧批次的完整历史操作入口。真实电商样本的两轮改价和数据库回读未执行，浏览器登录受阻（已按最新规范补查内置浏览器）。",
+      "issue": "不能把现有代码或 Mock 测试说成实际改价验收通过；按 FIX-03 补全过程。",
+      "source": "price_stock/mock",
+      "entry": "http://127.0.0.1:5173/fashion/price-import"
+    },
+    {
+      "id": "REV-05",
+      "title": "独立库存中心与多尺码 SKU",
+      "result": "Fail",
+      "shot": "受阻（登录验证码）",
+      "input": "fq_product、fq_stock、库存导入页面和业务页面目录",
+      "steps": "检查商品颜色尺码键、仓库数量、库存管理入口",
+      "expected": "独立库存中心能查看、筛选各颜色尺码及仓库，并追溯更新批次",
+      "actual": "fq_product 已有颜色/尺码 SKU 唯一约束，fq_stock 已按 product_id＋warehouse_code 独立保存 available_qty、as_of 和批次。前端目前只有库存全量导入页，缺独立库存列表和尺码矩阵；上轮 4 个合成 SKU 未覆盖多尺码、多仓更新。",
+      "issue": "复用现有库存表，补分页查询、矩阵、缺货/时效筛选、历史入口，并进行尺码和仓库隔离复验。",
+      "source": "schema/price_stock",
+      "entry": "http://127.0.0.1:5173/fashion/stock-import"
+    },
+    {
+      "id": "REV-06",
+      "title": "方案中心与选品可用性",
+      "result": "Fail",
+      "shot": "受阻（登录验证码）",
+      "input": "方案列表、工作台、demo 排序器和上轮演示 Run 记录",
+      "steps": "核对列表进入工作台、候选展示、生成/替换/锁定与尺码分配",
+      "expected": "销售从方案直接完成真实商品选品、看图、筛选、加入/移除、换款及尺码分配后保存回读",
+      "actual": "代码已有“工作台”跳转、生成搭配、采用、锁定、替换。候选卡展示名称/颜色/价格/数量，未展示商品图；需求输出直接显示 JSON，缺少完整人工选品操作。当前 demo 主要按价格排序，不代表真实 AI 选品。上轮成功 Run 只证明演示调用链，不能证明当前业务体验合格。",
+      "issue": "方案入口和业务交互需要补齐；先让人工选品完整可用，再独立验证 AI 辅助质量。",
+      "source": "quote/workbench/demo",
+      "entry": "http://127.0.0.1:5173/fashion/quote"
+    }
+  ]
+}

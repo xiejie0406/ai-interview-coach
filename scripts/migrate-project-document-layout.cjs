@@ -293,7 +293,7 @@ function rewriteTarget(rawTarget, oldSource, newSource) {
 const linkFilePaths = [
   path.join(root, 'README.md'),
   path.join(root, 'AGENTS.md'),
-  path.join(root, 'platform-backend', 'AI-MIGRATION.md'),
+  path.join(root, 'ruoyi-backend', 'AI-MIGRATION.md'),
   ...walkFiles(docsRoot),
   ...walkFiles(path.join(root, 'prototype')),
 ].filter((file, index, all) => all.indexOf(file) === index

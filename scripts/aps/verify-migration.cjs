@@ -3,10 +3,10 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..', '..');
 const sourcePath = path.join(root, '文档', '项目', '生产排产项目', '架构', '生产排程数据库基线草案.sql');
-const migrationPath = path.join(root, 'platform-backend', 'aps', 'aps-infrastructure-mysql', 'src', 'main',
+const migrationPath = path.join(root, 'ruoyi-backend', 'aps', 'aps-infrastructure-mysql', 'src', 'main',
   'resources', 'db', 'migration', 'aps', 'V001__aps_baseline.sql');
-const permissionPath = path.join(root, 'platform-backend', 'sql', 'aps-permissions.sql');
-const configPath = path.join(root, 'platform-backend', 'ruoyi-admin', 'src', 'main', 'resources', 'application-aps.yml');
+const permissionPath = path.join(root, 'ruoyi-backend', 'sql', 'aps-permissions.sql');
+const configPath = path.join(root, 'ruoyi-backend', 'ruoyi-admin', 'src', 'main', 'resources', 'application-aps.yml');
 
 const read = file => fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
 const stripComments = value => value.replace(/\/\*[\s\S]*?\*\//g, '').replace(/--[^\r\n]*/g, '');
@@ -50,9 +50,9 @@ check('Permission SQL defines 29 unique aps:* permission codes',
 check('Permission SQL is idempotent and grants no role',
   (permissions.match(/where\s+not\s+exists/ig) || []).length >= 1 &&
     !/insert\s+into\s+sys_role_menu/i.test(stripComments(permissions)), null);
-check('All APS runtime and migration gates default to false',
-  ['APS_ENABLED:false', 'APS_API_ENABLED:false', 'APS_PERSISTENCE_ENABLED:false',
-    'APS_FLYWAY_ENABLED:false', 'APS_DATASOURCE_ENABLED:false', 'APS_WORKER_ENABLED:false']
+check('APS API defaults to enabled while migration and Worker remain disabled',
+  ['APS_ENABLED:true', 'APS_API_ENABLED:true', 'APS_PERSISTENCE_ENABLED:true',
+    'APS_DATASOURCE_ENABLED:true', 'APS_FLYWAY_ENABLED:false', 'APS_WORKER_ENABLED:false']
     .every(value => config.includes(value)), null);
 
 const failed = checks.filter(item => item.status === 'Fail');

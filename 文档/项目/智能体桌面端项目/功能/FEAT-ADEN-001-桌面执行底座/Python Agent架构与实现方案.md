@@ -11,8 +11,8 @@
 
 Python 不建设第二个业务后端，也不提供 FastAPI 控制面。目标态按凭据和运行环境新增两个独立工程，不能为了复用 Python 代码把它们合成一个高权限发行物：
 
-1. `aden-agent-runtime/`：在服务端或受控 Worker 环境执行模型推理，只产生有版本、可校验的候选结果。
-2. `aden-runner/`：Windows 执行端工程；FEAT-ADEN-001 只实现无权限的 `runner-simulator`，不包含 UIA、浏览器、文件或外部发送能力。
+1. `python/aden-agent-runtime/`：在服务端或受控 Worker 环境执行模型推理，只产生有版本、可校验的候选结果。
+2. `python/aden-runner/`：Windows 执行端工程；FEAT-ADEN-001 只实现无权限的 `runner-simulator`，不包含 UIA、浏览器、文件或外部发送能力。
 
 真实 Windows Runner 不塞进 `agent-worker`。它未来仍在独立 `aden-runner` 发行物内拆为 Session 0 的 Service Supervisor 与用户会话中的 Session Agent，并走独立 L3 设计。当前只预留契约和合成模拟器，不创建高权限进程。
 
@@ -28,9 +28,9 @@ Python Agent SDK 推荐 **PydanticAI + 自有 `ModelAgentPort`**。原因是 Ade
 
 | 项目 | 当前事实 | 结论 |
 | --- | --- | --- |
-| Aden Python 工程 | 不存在 `aden-agent-runtime/`、Aden Agent Worker、Runner 或 Aden Python 契约 | 必须新建，不能把文件存在写成已实现 |
+| Aden Python 工程 | 不存在 `python/aden-agent-runtime/`、Aden Agent Worker、Runner 或 Aden Python 契约 | 必须新建，不能把文件存在写成已实现 |
 | `contracts/aden/` | 不存在 | 应建立跨 Java / TypeScript / Python 的机器契约包 |
-| `fashion-ai-runtime/` | 是智能选品项目的独立 Python Runtime，已有 Python 3.12、Pydantic v2、Provider 默认关闭和契约测试模式 | 只借鉴工程方法；不得共享业务模型、状态或数据库 |
+| `python/fashion-ai-runtime/` | 是智能选品项目的独立 Python Runtime，已有 Python 3.12、Pydantic v2、Provider 默认关闭和契约测试模式 | 只借鉴工程方法；不得共享业务模型、状态或数据库 |
 | 历史 Python 架构 | 已归档的 FastAPI / Temporal Python-first 方案包含有价值的强类型候选、RunSpec、租约和安全停止语义 | 只提炼不冲突的机制；FastAPI 控制面、Temporal 主流程和八进程部署不恢复 |
 | 当前 CORE 切片 | 不允许真实模型、UIA、浏览器、ERP、账号或外发 | 第一阶段必须使用 `FakeModelPort` / fixture，真实 Provider 为 `disabled` |
 
@@ -96,8 +96,8 @@ flowchart LR
 目标架构计划新增 **2 个 Python 顶层工程 + 1 个非运行时契约目录**：
 
 ```text
-aden-agent-runtime/       # 服务端低权限模型 Worker；当前只做离线 Fake 骨架
-aden-runner/              # Windows 执行端；当前只实现无权限 simulator
+python/aden-agent-runtime/       # 服务端低权限模型 Worker；当前只做离线 Fake 骨架
+python/aden-runner/              # Windows 执行端；当前只实现无权限 simulator
 contracts/aden/           # Java、Python、TypeScript 共用机器契约
 ```
 

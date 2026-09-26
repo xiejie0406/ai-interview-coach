@@ -144,19 +144,19 @@ fi
 
 if (( FAILURES == 0 )); then
   run_step "ortools-jni-smoke" \
-    mvn -f "${REPO_ROOT}/platform-backend/aps/pom.xml" \
+    mvn -f "${REPO_ROOT}/ruoyi-backend/aps/pom.xml" \
       -pl aps-solver-ortools -am \
       -Dtest=OrToolsNativeSmokeTest \
       -Dsurefire.failIfNoSpecifiedTests=false \
       test --no-transfer-progress
 
   run_step "backend-package" \
-    mvn -f "${REPO_ROOT}/platform-backend/pom.xml" \
+    mvn -f "${REPO_ROOT}/ruoyi-backend/pom.xml" \
       -pl ruoyi-admin,aps/aps-worker -am \
       -DskipTests package --no-transfer-progress
 
-  WORKER_JAR="${REPO_ROOT}/platform-backend/aps/aps-worker/target/aps-worker-3.9.2.jar"
-  API_JAR="${REPO_ROOT}/platform-backend/ruoyi-admin/target/ruoyi-admin.jar"
+  WORKER_JAR="${REPO_ROOT}/ruoyi-backend/aps/aps-worker/target/aps-worker-3.9.2.jar"
+  API_JAR="${REPO_ROOT}/ruoyi-backend/ruoyi-admin/target/ruoyi-admin.jar"
 
   if [[ -f "${WORKER_JAR}" ]]; then
     run_step "worker-artifact" jar tf "${WORKER_JAR}"
@@ -188,10 +188,10 @@ if (( FAILURES == 0 )); then
   fi
 
   if [[ "${APS_VERIFY_FRONTEND_BUILD:-0}" == "1" ]]; then
-    if [[ -d "${REPO_ROOT}/admin-web/node_modules" ]]; then
-      run_step "frontend-package" npm --prefix "${REPO_ROOT}/admin-web" run build:prod
+    if [[ -d "${REPO_ROOT}/frontend/admin-web/node_modules" ]]; then
+      run_step "frontend-package" npm --prefix "${REPO_ROOT}/frontend/admin-web" run build:prod
     else
-      record_result "frontend-package" "FAIL" "admin-web/node_modules is absent; provision with the approved lockfile before running"
+      record_result "frontend-package" "FAIL" "frontend/admin-web/node_modules is absent; provision with the approved lockfile before running"
       FAILURES=$((FAILURES + 1))
     fi
   else

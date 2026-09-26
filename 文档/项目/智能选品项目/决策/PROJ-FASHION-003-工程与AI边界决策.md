@@ -12,13 +12,13 @@
 
 | ID | 已确定事项 | 结果 | 主要理由 |
 | --- | --- | --- | --- |
-| FASHION-ADR-001 | 生产代码项目数量 | 首期恰好 3 个：`platform-backend/`、`admin-web/`、`fashion-ai-runtime/` | 复用现有 RuoYi 和管理端，只新增必要的 AI 运行时，避免重复身份、权限和前端工程 |
-| FASHION-ADR-002 | Python AI 项目数量 | 只有一个 `fashion-ai-runtime/` | 需求解析、选品搭配、视觉、生图适配和评测按 Python 包分层；不按 Agent 拆微服务 |
+| FASHION-ADR-001 | 生产代码项目数量 | 首期恰好 3 个：`ruoyi-backend/`、`frontend/admin-web/`、`python/fashion-ai-runtime/` | 复用现有 RuoYi 和管理端，只新增必要的 AI 运行时，避免重复身份、权限和前端工程 |
+| FASHION-ADR-002 | Python AI 项目数量 | 只有一个 `python/fashion-ai-runtime/` | 需求解析、选品搭配、视觉、生图适配和评测按 Python 包分层；不按 Agent 拆微服务 |
 | FASHION-ADR-003 | Java 与 Python 边界 | Java 是业务控制面和正式副作用入口；Python 是 AI 执行面 | 把模型的不确定性与权限、金额、库存、事务和审计隔离 |
 | FASHION-ADR-004 | 数据库所有权 | 服装业务事实统一使用 MySQL，由 Java 访问；Python 无业务库凭据 | 符合仓库内独立业务项目的数据库规则，避免跨库事务和双写事实源 |
 | FASHION-ADR-005 | 首期价格模型 | 一个 SKU 一套当前销售价；报价确认时复制到不可变明细 | 与数据库 v2.3 一致；客户价、渠道价、阶梯价和预约价没有已确认业务依据 |
 | FASHION-ADR-006 | 机器契约 | `contracts/fashion/` 是唯一共享契约目录，不计为第四个项目 | 契约需要被 Java/Python 共同消费，但不单独部署 |
-| FASHION-ADR-007 | 首期客户端 | 只在 `admin-web/` 建内部工作台 | 团购/批发客户首期接收文件，不需 Portal、移动端或客户自助登录 |
+| FASHION-ADR-007 | 首期客户端 | 只在 `frontend/admin-web/` 建内部工作台 | 团购/批发客户首期接收文件，不需 Portal、移动端或客户自助登录 |
 | FASHION-ADR-008 | 京东图片获取 | P0 使用现有 Chrome 插件下载，文件或 ZIP 上传，人工映射确认 | 不让自研扩展阻断核心业务；扩展只有在真实样本和权限边界验证后才进入 P1 |
 | FASHION-ADR-009 | 首期数据库规模 | v2.3 固定为 6 个模块、16 张 `fq_*` 业务表：10 张核心业务表和 6 张 AI 表 | 以业务主从关系和独立生命周期为建表边界，不再为技术中间状态预建业务表 |
 | FASHION-ADR-010 | 报价历史 | 由 `fq_quote`、`fq_quote_combo`、`fq_quote_detail` 确认后锁定和复制修订 | 三层已经保存客户、组合、SKU、金额、库存和图片证据，不再另建报价快照表 |
@@ -29,9 +29,9 @@
 
 | 项目 | 本轮落点 | 负责 | 明确不负责 |
 | --- | --- | --- | --- |
-| Java 业务项目 | `platform-backend/ruoyi-fashion` | RuoYi 身份/RBAC、客户、商品、当前价、库存、方案、报价、导入、文件元数据、AI Run 控制、预算、幂等、审计和 MySQL 事务 | 不把生成模型结果直接当正式价格、库存或报价 |
-| 管理端项目 | `admin-web/src/views/fashion` 及对应 API/路由 | 商品、数据批次、客户方案、搭配、图片、报价、交付和管理员配置页面 | 不直连 Python，不保存 Provider Secret，不在浏览器确认权限和金额事实 |
-| Python AI 项目 | `fashion-ai-runtime/` | 类型化需求解析、候选排序、搭配推理、解释、视觉理解、生图 Provider 适配、输出护栏、trace 和 eval | 不直连 MySQL，不自行改变业务状态，不直接对浏览器开放，不计算或确认正式报价 |
+| Java 业务项目 | `ruoyi-backend/ruoyi-fashion` | RuoYi 身份/RBAC、客户、商品、当前价、库存、方案、报价、导入、文件元数据、AI Run 控制、预算、幂等、审计和 MySQL 事务 | 不把生成模型结果直接当正式价格、库存或报价 |
+| 管理端项目 | `frontend/admin-web/src/views/fashion` 及对应 API/路由 | 商品、数据批次、客户方案、搭配、图片、报价、交付和管理员配置页面 | 不直连 Python，不保存 Provider Secret，不在浏览器确认权限和金额事实 |
+| Python AI 项目 | `python/fashion-ai-runtime/` | 类型化需求解析、候选排序、搭配推理、解释、视觉理解、生图 Provider 适配、输出护栏、trace 和 eval | 不直连 MySQL，不自行改变业务状态，不直接对浏览器开放，不计算或确认正式报价 |
 
 同一 Python 代码库以后可以从同一镜像启动 API 进程和 Worker 进程，以便分别扩缩容；这仍是一个项目，不是两个服务仓库。
 

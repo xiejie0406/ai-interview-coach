@@ -125,7 +125,9 @@ $docsHumanReadableFiles = @(
 )
 
 foreach ($file in $docsHumanReadableFiles) {
-    if ($file.Name -eq 'README.md' -or $file.Name -like 'LICENSE*') {
+    # 用户级验收规范 2026.09-r3 固定此 HTML 产物名，优先于项目中文命名约定。
+    if ($file.Name -eq 'README.md' -or $file.Name -like 'LICENSE*' -or
+        $file.Name -eq 'verification-report.html') {
         continue
     }
     if ($file.BaseName -notmatch '[\u4e00-\u9fff]') {
@@ -146,7 +148,7 @@ $markdownFiles = @(
         ForEach-Object FullName
 )
 $additionalMarkdownFiles = @(
-    Join-Path $workspaceRoot 'platform-backend\AI-MIGRATION.md'
+    Join-Path $workspaceRoot 'ruoyi-backend\AI-MIGRATION.md'
 )
 $markdownFiles += @($additionalMarkdownFiles | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf })
 $markdownFiles = @($markdownFiles | Sort-Object -Unique)
@@ -189,7 +191,7 @@ foreach ($file in $markdownFiles) {
         $relativeFile = Get-WorkspaceRelativePath $file
         $isArchivedDocument = $relativeFile -match '(^|[\\/])归档([\\/]|$)'
         if (-not $isArchivedDocument -and
-            $target -match '(^|/)(frontend|backend|apps)/') {
+            $target -match '(^|/)(backend|apps)/') {
             $errors.Add("Current document links to a removed project path: $relativeFile -> $target")
         }
     }

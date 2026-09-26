@@ -1,0 +1,20 @@
+{
+  "time": "2026-09-26T01:25:27.377Z",
+  "tool": "installed Playwright",
+  "browser": "153.0.8010.53",
+  "headless": true,
+  "viewport": "1440x1000",
+  "context": "new isolated context; no imported session",
+  "url": "http://127.0.0.1:5173/login?redirect=/fashion/product",
+  "status": "Blocked",
+  "reason": "captchaEnabled=true; no CAPTCHA solved; no authentication bypass",
+  "screenshot": "登录采证受阻.png",
+  "mask": "验证码图片及口令区域遮盖",
+  "network": [
+    {
+      "path": "/dev-api/captchaImage",
+      "status": 200
+    }
+  ],
+  "errors": []
+}

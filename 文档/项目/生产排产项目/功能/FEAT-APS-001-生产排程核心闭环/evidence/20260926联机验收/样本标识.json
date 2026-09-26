@@ -1,0 +1,1880 @@
+{
+  "prefix": "UAT260926",
+  "resources": [
+    {
+      "capacityUomCode": "EA",
+      "capacityValue": 1,
+      "code": "UAT260926-CNC",
+      "id": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+      "name": "数控加工机 A",
+      "remark": "合成验收资源",
+      "rowVersion": 0,
+      "ruoyiUserId": null,
+      "status": "ACTIVE",
+      "teamName": "验收白班",
+      "type": "MACHINE",
+      "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2",
+      "workshopId": "af301712-9ba4-4a9e-96ce-e057b2895dfe"
+    },
+    {
+      "capacityUomCode": "EA",
+      "capacityValue": 1,
+      "code": "UAT260926-ASM",
+      "id": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+      "name": "装配检测台 B",
+      "remark": "合成验收资源",
+      "rowVersion": 0,
+      "ruoyiUserId": null,
+      "status": "ACTIVE",
+      "teamName": "验收白班",
+      "type": "MACHINE",
+      "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2",
+      "workshopId": "af301712-9ba4-4a9e-96ce-e057b2895dfe"
+    },
+    {
+      "capacityUomCode": "EA",
+      "capacityValue": 1,
+      "code": "UAT260926-P1",
+      "id": "12c3127c-21e1-458d-90fb-786a831baf5e",
+      "name": "验收操作员甲",
+      "remark": "合成验收资源",
+      "rowVersion": 0,
+      "ruoyiUserId": null,
+      "status": "ACTIVE",
+      "teamName": "验收白班",
+      "type": "PERSON",
+      "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2",
+      "workshopId": "af301712-9ba4-4a9e-96ce-e057b2895dfe"
+    },
+    {
+      "capacityUomCode": "EA",
+      "capacityValue": 1,
+      "code": "UAT260926-P2",
+      "id": "02b5283c-c5d8-4692-9912-ca1106c98708",
+      "name": "验收操作员乙",
+      "remark": "合成验收资源",
+      "rowVersion": 0,
+      "ruoyiUserId": null,
+      "status": "ACTIVE",
+      "teamName": "验收白班",
+      "type": "PERSON",
+      "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2",
+      "workshopId": "af301712-9ba4-4a9e-96ce-e057b2895dfe"
+    }
+  ],
+  "items": [
+    {
+      "baseUomCode": "EA",
+      "code": "UAT260926-A",
+      "id": "073df520-132a-4c50-af0e-db4dbfcce0c0",
+      "name": "精密支架 A 型",
+      "remark": "合成验收产品",
+      "rowVersion": 0,
+      "specification": "铝合金 6061 / 标准型",
+      "status": "ACTIVE",
+      "type": "PRODUCT"
+    },
+    {
+      "baseUomCode": "EA",
+      "code": "UAT260926-B",
+      "id": "c6f0a8aa-a83f-46e3-976c-f286034ca879",
+      "name": "精密支架 B 型",
+      "remark": "合成验收产品",
+      "rowVersion": 0,
+      "specification": "铝合金 6061 / 加强型",
+      "status": "ACTIVE",
+      "type": "PRODUCT"
+    }
+  ],
+  "operations": [
+    {
+      "batchCapacity": null,
+      "batchUomCode": null,
+      "code": "UAT260926-CNC",
+      "compatibilityRuleJson": null,
+      "id": "52e6b053-7512-4c85-8a7e-c9b8788fb2ef",
+      "interruptible": false,
+      "mode": "MAN_MACHINE",
+      "name": "数控加工",
+      "outputItemId": null,
+      "phases": [
+        {
+          "durationModel": "FIXED",
+          "fixedSeconds": 300,
+          "id": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+          "maxSegments": 1,
+          "minSegmentSeconds": 0,
+          "name": "换型准备",
+          "operationSpecId": "52e6b053-7512-4c85-8a7e-c9b8788fb2ef",
+          "phaseNo": 1,
+          "phaseType": "SETUP",
+          "requirements": [
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+              "holdOnPause": false,
+              "id": "1faeaff5-6757-31a2-8153-1084f5e72940",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "4bd10061-ee69-38ef-9028-2cba5e87a188",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+              "requiredSkillCode": "CNC",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            }
+          ],
+          "resourceHoldPolicy": "PHASE_ONLY",
+          "resumeSetupSeconds": 0,
+          "rowVersion": 0,
+          "secondsPerUnit": 0,
+          "segmentResourcePolicy": "SAME_RESOURCES"
+        },
+        {
+          "durationModel": "PER_UNIT",
+          "fixedSeconds": 0,
+          "id": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+          "maxSegments": 1,
+          "minSegmentSeconds": 0,
+          "name": "数控加工",
+          "operationSpecId": "52e6b053-7512-4c85-8a7e-c9b8788fb2ef",
+          "phaseNo": 2,
+          "phaseType": "RUN",
+          "requirements": [
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+              "holdOnPause": false,
+              "id": "23f0f7b4-9bb8-3f9a-bb89-6910be27bdf7",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "2a9a6241-11d2-36d0-9675-8f6fe08cfe59",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+              "requiredSkillCode": "CNC",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            }
+          ],
+          "resourceHoldPolicy": "PHASE_ONLY",
+          "resumeSetupSeconds": 0,
+          "rowVersion": 0,
+          "secondsPerUnit": 60,
+          "segmentResourcePolicy": "SAME_RESOURCES"
+        }
+      ],
+      "qualityGateRequired": false,
+      "remark": "合成验收工序",
+      "rowVersion": 1,
+      "status": "ACTIVE"
+    },
+    {
+      "batchCapacity": null,
+      "batchUomCode": null,
+      "code": "UAT260926-ASM",
+      "compatibilityRuleJson": null,
+      "id": "a0c9e726-0fd4-4bc7-939c-dde697b98e23",
+      "interruptible": false,
+      "mode": "MAN_MACHINE",
+      "name": "装配与终检",
+      "outputItemId": null,
+      "phases": [
+        {
+          "durationModel": "FIXED",
+          "fixedSeconds": 300,
+          "id": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+          "maxSegments": 1,
+          "minSegmentSeconds": 0,
+          "name": "换型准备",
+          "operationSpecId": "a0c9e726-0fd4-4bc7-939c-dde697b98e23",
+          "phaseNo": 1,
+          "phaseType": "SETUP",
+          "requirements": [
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+              "holdOnPause": false,
+              "id": "28834ccc-f032-3fbe-9a24-fc9ca4fd17dc",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "57d5d1d6-5dfa-3bea-a1c3-d6198995efc5",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+              "requiredSkillCode": "ASSEMBLY",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            }
+          ],
+          "resourceHoldPolicy": "PHASE_ONLY",
+          "resumeSetupSeconds": 0,
+          "rowVersion": 0,
+          "secondsPerUnit": 0,
+          "segmentResourcePolicy": "SAME_RESOURCES"
+        },
+        {
+          "durationModel": "PER_UNIT",
+          "fixedSeconds": 0,
+          "id": "ae612745-9dbc-3296-9f83-b141034902bf",
+          "maxSegments": 1,
+          "minSegmentSeconds": 0,
+          "name": "装配与终检",
+          "operationSpecId": "a0c9e726-0fd4-4bc7-939c-dde697b98e23",
+          "phaseNo": 2,
+          "phaseType": "RUN",
+          "requirements": [
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+              "holdOnPause": false,
+              "id": "d8fd2b82-d7e2-3adb-9db0-d12f9b4d4d28",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "cfb65407-296d-301f-8535-487ba74d0a91",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+              "requiredSkillCode": "ASSEMBLY",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            }
+          ],
+          "resourceHoldPolicy": "PHASE_ONLY",
+          "resumeSetupSeconds": 0,
+          "rowVersion": 0,
+          "secondsPerUnit": 30,
+          "segmentResourcePolicy": "SAME_RESOURCES"
+        }
+      ],
+      "qualityGateRequired": true,
+      "remark": "合成验收工序",
+      "rowVersion": 1,
+      "status": "ACTIVE"
+    }
+  ],
+  "routes": [
+    {
+      "approvedAt": "2026-09-26T01:08:02.006669800Z",
+      "approvedBy": "admin",
+      "changeNote": "真实联机验收：加工→装配终检",
+      "effectiveFrom": "2026-09-01T00:00:00Z",
+      "effectiveTo": null,
+      "id": "157c2c7b-63c4-4a9e-a63e-d2f0cef9122b",
+      "itemId": "073df520-132a-4c50-af0e-db4dbfcce0c0",
+      "routeCode": "UAT260926-R-A",
+      "rowVersion": 1,
+      "status": "ACTIVE",
+      "versionNo": "1.0"
+    },
+    {
+      "approvedAt": "2026-09-26T01:08:05.199170600Z",
+      "approvedBy": "admin",
+      "changeNote": "真实联机验收：加工→装配终检",
+      "effectiveFrom": "2026-09-01T00:00:00Z",
+      "effectiveTo": null,
+      "id": "a092b4ff-1ec5-43d6-b37c-e3097f43e3d9",
+      "itemId": "c6f0a8aa-a83f-46e3-976c-f286034ca879",
+      "routeCode": "UAT260926-R-B",
+      "rowVersion": 1,
+      "status": "ACTIVE",
+      "versionNo": "1.0"
+    }
+  ],
+  "orders": [
+    {
+      "customerCode": "UAT-C01",
+      "customerName": "验收样本客户1",
+      "earliestStartAt": "2026-09-25T00:00:00Z",
+      "externalId": "UAT260926-SO01",
+      "id": "31d0a960-b3f3-3daf-9560-16f34326f5e6",
+      "lines": [
+        {
+          "components": [],
+          "demandQty": 40,
+          "dependencies": [],
+          "earliestStartAt": "2026-09-25T00:00:00Z",
+          "id": "de9f3ed1-12f3-36d3-8c89-4312ae05ce10",
+          "itemId": "073df520-132a-4c50-af0e-db4dbfcce0c0",
+          "lineNo": 1,
+          "orderId": "31d0a960-b3f3-3daf-9560-16f34326f5e6",
+          "promisedAt": "2026-09-25T09:00:00Z",
+          "routeVersionId": "157c2c7b-63c4-4a9e-a63e-d2f0cef9122b",
+          "rowVersion": 1,
+          "status": "RELEASED",
+          "uomCode": "EA"
+        }
+      ],
+      "orderNo": "UAT260926-SO01",
+      "priority": 90,
+      "promisedAt": "2026-09-25T09:00:00Z",
+      "remark": "合成验收订单，按2026-09-25班次回放，无外部发货",
+      "rowVersion": 1,
+      "sourceSystem": "UAT",
+      "status": "RELEASED"
+    },
+    {
+      "customerCode": "UAT-C02",
+      "customerName": "验收样本客户2",
+      "earliestStartAt": "2026-09-25T00:00:00Z",
+      "externalId": "UAT260926-SO02",
+      "id": "4e01bc9e-0d90-3263-9e36-ffaccc4cece5",
+      "lines": [
+        {
+          "components": [],
+          "demandQty": 30,
+          "dependencies": [],
+          "earliestStartAt": "2026-09-25T00:00:00Z",
+          "id": "0b97e169-5658-3c82-9202-76375a127768",
+          "itemId": "c6f0a8aa-a83f-46e3-976c-f286034ca879",
+          "lineNo": 1,
+          "orderId": "4e01bc9e-0d90-3263-9e36-ffaccc4cece5",
+          "promisedAt": "2026-09-25T09:00:00Z",
+          "routeVersionId": "a092b4ff-1ec5-43d6-b37c-e3097f43e3d9",
+          "rowVersion": 1,
+          "status": "RELEASED",
+          "uomCode": "EA"
+        }
+      ],
+      "orderNo": "UAT260926-SO02",
+      "priority": 70,
+      "promisedAt": "2026-09-25T09:00:00Z",
+      "remark": "合成验收订单，按2026-09-25班次回放，无外部发货",
+      "rowVersion": 1,
+      "sourceSystem": "UAT",
+      "status": "RELEASED"
+    },
+    {
+      "customerCode": "UAT-C03",
+      "customerName": "验收样本客户3",
+      "earliestStartAt": "2026-09-25T00:00:00Z",
+      "externalId": "UAT260926-SO03",
+      "id": "0819e27f-0163-3d8a-8fcf-4113cbcac4e9",
+      "lines": [
+        {
+          "components": [],
+          "demandQty": 20,
+          "dependencies": [],
+          "earliestStartAt": "2026-09-25T00:00:00Z",
+          "id": "489f6534-0856-3cec-95b9-15317f126309",
+          "itemId": "073df520-132a-4c50-af0e-db4dbfcce0c0",
+          "lineNo": 1,
+          "orderId": "0819e27f-0163-3d8a-8fcf-4113cbcac4e9",
+          "promisedAt": "2026-09-25T09:00:00Z",
+          "routeVersionId": "157c2c7b-63c4-4a9e-a63e-d2f0cef9122b",
+          "rowVersion": 1,
+          "status": "RELEASED",
+          "uomCode": "EA"
+        }
+      ],
+      "orderNo": "UAT260926-SO03",
+      "priority": 50,
+      "promisedAt": "2026-09-25T09:00:00Z",
+      "remark": "合成验收订单，按2026-09-25班次回放，无外部发货",
+      "rowVersion": 1,
+      "sourceSystem": "UAT",
+      "status": "RELEASED"
+    }
+  ],
+  "runs": [],
+  "workshop": {
+    "code": "UAT260926-WS",
+    "id": "af301712-9ba4-4a9e-96ce-e057b2895dfe",
+    "managerUserId": "1",
+    "name": "验收样本·精密制造车间",
+    "remark": "2026-09-26 真实联机验收合成数据",
+    "rowVersion": 0,
+    "status": "ACTIVE"
+  },
+  "center": {
+    "capacityUomCode": "EA",
+    "centerType": "MIXED",
+    "code": "UAT260926-CELL",
+    "concurrentCapacity": 4,
+    "id": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2",
+    "name": "加工装配单元",
+    "remark": null,
+    "rowVersion": 0,
+    "status": "ACTIVE",
+    "workshopId": "af301712-9ba4-4a9e-96ce-e057b2895dfe"
+  },
+  "day": "2026-09-25",
+  "start": "2026-09-25T00:00:00Z",
+  "end": "2026-09-25T09:00:00Z",
+  "beforeCalendar": [
+    {
+      "code": "RESOURCE_WITHOUT_AVAILABLE_WINDOW",
+      "message": "资源没有可用或加班时间窗",
+      "objectId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+      "objectType": "RESOURCE"
+    },
+    {
+      "code": "RESOURCE_WITHOUT_AVAILABLE_WINDOW",
+      "message": "资源没有可用或加班时间窗",
+      "objectId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+      "objectType": "RESOURCE"
+    },
+    {
+      "code": "RESOURCE_WITHOUT_AVAILABLE_WINDOW",
+      "message": "资源没有可用或加班时间窗",
+      "objectId": "12c3127c-21e1-458d-90fb-786a831baf5e",
+      "objectType": "RESOURCE"
+    },
+    {
+      "code": "RESOURCE_WITHOUT_AVAILABLE_WINDOW",
+      "message": "资源没有可用或加班时间窗",
+      "objectId": "02b5283c-c5d8-4692-9912-ca1106c98708",
+      "objectType": "RESOURCE"
+    }
+  ],
+  "afterCalendar": [
+    {
+      "code": "AVAILABILITY_CONFLICT",
+      "message": "可用窗与不可用窗重叠，将按不可用窗扣减",
+      "objectId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+      "objectType": "RESOURCE"
+    },
+    {
+      "code": "AVAILABILITY_CONFLICT",
+      "message": "可用窗与不可用窗重叠，将按不可用窗扣减",
+      "objectId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+      "objectType": "RESOURCE"
+    },
+    {
+      "code": "AVAILABILITY_CONFLICT",
+      "message": "可用窗与不可用窗重叠，将按不可用窗扣减",
+      "objectId": "12c3127c-21e1-458d-90fb-786a831baf5e",
+      "objectType": "RESOURCE"
+    },
+    {
+      "code": "AVAILABILITY_CONFLICT",
+      "message": "可用窗与不可用窗重叠，将按不可用窗扣减",
+      "objectId": "02b5283c-c5d8-4692-9912-ca1106c98708",
+      "objectType": "RESOURCE"
+    }
+  ],
+  "expansions": [
+    {
+      "dependencies": [
+        {
+          "consumesOutput": false,
+          "dependencyType": "FINISH",
+          "id": "1e20b1b9-0c9f-3f2d-b28e-32eb230ae3ab",
+          "lagSeconds": 0,
+          "predecessorTaskId": "7188a2e6-e2cc-3e5f-bb81-1565ca76469e",
+          "rowVersion": 0,
+          "successorTaskId": "9c32db55-ebb1-3372-9338-d2c9e0774a6a",
+          "thresholdQty": null,
+          "thresholdRatio": null,
+          "transferBatchQty": null,
+          "uomCode": null
+        }
+      ],
+      "lots": [
+        {
+          "id": "47594d25-343d-31a4-9123-2e2fd58511e0",
+          "itemId": "073df520-132a-4c50-af0e-db4dbfcce0c0",
+          "lotNo": "UAT260926-SO01-001",
+          "lotType": "NORMAL",
+          "orderLineId": "de9f3ed1-12f3-36d3-8c89-4312ae05ce10",
+          "parentLotId": null,
+          "plannedQty": 40,
+          "recoveryReason": null,
+          "routeVersionId": "157c2c7b-63c4-4a9e-a63e-d2f0cef9122b",
+          "rowVersion": 0,
+          "status": "PLANNED",
+          "uomCode": "EA"
+        }
+      ],
+      "materialDemands": [],
+      "order": {
+        "customerCode": "UAT-C01",
+        "customerName": "验收样本客户1",
+        "earliestStartAt": "2026-09-25T00:00:00Z",
+        "externalId": "UAT260926-SO01",
+        "id": "31d0a960-b3f3-3daf-9560-16f34326f5e6",
+        "lines": [
+          {
+            "components": [],
+            "demandQty": 40,
+            "dependencies": [],
+            "earliestStartAt": "2026-09-25T00:00:00Z",
+            "id": "de9f3ed1-12f3-36d3-8c89-4312ae05ce10",
+            "itemId": "073df520-132a-4c50-af0e-db4dbfcce0c0",
+            "lineNo": 1,
+            "orderId": "31d0a960-b3f3-3daf-9560-16f34326f5e6",
+            "promisedAt": "2026-09-25T09:00:00Z",
+            "routeVersionId": "157c2c7b-63c4-4a9e-a63e-d2f0cef9122b",
+            "rowVersion": 0,
+            "status": "DRAFT",
+            "uomCode": "EA"
+          }
+        ],
+        "orderNo": "UAT260926-SO01",
+        "priority": 90,
+        "promisedAt": "2026-09-25T09:00:00Z",
+        "remark": "合成验收订单，按2026-09-25班次回放，无外部发货",
+        "rowVersion": 0,
+        "sourceSystem": "UAT",
+        "status": "DRAFT"
+      },
+      "reused": false,
+      "tasks": [
+        {
+          "id": "7188a2e6-e2cc-3e5f-bb81-1565ca76469e",
+          "interruptible": false,
+          "minimumSkillLevel": 2,
+          "operationSpecId": "52e6b053-7512-4c85-8a7e-c9b8788fb2ef",
+          "productionLotId": "47594d25-343d-31a4-9123-2e2fd58511e0",
+          "requiredSkillCode": "CNC",
+          "requirementSnapshot": [
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+              "holdOnPause": false,
+              "id": "1faeaff5-6757-31a2-8153-1084f5e72940",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "4bd10061-ee69-38ef-9028-2cba5e87a188",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+              "requiredSkillCode": "CNC",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+              "holdOnPause": false,
+              "id": "23f0f7b4-9bb8-3f9a-bb89-6910be27bdf7",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "2a9a6241-11d2-36d0-9675-8f6fe08cfe59",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+              "requiredSkillCode": "CNC",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            }
+          ],
+          "routeNodeId": "f0865948-8545-3358-a47f-4879a57280cc",
+          "routeVersionId": "157c2c7b-63c4-4a9e-a63e-d2f0cef9122b",
+          "rowVersion": 0,
+          "runSeconds": 2400,
+          "setupSeconds": 300,
+          "status": "NOT_READY",
+          "taskCode": "UAT260926-SO01-001-CNC",
+          "taskName": "数控加工",
+          "taskQty": 40,
+          "transportSeconds": 0,
+          "unloadSeconds": 0,
+          "uomCode": "EA",
+          "waitSeconds": 0,
+          "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+        },
+        {
+          "id": "9c32db55-ebb1-3372-9338-d2c9e0774a6a",
+          "interruptible": false,
+          "minimumSkillLevel": 2,
+          "operationSpecId": "a0c9e726-0fd4-4bc7-939c-dde697b98e23",
+          "productionLotId": "47594d25-343d-31a4-9123-2e2fd58511e0",
+          "requiredSkillCode": "ASSEMBLY",
+          "requirementSnapshot": [
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+              "holdOnPause": false,
+              "id": "28834ccc-f032-3fbe-9a24-fc9ca4fd17dc",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "57d5d1d6-5dfa-3bea-a1c3-d6198995efc5",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+              "requiredSkillCode": "ASSEMBLY",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+              "holdOnPause": false,
+              "id": "d8fd2b82-d7e2-3adb-9db0-d12f9b4d4d28",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "cfb65407-296d-301f-8535-487ba74d0a91",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+              "requiredSkillCode": "ASSEMBLY",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            }
+          ],
+          "routeNodeId": "09fe7a11-39a3-3a31-af63-69ad843b163d",
+          "routeVersionId": "157c2c7b-63c4-4a9e-a63e-d2f0cef9122b",
+          "rowVersion": 0,
+          "runSeconds": 1200,
+          "setupSeconds": 300,
+          "status": "NOT_READY",
+          "taskCode": "UAT260926-SO01-001-ASM",
+          "taskName": "装配与终检",
+          "taskQty": 40,
+          "transportSeconds": 0,
+          "unloadSeconds": 0,
+          "uomCode": "EA",
+          "waitSeconds": 0,
+          "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+        }
+      ]
+    },
+    {
+      "dependencies": [
+        {
+          "consumesOutput": false,
+          "dependencyType": "FINISH",
+          "id": "79fa9a32-320c-35ea-8b38-f4d4de8b1a4a",
+          "lagSeconds": 0,
+          "predecessorTaskId": "191c3e15-145f-3c91-9f3e-ad8dc7ae2f01",
+          "rowVersion": 0,
+          "successorTaskId": "1683967d-37c4-3fda-92f0-dbf6c7a9b55b",
+          "thresholdQty": null,
+          "thresholdRatio": null,
+          "transferBatchQty": null,
+          "uomCode": null
+        }
+      ],
+      "lots": [
+        {
+          "id": "bfa49b5e-de61-3c11-ac15-c84055810133",
+          "itemId": "c6f0a8aa-a83f-46e3-976c-f286034ca879",
+          "lotNo": "UAT260926-SO02-001",
+          "lotType": "NORMAL",
+          "orderLineId": "0b97e169-5658-3c82-9202-76375a127768",
+          "parentLotId": null,
+          "plannedQty": 30,
+          "recoveryReason": null,
+          "routeVersionId": "a092b4ff-1ec5-43d6-b37c-e3097f43e3d9",
+          "rowVersion": 0,
+          "status": "PLANNED",
+          "uomCode": "EA"
+        }
+      ],
+      "materialDemands": [],
+      "order": {
+        "customerCode": "UAT-C02",
+        "customerName": "验收样本客户2",
+        "earliestStartAt": "2026-09-25T00:00:00Z",
+        "externalId": "UAT260926-SO02",
+        "id": "4e01bc9e-0d90-3263-9e36-ffaccc4cece5",
+        "lines": [
+          {
+            "components": [],
+            "demandQty": 30,
+            "dependencies": [],
+            "earliestStartAt": "2026-09-25T00:00:00Z",
+            "id": "0b97e169-5658-3c82-9202-76375a127768",
+            "itemId": "c6f0a8aa-a83f-46e3-976c-f286034ca879",
+            "lineNo": 1,
+            "orderId": "4e01bc9e-0d90-3263-9e36-ffaccc4cece5",
+            "promisedAt": "2026-09-25T09:00:00Z",
+            "routeVersionId": "a092b4ff-1ec5-43d6-b37c-e3097f43e3d9",
+            "rowVersion": 0,
+            "status": "DRAFT",
+            "uomCode": "EA"
+          }
+        ],
+        "orderNo": "UAT260926-SO02",
+        "priority": 70,
+        "promisedAt": "2026-09-25T09:00:00Z",
+        "remark": "合成验收订单，按2026-09-25班次回放，无外部发货",
+        "rowVersion": 0,
+        "sourceSystem": "UAT",
+        "status": "DRAFT"
+      },
+      "reused": false,
+      "tasks": [
+        {
+          "id": "191c3e15-145f-3c91-9f3e-ad8dc7ae2f01",
+          "interruptible": false,
+          "minimumSkillLevel": 2,
+          "operationSpecId": "52e6b053-7512-4c85-8a7e-c9b8788fb2ef",
+          "productionLotId": "bfa49b5e-de61-3c11-ac15-c84055810133",
+          "requiredSkillCode": "CNC",
+          "requirementSnapshot": [
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+              "holdOnPause": false,
+              "id": "1faeaff5-6757-31a2-8153-1084f5e72940",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "4bd10061-ee69-38ef-9028-2cba5e87a188",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+              "requiredSkillCode": "CNC",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+              "holdOnPause": false,
+              "id": "23f0f7b4-9bb8-3f9a-bb89-6910be27bdf7",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "2a9a6241-11d2-36d0-9675-8f6fe08cfe59",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+              "requiredSkillCode": "CNC",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            }
+          ],
+          "routeNodeId": "7550f5b1-03c2-30bc-a49a-ea461c39d2ca",
+          "routeVersionId": "a092b4ff-1ec5-43d6-b37c-e3097f43e3d9",
+          "rowVersion": 0,
+          "runSeconds": 1800,
+          "setupSeconds": 300,
+          "status": "NOT_READY",
+          "taskCode": "UAT260926-SO02-001-CNC",
+          "taskName": "数控加工",
+          "taskQty": 30,
+          "transportSeconds": 0,
+          "unloadSeconds": 0,
+          "uomCode": "EA",
+          "waitSeconds": 0,
+          "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+        },
+        {
+          "id": "1683967d-37c4-3fda-92f0-dbf6c7a9b55b",
+          "interruptible": false,
+          "minimumSkillLevel": 2,
+          "operationSpecId": "a0c9e726-0fd4-4bc7-939c-dde697b98e23",
+          "productionLotId": "bfa49b5e-de61-3c11-ac15-c84055810133",
+          "requiredSkillCode": "ASSEMBLY",
+          "requirementSnapshot": [
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+              "holdOnPause": false,
+              "id": "28834ccc-f032-3fbe-9a24-fc9ca4fd17dc",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "57d5d1d6-5dfa-3bea-a1c3-d6198995efc5",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+              "requiredSkillCode": "ASSEMBLY",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+              "holdOnPause": false,
+              "id": "d8fd2b82-d7e2-3adb-9db0-d12f9b4d4d28",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "cfb65407-296d-301f-8535-487ba74d0a91",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+              "requiredSkillCode": "ASSEMBLY",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            }
+          ],
+          "routeNodeId": "73ccfc99-a82e-3892-8451-34b3a4c7db82",
+          "routeVersionId": "a092b4ff-1ec5-43d6-b37c-e3097f43e3d9",
+          "rowVersion": 0,
+          "runSeconds": 900,
+          "setupSeconds": 300,
+          "status": "NOT_READY",
+          "taskCode": "UAT260926-SO02-001-ASM",
+          "taskName": "装配与终检",
+          "taskQty": 30,
+          "transportSeconds": 0,
+          "unloadSeconds": 0,
+          "uomCode": "EA",
+          "waitSeconds": 0,
+          "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+        }
+      ]
+    },
+    {
+      "dependencies": [
+        {
+          "consumesOutput": false,
+          "dependencyType": "FINISH",
+          "id": "db5ef1a5-35ec-3038-a602-f4bc2d269d9b",
+          "lagSeconds": 0,
+          "predecessorTaskId": "7a1a0846-4dd7-3892-b250-c5d7aefca74e",
+          "rowVersion": 0,
+          "successorTaskId": "e772025e-f18e-3af5-aaa1-0acd14ca5889",
+          "thresholdQty": null,
+          "thresholdRatio": null,
+          "transferBatchQty": null,
+          "uomCode": null
+        }
+      ],
+      "lots": [
+        {
+          "id": "f35626f9-942a-3136-90fd-abda9c6394d7",
+          "itemId": "073df520-132a-4c50-af0e-db4dbfcce0c0",
+          "lotNo": "UAT260926-SO03-001",
+          "lotType": "NORMAL",
+          "orderLineId": "489f6534-0856-3cec-95b9-15317f126309",
+          "parentLotId": null,
+          "plannedQty": 20,
+          "recoveryReason": null,
+          "routeVersionId": "157c2c7b-63c4-4a9e-a63e-d2f0cef9122b",
+          "rowVersion": 0,
+          "status": "PLANNED",
+          "uomCode": "EA"
+        }
+      ],
+      "materialDemands": [],
+      "order": {
+        "customerCode": "UAT-C03",
+        "customerName": "验收样本客户3",
+        "earliestStartAt": "2026-09-25T00:00:00Z",
+        "externalId": "UAT260926-SO03",
+        "id": "0819e27f-0163-3d8a-8fcf-4113cbcac4e9",
+        "lines": [
+          {
+            "components": [],
+            "demandQty": 20,
+            "dependencies": [],
+            "earliestStartAt": "2026-09-25T00:00:00Z",
+            "id": "489f6534-0856-3cec-95b9-15317f126309",
+            "itemId": "073df520-132a-4c50-af0e-db4dbfcce0c0",
+            "lineNo": 1,
+            "orderId": "0819e27f-0163-3d8a-8fcf-4113cbcac4e9",
+            "promisedAt": "2026-09-25T09:00:00Z",
+            "routeVersionId": "157c2c7b-63c4-4a9e-a63e-d2f0cef9122b",
+            "rowVersion": 0,
+            "status": "DRAFT",
+            "uomCode": "EA"
+          }
+        ],
+        "orderNo": "UAT260926-SO03",
+        "priority": 50,
+        "promisedAt": "2026-09-25T09:00:00Z",
+        "remark": "合成验收订单，按2026-09-25班次回放，无外部发货",
+        "rowVersion": 0,
+        "sourceSystem": "UAT",
+        "status": "DRAFT"
+      },
+      "reused": false,
+      "tasks": [
+        {
+          "id": "7a1a0846-4dd7-3892-b250-c5d7aefca74e",
+          "interruptible": false,
+          "minimumSkillLevel": 2,
+          "operationSpecId": "52e6b053-7512-4c85-8a7e-c9b8788fb2ef",
+          "productionLotId": "f35626f9-942a-3136-90fd-abda9c6394d7",
+          "requiredSkillCode": "CNC",
+          "requirementSnapshot": [
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+              "holdOnPause": false,
+              "id": "1faeaff5-6757-31a2-8153-1084f5e72940",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "4bd10061-ee69-38ef-9028-2cba5e87a188",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+              "requiredSkillCode": "CNC",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+              "holdOnPause": false,
+              "id": "23f0f7b4-9bb8-3f9a-bb89-6910be27bdf7",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "2a9a6241-11d2-36d0-9675-8f6fe08cfe59",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+              "requiredSkillCode": "CNC",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            }
+          ],
+          "routeNodeId": "f0865948-8545-3358-a47f-4879a57280cc",
+          "routeVersionId": "157c2c7b-63c4-4a9e-a63e-d2f0cef9122b",
+          "rowVersion": 0,
+          "runSeconds": 1200,
+          "setupSeconds": 300,
+          "status": "NOT_READY",
+          "taskCode": "UAT260926-SO03-001-CNC",
+          "taskName": "数控加工",
+          "taskQty": 20,
+          "transportSeconds": 0,
+          "unloadSeconds": 0,
+          "uomCode": "EA",
+          "waitSeconds": 0,
+          "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+        },
+        {
+          "id": "e772025e-f18e-3af5-aaa1-0acd14ca5889",
+          "interruptible": false,
+          "minimumSkillLevel": 2,
+          "operationSpecId": "a0c9e726-0fd4-4bc7-939c-dde697b98e23",
+          "productionLotId": "f35626f9-942a-3136-90fd-abda9c6394d7",
+          "requiredSkillCode": "ASSEMBLY",
+          "requirementSnapshot": [
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+              "holdOnPause": false,
+              "id": "28834ccc-f032-3fbe-9a24-fc9ca4fd17dc",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "57d5d1d6-5dfa-3bea-a1c3-d6198995efc5",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+              "requiredSkillCode": "ASSEMBLY",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+              "holdOnPause": false,
+              "id": "d8fd2b82-d7e2-3adb-9db0-d12f9b4d4d28",
+              "minimumSkillLevel": null,
+              "optional": false,
+              "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+              "requiredSkillCode": null,
+              "requirementNo": 1,
+              "resourceType": "MACHINE",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            },
+            {
+              "capabilityRuleJson": null,
+              "fixedResourceId": null,
+              "holdOnPause": false,
+              "id": "cfb65407-296d-301f-8535-487ba74d0a91",
+              "minimumSkillLevel": 2,
+              "optional": false,
+              "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+              "requiredSkillCode": "ASSEMBLY",
+              "requirementNo": 2,
+              "resourceType": "PERSON",
+              "rowVersion": 0,
+              "seatCount": 1,
+              "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+            }
+          ],
+          "routeNodeId": "09fe7a11-39a3-3a31-af63-69ad843b163d",
+          "routeVersionId": "157c2c7b-63c4-4a9e-a63e-d2f0cef9122b",
+          "rowVersion": 0,
+          "runSeconds": 600,
+          "setupSeconds": 300,
+          "status": "NOT_READY",
+          "taskCode": "UAT260926-SO03-001-ASM",
+          "taskName": "装配与终检",
+          "taskQty": 20,
+          "transportSeconds": 0,
+          "unloadSeconds": 0,
+          "uomCode": "EA",
+          "waitSeconds": 0,
+          "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+        }
+      ]
+    }
+  ],
+  "planRequestKey": "1c550ffa-aa37-49d3-9a7b-935d3068a683",
+  "planInput": {
+    "siteCode": "APS_PREVIEW",
+    "workshopIds": [
+      "af301712-9ba4-4a9e-96ce-e057b2895dfe"
+    ],
+    "orderIds": [
+      "31d0a960-b3f3-3daf-9560-16f34326f5e6",
+      "4e01bc9e-0d90-3263-9e36-ffaccc4cece5",
+      "0819e27f-0163-3d8a-8fcf-4113cbcac4e9"
+    ],
+    "capturedAt": "2026-09-26T01:13:05.248Z",
+    "definitionRevision": 1,
+    "executionRevision": 0,
+    "horizon": {
+      "startAt": "2026-09-25T00:00:00Z",
+      "detailEndAt": "2026-09-25T09:00:00Z",
+      "endAt": "2026-09-25T09:00:00Z",
+      "planningAnchorAt": "2026-09-25T00:00:00Z",
+      "timeUnitSeconds": 60,
+      "displayTimeZone": "Asia/Shanghai"
+    },
+    "parameters": {
+      "maxSolveSeconds": 30,
+      "randomSeed": 26,
+      "solverSearchThreads": 1,
+      "absoluteGapLimit": 0,
+      "relativeGapLimit": 0
+    },
+    "sharedBatches": []
+  },
+  "planStatus": {
+    "baseVersion": null,
+    "contractType": "PLAN_REQUEST_STATUS",
+    "definitionRevision": 1,
+    "executionRevision": 0,
+    "horizon": {
+      "detailEndAt": "2026-09-25T09:00:00Z",
+      "endAt": "2026-09-25T09:00:00Z",
+      "planningAnchorAt": "2026-09-25T00:00:00Z",
+      "startAt": "2026-09-25T00:00:00Z",
+      "timeUnitSeconds": 60
+    },
+    "inputHash": "989f9689ac399fbac4f4e7afd4a1a2d796d89060f333d91d3e5367a11ab644ee",
+    "planStatus": "FEASIBLE",
+    "planVersionId": "d93a0ca3-bf7b-388f-8461-8cf175f4c95e",
+    "reasonCodes": [],
+    "requestId": "1c550ffa-aa37-49d3-9a7b-935d3068a683",
+    "resultKind": "FEASIBLE",
+    "schemaVersion": "1.0",
+    "solverStatus": "OPTIMAL",
+    "updatedAt": "2026-09-26T09:13:15.362Z"
+  },
+  "planDetail": {
+    "allocations": [
+      {
+        "allocationRole": "MACHINE",
+        "capacityUsed": "1",
+        "id": "e960a3a4-e8d8-31b4-bd6c-796c87594b18",
+        "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+        "requirementId": "1faeaff5-6757-31a2-8153-1084f5e72940",
+        "resourceId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+        "seatNo": 1,
+        "segmentId": "2155901a-18ce-357c-8c53-8321f351bab4"
+      },
+      {
+        "allocationRole": "PERSON",
+        "capacityUsed": "1",
+        "id": "d81beb9d-5fb5-3224-a436-2eb8a6cea400",
+        "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+        "requirementId": "4bd10061-ee69-38ef-9028-2cba5e87a188",
+        "resourceId": "12c3127c-21e1-458d-90fb-786a831baf5e",
+        "seatNo": 1,
+        "segmentId": "2155901a-18ce-357c-8c53-8321f351bab4"
+      },
+      {
+        "allocationRole": "MACHINE",
+        "capacityUsed": "1",
+        "id": "e4dfa816-fec2-3956-80d9-95ee84730f7c",
+        "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+        "requirementId": "23f0f7b4-9bb8-3f9a-bb89-6910be27bdf7",
+        "resourceId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+        "seatNo": 1,
+        "segmentId": "256efeec-0cd2-3e2c-a968-cd284cc2b82a"
+      },
+      {
+        "allocationRole": "PERSON",
+        "capacityUsed": "1",
+        "id": "840f7a25-bdd9-32f3-a20f-c27cca857ace",
+        "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+        "requirementId": "2a9a6241-11d2-36d0-9675-8f6fe08cfe59",
+        "resourceId": "02b5283c-c5d8-4692-9912-ca1106c98708",
+        "seatNo": 1,
+        "segmentId": "256efeec-0cd2-3e2c-a968-cd284cc2b82a"
+      },
+      {
+        "allocationRole": "MACHINE",
+        "capacityUsed": "1",
+        "id": "c9c95a03-497b-3046-88df-e5b587dc3e0f",
+        "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+        "requirementId": "1faeaff5-6757-31a2-8153-1084f5e72940",
+        "resourceId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+        "seatNo": 1,
+        "segmentId": "3cfd25bb-f248-3dbe-aaeb-f8d6b7dbd72d"
+      },
+      {
+        "allocationRole": "PERSON",
+        "capacityUsed": "1",
+        "id": "5a017301-9d6b-3605-a02e-12287390d44f",
+        "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+        "requirementId": "4bd10061-ee69-38ef-9028-2cba5e87a188",
+        "resourceId": "02b5283c-c5d8-4692-9912-ca1106c98708",
+        "seatNo": 1,
+        "segmentId": "3cfd25bb-f248-3dbe-aaeb-f8d6b7dbd72d"
+      },
+      {
+        "allocationRole": "MACHINE",
+        "capacityUsed": "1",
+        "id": "c1e28795-e41d-33ba-b890-04003727a14f",
+        "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+        "requirementId": "1faeaff5-6757-31a2-8153-1084f5e72940",
+        "resourceId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+        "seatNo": 1,
+        "segmentId": "6496445e-2e9c-3814-ae06-8e1d9038e26b"
+      },
+      {
+        "allocationRole": "PERSON",
+        "capacityUsed": "1",
+        "id": "5da9a294-ceb3-3340-8cdb-2c2b02edcc7a",
+        "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+        "requirementId": "4bd10061-ee69-38ef-9028-2cba5e87a188",
+        "resourceId": "12c3127c-21e1-458d-90fb-786a831baf5e",
+        "seatNo": 1,
+        "segmentId": "6496445e-2e9c-3814-ae06-8e1d9038e26b"
+      },
+      {
+        "allocationRole": "MACHINE",
+        "capacityUsed": "1",
+        "id": "e5abd95b-72b5-3273-8573-9c56c42c4ffe",
+        "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+        "requirementId": "28834ccc-f032-3fbe-9a24-fc9ca4fd17dc",
+        "resourceId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+        "seatNo": 1,
+        "segmentId": "9606262c-91cd-3426-bb54-a5c737c8fa39"
+      },
+      {
+        "allocationRole": "PERSON",
+        "capacityUsed": "1",
+        "id": "272cdced-1166-31e1-b98e-273b32d96ad0",
+        "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+        "requirementId": "57d5d1d6-5dfa-3bea-a1c3-d6198995efc5",
+        "resourceId": "02b5283c-c5d8-4692-9912-ca1106c98708",
+        "seatNo": 1,
+        "segmentId": "9606262c-91cd-3426-bb54-a5c737c8fa39"
+      },
+      {
+        "allocationRole": "MACHINE",
+        "capacityUsed": "1",
+        "id": "f4d5322e-6448-3621-a516-426d7c0b7aaf",
+        "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+        "requirementId": "23f0f7b4-9bb8-3f9a-bb89-6910be27bdf7",
+        "resourceId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+        "seatNo": 1,
+        "segmentId": "a0fdcfd0-5ced-38f9-81d5-c2139a78b2ff"
+      },
+      {
+        "allocationRole": "PERSON",
+        "capacityUsed": "1",
+        "id": "d784cc77-ac37-3fb2-9cd6-0234ac5ea934",
+        "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+        "requirementId": "2a9a6241-11d2-36d0-9675-8f6fe08cfe59",
+        "resourceId": "12c3127c-21e1-458d-90fb-786a831baf5e",
+        "seatNo": 1,
+        "segmentId": "a0fdcfd0-5ced-38f9-81d5-c2139a78b2ff"
+      },
+      {
+        "allocationRole": "MACHINE",
+        "capacityUsed": "1",
+        "id": "b6f48f87-a67c-3d95-84b4-18e71861196c",
+        "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+        "requirementId": "28834ccc-f032-3fbe-9a24-fc9ca4fd17dc",
+        "resourceId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+        "seatNo": 1,
+        "segmentId": "bdf697c5-bda6-371a-b02f-bae066c012f6"
+      },
+      {
+        "allocationRole": "PERSON",
+        "capacityUsed": "1",
+        "id": "1cd278ab-8ae1-30dc-a420-e9f0469cf3b4",
+        "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+        "requirementId": "57d5d1d6-5dfa-3bea-a1c3-d6198995efc5",
+        "resourceId": "02b5283c-c5d8-4692-9912-ca1106c98708",
+        "seatNo": 1,
+        "segmentId": "bdf697c5-bda6-371a-b02f-bae066c012f6"
+      },
+      {
+        "allocationRole": "MACHINE",
+        "capacityUsed": "1",
+        "id": "4bb83b31-577a-35db-b795-7c6f18f1bdb8",
+        "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+        "requirementId": "28834ccc-f032-3fbe-9a24-fc9ca4fd17dc",
+        "resourceId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+        "seatNo": 1,
+        "segmentId": "c7c0be2d-a0dc-3b9f-a7b6-41f4651ffefc"
+      },
+      {
+        "allocationRole": "PERSON",
+        "capacityUsed": "1",
+        "id": "3b748e75-ecf0-3f1e-865b-17a17db97eed",
+        "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+        "requirementId": "57d5d1d6-5dfa-3bea-a1c3-d6198995efc5",
+        "resourceId": "02b5283c-c5d8-4692-9912-ca1106c98708",
+        "seatNo": 1,
+        "segmentId": "c7c0be2d-a0dc-3b9f-a7b6-41f4651ffefc"
+      },
+      {
+        "allocationRole": "MACHINE",
+        "capacityUsed": "1",
+        "id": "04736053-c339-319b-a4b5-db47c4fcb3fc",
+        "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+        "requirementId": "d8fd2b82-d7e2-3adb-9db0-d12f9b4d4d28",
+        "resourceId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+        "seatNo": 1,
+        "segmentId": "c9f688a5-14e1-3950-8b4f-b6ef2c353a1e"
+      },
+      {
+        "allocationRole": "PERSON",
+        "capacityUsed": "1",
+        "id": "3d86a4e0-2e2f-3545-be91-b39674a13536",
+        "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+        "requirementId": "cfb65407-296d-301f-8535-487ba74d0a91",
+        "resourceId": "02b5283c-c5d8-4692-9912-ca1106c98708",
+        "seatNo": 1,
+        "segmentId": "c9f688a5-14e1-3950-8b4f-b6ef2c353a1e"
+      },
+      {
+        "allocationRole": "MACHINE",
+        "capacityUsed": "1",
+        "id": "e80831f0-e574-393b-b3c8-e2ee07293997",
+        "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+        "requirementId": "23f0f7b4-9bb8-3f9a-bb89-6910be27bdf7",
+        "resourceId": "ae8f9e6a-355b-4453-9f96-b43384cde1a4",
+        "seatNo": 1,
+        "segmentId": "e8165667-b873-37b5-a510-68b7f3d474c5"
+      },
+      {
+        "allocationRole": "PERSON",
+        "capacityUsed": "1",
+        "id": "31bb8852-0abf-3cd7-80d1-637a27b6b0a8",
+        "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+        "requirementId": "2a9a6241-11d2-36d0-9675-8f6fe08cfe59",
+        "resourceId": "02b5283c-c5d8-4692-9912-ca1106c98708",
+        "seatNo": 1,
+        "segmentId": "e8165667-b873-37b5-a510-68b7f3d474c5"
+      },
+      {
+        "allocationRole": "MACHINE",
+        "capacityUsed": "1",
+        "id": "c6efb78a-5608-3365-b3e4-4a1678cabe53",
+        "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+        "requirementId": "d8fd2b82-d7e2-3adb-9db0-d12f9b4d4d28",
+        "resourceId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+        "seatNo": 1,
+        "segmentId": "f85555d6-cc53-373a-a860-ab5c79f658af"
+      },
+      {
+        "allocationRole": "PERSON",
+        "capacityUsed": "1",
+        "id": "73f0d320-3d94-38cb-aaba-60b8109a402c",
+        "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+        "requirementId": "cfb65407-296d-301f-8535-487ba74d0a91",
+        "resourceId": "12c3127c-21e1-458d-90fb-786a831baf5e",
+        "seatNo": 1,
+        "segmentId": "f85555d6-cc53-373a-a860-ab5c79f658af"
+      },
+      {
+        "allocationRole": "MACHINE",
+        "capacityUsed": "1",
+        "id": "b84f8cdb-d236-3609-9a38-1dd26ff21d03",
+        "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+        "requirementId": "d8fd2b82-d7e2-3adb-9db0-d12f9b4d4d28",
+        "resourceId": "e7781ef6-594c-4af9-8b72-9fdae0b1e5ac",
+        "seatNo": 1,
+        "segmentId": "fed38213-0a97-3248-b6f8-41266c6bab97"
+      },
+      {
+        "allocationRole": "PERSON",
+        "capacityUsed": "1",
+        "id": "3f1cc206-e143-3c21-8bc1-b631ea80213f",
+        "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+        "requirementId": "cfb65407-296d-301f-8535-487ba74d0a91",
+        "resourceId": "02b5283c-c5d8-4692-9912-ca1106c98708",
+        "seatNo": 1,
+        "segmentId": "fed38213-0a97-3248-b6f8-41266c6bab97"
+      }
+    ],
+    "candidateHash": "f0dda47cd49df92aa1d29a847100a821b398a4411da4138f561510c574de2873",
+    "contractType": "PLAN_VERSION_DETAIL",
+    "inputCapturedAt": "2026-09-26T01:13:05.248Z",
+    "jobs": [
+      {
+        "batchCode": null,
+        "capacityUomCode": null,
+        "capacityValue": null,
+        "carryRunId": null,
+        "compatibilityKey": null,
+        "endAt": "2026-09-25T00:25:00Z",
+        "jobCode": "JOB-4",
+        "jobId": "bde92df2-c0a5-3217-8464-58be68458870",
+        "jobType": "NORMAL",
+        "members": [
+          {
+            "id": "3bf9bb6b-150d-32d9-a1ab-e979f521e582",
+            "memberNo": 1,
+            "plannedQty": "20",
+            "taskId": "7a1a0846-4dd7-3892-b250-c5d7aefca74e",
+            "uomCode": "EA"
+          }
+        ],
+        "operationSpecId": "52e6b053-7512-4c85-8a7e-c9b8788fb2ef",
+        "plannedQty": "20",
+        "startAt": "2026-09-25T00:00:00Z",
+        "uomCode": "EA",
+        "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+      },
+      {
+        "batchCode": null,
+        "capacityUomCode": null,
+        "capacityValue": null,
+        "carryRunId": null,
+        "compatibilityKey": null,
+        "endAt": "2026-09-25T01:00:00Z",
+        "jobCode": "JOB-3",
+        "jobId": "9165a3ae-f78c-3d34-b14a-fa99de0f5592",
+        "jobType": "NORMAL",
+        "members": [
+          {
+            "id": "b575b939-05b4-3aa2-b00f-bcb560ece511",
+            "memberNo": 1,
+            "plannedQty": "30",
+            "taskId": "191c3e15-145f-3c91-9f3e-ad8dc7ae2f01",
+            "uomCode": "EA"
+          }
+        ],
+        "operationSpecId": "52e6b053-7512-4c85-8a7e-c9b8788fb2ef",
+        "plannedQty": "30",
+        "startAt": "2026-09-25T00:25:00Z",
+        "uomCode": "EA",
+        "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+      },
+      {
+        "batchCode": null,
+        "capacityUomCode": null,
+        "capacityValue": null,
+        "carryRunId": null,
+        "compatibilityKey": null,
+        "endAt": "2026-09-25T00:40:00Z",
+        "jobCode": "JOB-5",
+        "jobId": "e95d127c-a1ce-308a-a5be-a5c1879cc4c5",
+        "jobType": "NORMAL",
+        "members": [
+          {
+            "id": "0e60955a-045b-3d5c-99a5-ae4ac150b84f",
+            "memberNo": 1,
+            "plannedQty": "20",
+            "taskId": "e772025e-f18e-3af5-aaa1-0acd14ca5889",
+            "uomCode": "EA"
+          }
+        ],
+        "operationSpecId": "a0c9e726-0fd4-4bc7-939c-dde697b98e23",
+        "plannedQty": "20",
+        "startAt": "2026-09-25T00:25:00Z",
+        "uomCode": "EA",
+        "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+      },
+      {
+        "batchCode": null,
+        "capacityUomCode": null,
+        "capacityValue": null,
+        "carryRunId": null,
+        "compatibilityKey": null,
+        "endAt": "2026-09-25T01:20:00Z",
+        "jobCode": "JOB-6",
+        "jobId": "f615de8d-3c5d-3c23-8bd8-33bd4fc68886",
+        "jobType": "NORMAL",
+        "members": [
+          {
+            "id": "f2883083-7cf0-3b77-ba05-0709712202ea",
+            "memberNo": 1,
+            "plannedQty": "30",
+            "taskId": "1683967d-37c4-3fda-92f0-dbf6c7a9b55b",
+            "uomCode": "EA"
+          }
+        ],
+        "operationSpecId": "a0c9e726-0fd4-4bc7-939c-dde697b98e23",
+        "plannedQty": "30",
+        "startAt": "2026-09-25T01:00:00Z",
+        "uomCode": "EA",
+        "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+      },
+      {
+        "batchCode": null,
+        "capacityUomCode": null,
+        "capacityValue": null,
+        "carryRunId": null,
+        "compatibilityKey": null,
+        "endAt": "2026-09-25T02:45:00Z",
+        "jobCode": "JOB-2",
+        "jobId": "88d4cc44-e6df-3ad4-aec6-4ba0b3c7d4a9",
+        "jobType": "NORMAL",
+        "members": [
+          {
+            "id": "ae7d8f69-e1b4-3fc8-b822-24ff672e96a6",
+            "memberNo": 1,
+            "plannedQty": "40",
+            "taskId": "7188a2e6-e2cc-3e5f-bb81-1565ca76469e",
+            "uomCode": "EA"
+          }
+        ],
+        "operationSpecId": "52e6b053-7512-4c85-8a7e-c9b8788fb2ef",
+        "plannedQty": "40",
+        "startAt": "2026-09-25T02:00:00Z",
+        "uomCode": "EA",
+        "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+      },
+      {
+        "batchCode": null,
+        "capacityUomCode": null,
+        "capacityValue": null,
+        "carryRunId": null,
+        "compatibilityKey": null,
+        "endAt": "2026-09-25T03:10:00Z",
+        "jobCode": "JOB-1",
+        "jobId": "49c13657-0d77-30a9-a104-370eefbd6230",
+        "jobType": "NORMAL",
+        "members": [
+          {
+            "id": "ee6b548f-ef4f-36bf-a78f-361dad6ea819",
+            "memberNo": 1,
+            "plannedQty": "40",
+            "taskId": "9c32db55-ebb1-3372-9338-d2c9e0774a6a",
+            "uomCode": "EA"
+          }
+        ],
+        "operationSpecId": "a0c9e726-0fd4-4bc7-939c-dde697b98e23",
+        "plannedQty": "40",
+        "startAt": "2026-09-25T02:45:00Z",
+        "uomCode": "EA",
+        "workCenterId": "19faf9e7-7e5c-456e-aa9f-bf2f0133b4f2"
+      }
+    ],
+    "latestFactUpdatedAt": "2026-09-26T09:08:27.980Z",
+    "locks": [],
+    "problems": [],
+    "resultKind": "FEASIBLE",
+    "schemaVersion": "1.0",
+    "segments": [
+      {
+        "endAt": "2026-09-25T00:05:00Z",
+        "id": "2155901a-18ce-357c-8c53-8321f351bab4",
+        "jobId": "bde92df2-c0a5-3217-8464-58be68458870",
+        "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+        "phaseType": "SETUP",
+        "plannedQty": "20",
+        "releaseAt": null,
+        "releaseQty": null,
+        "segmentNo": 1,
+        "startAt": "2026-09-25T00:00:00Z",
+        "uomCode": "EA"
+      },
+      {
+        "endAt": "2026-09-25T00:25:00Z",
+        "id": "256efeec-0cd2-3e2c-a968-cd284cc2b82a",
+        "jobId": "bde92df2-c0a5-3217-8464-58be68458870",
+        "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+        "phaseType": "RUN",
+        "plannedQty": "20",
+        "releaseAt": null,
+        "releaseQty": null,
+        "segmentNo": 2,
+        "startAt": "2026-09-25T00:05:00Z",
+        "uomCode": "EA"
+      },
+      {
+        "endAt": "2026-09-25T00:30:00Z",
+        "id": "6496445e-2e9c-3814-ae06-8e1d9038e26b",
+        "jobId": "9165a3ae-f78c-3d34-b14a-fa99de0f5592",
+        "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+        "phaseType": "SETUP",
+        "plannedQty": "30",
+        "releaseAt": null,
+        "releaseQty": null,
+        "segmentNo": 1,
+        "startAt": "2026-09-25T00:25:00Z",
+        "uomCode": "EA"
+      },
+      {
+        "endAt": "2026-09-25T00:30:00Z",
+        "id": "9606262c-91cd-3426-bb54-a5c737c8fa39",
+        "jobId": "e95d127c-a1ce-308a-a5be-a5c1879cc4c5",
+        "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+        "phaseType": "SETUP",
+        "plannedQty": "20",
+        "releaseAt": null,
+        "releaseQty": null,
+        "segmentNo": 1,
+        "startAt": "2026-09-25T00:25:00Z",
+        "uomCode": "EA"
+      },
+      {
+        "endAt": "2026-09-25T01:00:00Z",
+        "id": "a0fdcfd0-5ced-38f9-81d5-c2139a78b2ff",
+        "jobId": "9165a3ae-f78c-3d34-b14a-fa99de0f5592",
+        "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+        "phaseType": "RUN",
+        "plannedQty": "30",
+        "releaseAt": null,
+        "releaseQty": null,
+        "segmentNo": 2,
+        "startAt": "2026-09-25T00:30:00Z",
+        "uomCode": "EA"
+      },
+      {
+        "endAt": "2026-09-25T00:40:00Z",
+        "id": "fed38213-0a97-3248-b6f8-41266c6bab97",
+        "jobId": "e95d127c-a1ce-308a-a5be-a5c1879cc4c5",
+        "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+        "phaseType": "RUN",
+        "plannedQty": "20",
+        "releaseAt": null,
+        "releaseQty": null,
+        "segmentNo": 2,
+        "startAt": "2026-09-25T00:30:00Z",
+        "uomCode": "EA"
+      },
+      {
+        "endAt": "2026-09-25T01:05:00Z",
+        "id": "bdf697c5-bda6-371a-b02f-bae066c012f6",
+        "jobId": "f615de8d-3c5d-3c23-8bd8-33bd4fc68886",
+        "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+        "phaseType": "SETUP",
+        "plannedQty": "30",
+        "releaseAt": null,
+        "releaseQty": null,
+        "segmentNo": 1,
+        "startAt": "2026-09-25T01:00:00Z",
+        "uomCode": "EA"
+      },
+      {
+        "endAt": "2026-09-25T01:20:00Z",
+        "id": "f85555d6-cc53-373a-a860-ab5c79f658af",
+        "jobId": "f615de8d-3c5d-3c23-8bd8-33bd4fc68886",
+        "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+        "phaseType": "RUN",
+        "plannedQty": "30",
+        "releaseAt": null,
+        "releaseQty": null,
+        "segmentNo": 2,
+        "startAt": "2026-09-25T01:05:00Z",
+        "uomCode": "EA"
+      },
+      {
+        "endAt": "2026-09-25T02:05:00Z",
+        "id": "3cfd25bb-f248-3dbe-aaeb-f8d6b7dbd72d",
+        "jobId": "88d4cc44-e6df-3ad4-aec6-4ba0b3c7d4a9",
+        "phaseId": "19868cc5-9ca9-34c7-8083-b2c16075c5f9",
+        "phaseType": "SETUP",
+        "plannedQty": "40",
+        "releaseAt": null,
+        "releaseQty": null,
+        "segmentNo": 1,
+        "startAt": "2026-09-25T02:00:00Z",
+        "uomCode": "EA"
+      },
+      {
+        "endAt": "2026-09-25T02:45:00Z",
+        "id": "e8165667-b873-37b5-a510-68b7f3d474c5",
+        "jobId": "88d4cc44-e6df-3ad4-aec6-4ba0b3c7d4a9",
+        "phaseId": "2faa7f32-cf9b-361f-9d3f-1b2ea82e6658",
+        "phaseType": "RUN",
+        "plannedQty": "40",
+        "releaseAt": null,
+        "releaseQty": null,
+        "segmentNo": 2,
+        "startAt": "2026-09-25T02:05:00Z",
+        "uomCode": "EA"
+      },
+      {
+        "endAt": "2026-09-25T02:50:00Z",
+        "id": "c7c0be2d-a0dc-3b9f-a7b6-41f4651ffefc",
+        "jobId": "49c13657-0d77-30a9-a104-370eefbd6230",
+        "phaseId": "c42fb3cc-2787-3deb-9577-323ec13dc7ee",
+        "phaseType": "SETUP",
+        "plannedQty": "40",
+        "releaseAt": null,
+        "releaseQty": null,
+        "segmentNo": 1,
+        "startAt": "2026-09-25T02:45:00Z",
+        "uomCode": "EA"
+      },
+      {
+        "endAt": "2026-09-25T03:10:00Z",
+        "id": "c9f688a5-14e1-3950-8b4f-b6ef2c353a1e",
+        "jobId": "49c13657-0d77-30a9-a104-370eefbd6230",
+        "phaseId": "ae612745-9dbc-3296-9f83-b141034902bf",
+        "phaseType": "RUN",
+        "plannedQty": "40",
+        "releaseAt": null,
+        "releaseQty": null,
+        "segmentNo": 2,
+        "startAt": "2026-09-25T02:50:00Z",
+        "uomCode": "EA"
+      }
+    ],
+    "solverStatus": "OPTIMAL",
+    "stale": true,
+    "unplannedTaskIds": [],
+    "version": {
+      "baseVersionId": null,
+      "definitionRevision": 1,
+      "executionRevision": 0,
+      "inputHash": "989f9689ac399fbac4f4e7afd4a1a2d796d89060f333d91d3e5367a11ab644ee",
+      "planVersionId": "d93a0ca3-bf7b-388f-8461-8cf175f4c95e",
+      "rowVersion": 2,
+      "status": "FEASIBLE",
+      "updatedAt": "2026-09-26T09:13:15.362Z",
+      "versionName": "候选计划-1c550ffa",
+      "versionNo": 1
+    }
+  },
+  "publishBeforeFix": {
+    "data": {
+      "code": 500,
+      "msg": "排程输入创建后主数据或现场事实已变化，请重新排程"
+    },
+    "status": 200
+  },
+  "browserInfo": {
+    "devicePixelRatio": 1.090000033378601,
+    "height": 739,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "width": 832,
+    "mode": "内置浏览器已有登录会话，有头；用户明确批准"
+  },
+  "planChecks": {
+    "jobs": 6,
+    "segments": 12,
+    "allocations": 24,
+    "overlaps": [],
+    "outsideCalendar": [],
+    "dependencyViolations": [],
+    "durationViolations": []
+  }
+}

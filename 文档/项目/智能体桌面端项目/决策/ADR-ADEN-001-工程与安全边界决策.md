@@ -7,7 +7,7 @@
 > 决策日期：2026-09-12；创建 / 更新：2026-09-12  
 > 批准依据：2026-09-12 用户批准十阶段执行包并明确要求按十个阶段进入编码实现  
 > 上游：[十阶段实施任务清单](../功能/FEAT-ADEN-001-桌面执行底座/任务清单.md)、[功能规格](../功能/FEAT-ADEN-001-桌面执行底座/功能规格.md)、[总技术设计](../功能/FEAT-ADEN-001-桌面执行底座/技术设计.md)  
-> 适用范围：`contracts/aden/`、`platform-backend/ruoyi-aden/`、`aden-desktop/`、`aden-runner/`、`aden-agent-runtime/`  
+> 适用范围：`contracts/aden/`、`ruoyi-backend/ruoyi-aden/`、`frontend/desktop/aden-desktop/`、`python/aden-runner/`、`python/aden-agent-runtime/`
 > 状态边界：本文记录已批准的稳定取舍，不维护任务进度或验证结论；实施状态以任务清单为准，实际命令与结果以 Feature 验证记录为准
 
 ## 1. 决策摘要
@@ -24,13 +24,13 @@ FEAT-ADEN-001 采用 RuoYi / MySQL 单一控制面、四个实现单元加一个
 
 ## 2. 上下文与约束
 
-当前工作区已有随 `ruoyi-admin` 运行的 `ruoyi-aden` Maven 骨架和一个 `aden-desktop` Electron 骨架，但 `contracts/aden/`、`aden-runner/`、`aden-agent-runtime/`、Aden 业务表和跨进程 API 尚待实现。当前 Feature 只交付合成 CORE：不使用真实账号、真实业务数据、模型 Provider、Windows UIA、浏览器控制、Shell、任意文件访问或外部发送。
+当前工作区已有随 `ruoyi-admin` 运行的 `ruoyi-aden` Maven 骨架和一个 `aden-desktop` Electron 骨架，但 `contracts/aden/`、`python/aden-runner/`、`python/aden-agent-runtime/`、Aden 业务表和跨进程 API 尚待实现。当前 Feature 只交付合成 CORE：不使用真实账号、真实业务数据、模型 Provider、Windows UIA、浏览器控制、Shell、任意文件访问或外部发送。
 
 现有 RuoYi 平台已经拥有账号、JWT / Redis 登录事实、角色和功能权限；项目规范同时要求 RuoYi 成为智能体桌面端唯一中心控制面。另建 Python 或 Electron 业务后端会产生任务、权限、审批、事件和审计的双重真相，无法在失败恢复时确定谁拥有最终状态。
 
 数据库方面，RuoYi 基线不是由 Aden 创建的空库。Aden 需要能在全新隔离库和已有 RuoYi Schema 上显式、可审计地演进，又不能让普通应用启动静默修改数据库或误扫其他项目的 migration。
 
-安全方面，当前 `platform-backend/ruoyi-framework/.../ResourcesConfig.java` 通过 `addAllowedOriginPattern("*")`、任意 header / method 和 `/**` 注册全局 `CorsFilter`。当前 Electron main 和 Python 进程不需要浏览器 CORS；若直接继承该全局行为，任意网页 Origin 可能向 `/api/v1/aden/**` 发起带用户 Token 的跨源请求或探测认证边界。因此 Aden 必须在不改变共享 RuoYi 行为的前提下建立更窄且优先执行的拒绝门。
+安全方面，当前 `ruoyi-backend/ruoyi-framework/.../ResourcesConfig.java` 通过 `addAllowedOriginPattern("*")`、任意 header / method 和 `/**` 注册全局 `CorsFilter`。当前 Electron main 和 Python 进程不需要浏览器 CORS；若直接继承该全局行为，任意网页 Origin 可能向 `/api/v1/aden/**` 发起带用户 Token 的跨源请求或探测认证边界。因此 Aden 必须在不改变共享 RuoYi 行为的前提下建立更窄且优先执行的拒绝门。
 
 ## 3. ADEN-ADR-001：唯一控制面与工程数量
 
@@ -42,10 +42,10 @@ RuoYi / `ruoyi-admin` 是唯一服务端控制面，MySQL `aden_*` 表族是当�
 
 | 落点 | 类型 | 职责边界 |
 | --- | --- | --- |
-| `platform-backend/ruoyi-aden/` | 既有 Java Maven 模块 | Aden 领域、应用、REST / SSE、身份适配和 MySQL 持久化；由现有 `ruoyi-admin` 承载 |
-| `aden-desktop/` | 既有 Electron 工程 | main / preload / renderer 三个信任层；用户操作与只读投影 |
-| `aden-runner/` | 新 Python 工程 | 当前仅无权限 Runner simulator；未来高权限 Runner 需另开 L3 Feature |
-| `aden-agent-runtime/` | 新 Python 工程 | 当前仅离线、Provider-disabled 的候选推理骨架 |
+| `ruoyi-backend/ruoyi-aden/` | 既有 Java Maven 模块 | Aden 领域、应用、REST / SSE、身份适配和 MySQL 持久化；由现有 `ruoyi-admin` 承载 |
+| `frontend/desktop/aden-desktop/` | 既有 Electron 工程 | main / preload / renderer 三个信任层；用户操作与只读投影 |
+| `python/aden-runner/` | 新 Python 工程 | 当前仅无权限 Runner simulator；未来高权限 Runner 需另开 L3 Feature |
+| `python/aden-agent-runtime/` | 新 Python 工程 | 当前仅离线、Provider-disabled 的候选推理骨架 |
 | `contracts/aden/` | 非运行时契约目录 | OpenAPI 3.1、JSON Schema 2020-12、examples 与三端生成 / 校验入口 |
 
 不新增 Java Maven 子模块，不把 `contracts/aden/` 计为服务，不把 Python 的包边界写成多个部署单元。两个 Python 工程可以复用纯契约生成方法，但不得合并发行物、凭据或运行权限。

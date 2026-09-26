@@ -1,0 +1,14 @@
+{
+  "result": "Pass",
+  "installedExe": "C:\\Users\\admin\\AppData\\Local\\Programs\\Aden Local Test\\Aden Local Test.exe",
+  "rendererUrl": "file:///C:/Users/admin/AppData/Local/Programs/Aden%20Local%20Test/resources/app/out/renderer/index.html",
+  "syntheticTasks": [
+    "E2E 正常成功",
+    "E2E 安全点取消"
+  ],
+  "finalStates": [
+    "SUCCEEDED",
+    "CANCELED"
+  ],
+  "completedAt": "2026-09-26T01:44:30.872Z"
+}

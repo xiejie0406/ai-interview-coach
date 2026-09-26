@@ -1,0 +1,14 @@
+audit_utc
+2026-09-26 02:04:56
+id	status	is_current	row_version	updated_at
+d93a0ca3-bf7b-388f-8461-8cf175f4c95e	FEASIBLE	0	2	2026-09-26 01:13:15.362
+orders
+3
+tasks
+6
+execution_runs
+0
+reports
+0
+output_lots
+0

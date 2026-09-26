@@ -75,7 +75,7 @@ def probe_python(pattern: str) -> str:
 
 
 def probe_typescript(temp: Path, pattern: str) -> str:
-    tsc = WORKSPACE_ROOT / "aden-desktop/node_modules/.bin/tsc.cmd"
+    tsc = WORKSPACE_ROOT / "frontend/desktop/aden-desktop/node_modules/.bin/tsc.cmd"
     if not tsc.is_file():
         discovered = shutil.which("tsc")
         if not discovered:

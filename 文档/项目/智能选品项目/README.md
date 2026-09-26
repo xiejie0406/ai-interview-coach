@@ -9,13 +9,15 @@
 
 本项目面向服装商品导入、智能选品与搭配、图片方案、销售报价和交付文件，是仓库内独立业务产品。它不改变 AI Interview Coach 的产品范围、数据库所有权或发布状态。
 
+**2026-09-26 最新业务决定：用户不接受当前本机演示版，要求先核对整改计划再修改。** 当前整改范围为真实电商样本与 Excel 导入、服装字段、价格更新、独立 SKU 库存中心及方案选品体验。见 [Feature 验收记录与报告](功能/FEAT-FASHION-001-服装智能选品生产首版/验收记录.md) 和 [唯一任务清单第 15 节](功能/FEAT-FASHION-001-服装智能选品生产首版/任务清单.md)。下文 2026-09-13 实现状态属于历史工程基线；本机表、字典、菜单已于 2026-09-26 安装，Python 显式 demo 不代表真实 AI 或业务验收通过。
+
 ## 1. 项目组成
 
 首期包含三个生产代码项目：
 
-1. `platform-backend/` 内的 `ruoyi-fashion` Maven 模块：负责 RuoYi 接入、权限、业务 API、MySQL 事实、事务、报价、任务控制和审计。
-2. `admin-web/` 内的 `fashion` 业务页面：负责商品、方案、搭配、图片、报价和交付工作台。
-3. `fashion-ai-runtime/`：唯一 Python 智能体运行时，负责需求解析、候选排序、搭配推理、视觉与 Provider 适配、结构化校验和评测。
+1. `ruoyi-backend/` 内的 `ruoyi-fashion` Maven 模块：负责 RuoYi 接入、权限、业务 API、MySQL 事实、事务、报价、任务控制和审计。
+2. `frontend/admin-web/` 内的 `fashion` 业务页面：负责商品、方案、搭配、图片、报价和交付工作台。
+3. `python/fashion-ai-runtime/`：唯一 Python 智能体运行时，负责需求解析、候选排序、搭配推理、视觉与 Provider 适配、结构化校验和评测。
 
 `contracts/fashion/` 是共享机器契约目录，不是第四个部署项目。MySQL、对象存储、队列和观测系统属于基础设施。首期不新增 `portal-web`、`mobile` 或自研浏览器扩展；京东图片采用既有 Chrome 插件下载的文件或 ZIP 上传，并由人工确认映射。
 

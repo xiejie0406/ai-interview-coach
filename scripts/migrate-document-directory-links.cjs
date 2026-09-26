@@ -103,7 +103,7 @@ const targetFiles = [];
 for (const fixedPath of [
   path.join(workspaceRoot, 'README.md'),
   path.join(workspaceRoot, 'AGENTS.md'),
-  path.join(workspaceRoot, 'platform-backend', 'AI-MIGRATION.md'),
+  path.join(workspaceRoot, 'ruoyi-backend', 'AI-MIGRATION.md'),
 ]) {
   if (fs.existsSync(fixedPath)) targetFiles.push(fixedPath);
 }

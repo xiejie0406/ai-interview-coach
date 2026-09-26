@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aden 合成 CORE 验收报告 · 2026-09-25</title>
+  <style>
+    :root { color-scheme: light; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; color: #163128; background: #f5f7f5; }
+    body { margin: 0; padding: 32px; }
+    main { max-width: 1120px; margin: auto; }
+    h1 { margin: 0 0 8px; font-size: 30px; }
+    h2 { font-size: 20px; margin-top: 34px; }
+    p { line-height: 1.65; }
+    .lead { color: #53675f; margin: 0 0 24px; }
+    .card { background: white; border: 1px solid #d9e3dc; border-radius: 14px; padding: 22px; margin: 18px 0; }
+    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .metric { background: #e9f4ed; border-radius: 10px; padding: 16px; }
+    .metric strong { display: block; font-size: 25px; }
+    .metric span { color: #53675f; }
+    table { border-collapse: collapse; width: 100%; font-size: 14px; }
+    th, td { border-bottom: 1px solid #e4ebe6; padding: 12px 10px; text-align: left; vertical-align: top; line-height: 1.5; }
+    th { background: #f0f5f1; }
+    .pass { color: #14734b; font-weight: 700; }
+    .pending { color: #8a5b13; font-weight: 700; }
+    .fail { color: #a32f2f; font-weight: 700; }
+    img { display: block; width: 100%; border: 1px solid #d9e3dc; border-radius: 10px; }
+    small { color: #596e62; }
+    code { background: #eef2ee; padding: 2px 5px; border-radius: 4px; }
+    @media (max-width: 720px) { body { padding: 16px; } .summary { grid-template-columns: 1fr; } table { display: block; overflow-x: auto; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Aden 桌面执行底座 · 合成验收报告</h1>
+    <p class="lead">FEAT-ADEN-001 · 2026-09-25（Asia/Shanghai）· 隔离本机环境 · 用户接受决定待确认</p>
+  </header>
+  <section class="summary" aria-label="执行摘要">
+    <div class="metric"><strong>4 / 4</strong><span>已执行合成场景通过</span></div>
+    <div class="metric"><strong>55</strong><span>桌面端测试通过</span></div>
+    <div class="metric"><strong>待确认</strong><span>用户接受决定</span></div>
+  </section>
+  <section class="card">
+    <h2>对象与环境</h2>
+    <p>Electron 桌面端 0.2.0；隔离 MySQL、Redis、RuoYi 与 Runner simulator 均位于随机 loopback 端口。合成操作员进入唯一的 <code>Aden E2E Workspace</code>。本轮临时 API 为 <code>http://127.0.0.1:3152</code>，关闭验收窗口后自动清理。没有使用真实账号、业务数据、模型或外部连接器。</p>
+    <p><strong>构建限制：</strong>干净后端聚合构建在 <code>ruoyi-admin</code> 阶段失败；同时查到原有 <code>8081</code> 进程占用目标 JAR。未保留完整 Maven 错误文本，不能确认唯一根因。本轮运行复用了 2026-09-13 的后端 JAR；桌面 bundle 本轮重新生成。该失败保留为 <span class="fail">Fail</span>，不计入通过项。</p>
+  </section>
+  <section class="card">
+    <h2>场景结果</h2>
+    <table>
+      <thead><tr><th>场景</th><th>预期与实际</th><th>结果</th><th>证据边界</th></tr></thead>
+      <tbody>
+        <tr><td>隔离环境与验证码</td><td>Aden 迁移到 V4 并校验；<code>/captchaImage</code> 返回开启状态和 JPEG。</td><td class="pass">Pass</td><td>只证明本轮合成环境。</td></tr>
+        <tr><td>任务成功与安全取消</td><td>真实跨进程 E2E 输出 <code>ADEN_SYNTHETIC_E2E_OK</code>；页面出现 <code>SUCCEEDED</code> 与 <code>CANCELED</code>。</td><td class="pass">Pass</td><td>此自动场景使用验证码关闭的 test profile。</td></tr>
+        <tr><td>图片验证码登录</td><td>独立 Electron 会话人工读取并输入图片验证码；进入授权 Workspace 的任务中心，无 renderer pageerror。</td><td class="pass">Pass</td><td>首次输入后未进入任务中心且未捕获错误文本；重新获取新验证码后通过。</td></tr>
+        <tr><td>退出登录</td><td>点击退出后回到“登录 Aden”页面。</td><td class="pass">Pass</td><td>同一验证码开启的桌面会话。</td></tr>
+        <tr><td>用户可用性与接受决定</td><td>由用户查看保留窗口并决定是否接受界面与限制。</td><td class="pending">NotRun / 待确认</td><td>Agent 的技术执行不代替用户签收。</td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="card">
+    <h2>验证码登录后的任务中心</h2>
+    <img src="验证码登录后任务中心.png" alt="Aden 任务中心显示唯一 Workspace、成功任务与取消任务">
+    <p><small>截图采自实际验证码开启的 Electron 会话。成功与取消任务由同一隔离环境的自动 E2E 创建；截图不含口令、Token 或验证码答案。</small></p>
+  </section>
+  <section class="card">
+    <h2>结论与来源</h2>
+    <p>本轮合成 CORE 场景执行通过；用户接受决定仍待确认。真实微信、电商、ERP、Provider、安装包、生产部署和发布均未验收。</p>
+    <p><small>本报告按相邻 <code>验收记录.md</code> 与 <code>验证记录.md</code> 的 2026-09-25 实际步骤整理，是展示件；场景状态以验收记录为准。执行方式：<code>npm test</code>；<code>run-synthetic-e2e.ps1 -SkipBuild -InteractiveUat</code>；独立 Electron profile 中进行图片验证码登录和退出。</small></p>
+  </section>
+</main>
+</body>
+</html>

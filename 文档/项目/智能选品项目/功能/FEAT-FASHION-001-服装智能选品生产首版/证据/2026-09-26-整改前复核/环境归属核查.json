@@ -1,0 +1,119 @@
+{
+  "time": "2026-09-26T09:59:40.1415479+08:00",
+  "root": "D:\\2025Ai\\26-05-23\\java-workspace",
+  "head": "fe35a459ff92d913fe6bde293b2340add392e14f",
+  "worktrees": [
+    "worktree D:/2025Ai/26-05-23/java-workspace",
+    "HEAD fe35a459ff92d913fe6bde293b2340add392e14f",
+    "branch refs/heads/main",
+    ""
+  ],
+  "statusRecords": 4014,
+  "listeners": [
+    {
+      "port": 8100,
+      "address": "127.0.0.1",
+      "pid": 30236,
+      "process": "python.exe",
+      "executable": "C:\\Program Files\\Python312\\python.exe",
+      "started": "2026-09-26T08:58:25.974243+08:00",
+      "entry": "uvicorn fashion_ai.main:app"
+    },
+    {
+      "port": 8081,
+      "address": "127.0.0.1",
+      "pid": 30752,
+      "process": "java.exe",
+      "executable": "C:\\Users\\admin\\AppData\\Local\\Programs\\Eclipse Adoptium\\jdk-21.0.10.7-hotspot\\bin\\java.exe",
+      "started": "2026-09-26T08:59:09.723911+08:00",
+      "entry": "D:\\2025Ai\\26-05-23\\java-workspace\\ruoyi-backend\\ruoyi-admin\\target\\ruoyi-admin.jar"
+    },
+    {
+      "port": 5173,
+      "address": "127.0.0.1",
+      "pid": 4364,
+      "process": "node.exe",
+      "executable": "C:\\Program Files\\nodejs\\node.exe",
+      "started": "2026-09-26T07:43:52.795206+08:00",
+      "entry": "D:\\2025Ai\\26-05-23\\java-workspace\\frontend\\admin-web\\node_modules\\.bin\\\\..\\vite\\bin\\vite.js"
+    }
+  ],
+  "configuredDatabase": "localhost:3306/ry-vue",
+  "databaseRuntimeVerified": false,
+  "configuredPython": "http://127.0.0.1:8100",
+  "configuredWorker": "true",
+  "configuredProvider": "demo",
+  "runtimeConfigVerified": false,
+  "artifacts": [
+    {
+      "path": "frontend/admin-web/vite.config.js",
+      "sha256": "4DE429C7FBAF2A806461ADC20B0CE87FF80F805540D5F5EC658C6F281897704E",
+      "bytes": 2739,
+      "modified": "2026-08-23T02:09:37.1097231Z"
+    },
+    {
+      "path": "frontend/admin-web/src/views/fashion/product/index.vue",
+      "sha256": "23F175D181E6FBC0C7CE6670C4205A266942937ED681A3895CA9D8E2D7225838",
+      "bytes": 16603,
+      "modified": "2026-09-12T21:44:30.3620736Z"
+    },
+    {
+      "path": "frontend/admin-web/src/views/fashion/import/index.vue",
+      "sha256": "D5C855D0776A6DE0FD490CDDF0573909E27AB79F3D41E7A17E85757DA50B8162",
+      "bytes": 4484,
+      "modified": "2026-09-12T18:11:14.8845656Z"
+    },
+    {
+      "path": "frontend/admin-web/src/views/fashion/import/components/CatalogValueImportPanel.vue",
+      "sha256": "5DE3379FE47F1E52CD09AD85D76F395BF7A621CC47F829A698C489C3F58D0810",
+      "bytes": 8262,
+      "modified": "2026-09-12T19:22:05.2894647Z"
+    },
+    {
+      "path": "frontend/admin-web/src/views/fashion/quote/index.vue",
+      "sha256": "D9441816320FE5D74AD16008A30EE5261A3B812B9BBFE222A8F8CAB24A473E88",
+      "bytes": 21204,
+      "modified": "2026-09-13T01:55:43.4183433Z"
+    },
+    {
+      "path": "frontend/admin-web/src/views/fashion/workbench/index.vue",
+      "sha256": "35E6B459E03A54D955EE529840A359451E0A7994B99BA3CEA401EB935E54D71B",
+      "bytes": 20681,
+      "modified": "2026-09-12T23:40:03.2550627Z"
+    },
+    {
+      "path": "python/fashion-ai-runtime/src/fashion_ai/main.py",
+      "sha256": "EFBAD708FACA31703E51947C1AE282717BA969913D169FB95D0844BF9891E39F",
+      "bytes": 5529,
+      "modified": "2026-09-26T00:50:24.6718191Z"
+    },
+    {
+      "path": "python/fashion-ai-runtime/src/fashion_ai/application/demo_provider.py",
+      "sha256": "DDED3D24597918132AD9738852C90F206EAF6DAEB992EFF570D358F5D93DE3C1",
+      "bytes": 7695,
+      "modified": "2026-09-26T00:47:38.7370574Z"
+    },
+    {
+      "path": "ruoyi-backend/ruoyi-admin/target/ruoyi-admin.jar",
+      "sha256": "85D426CF7EC096EDF299D9ADF7396A87889B943F3A9C9C2228F09657806C85EB",
+      "bytes": 97942170,
+      "modified": "2026-09-26T01:23:15.3902199Z"
+    }
+  ],
+  "isolation": "NotEstablished",
+  "notes": [
+    "single shared worktree with mixed modifications",
+    "frontend proxy source targets shared 8081; live upstream identity not independently exposed",
+    "on-disk JAR hash does not prove hash loaded by running JVM",
+    "database/cache runtime identity not introspected; configuration is not runtime proof",
+    "DEMO-LOCAL test data identifiers are scoped but database is not dedicated"
+  ],
+  "configuredCache": {
+    "host": "localhost",
+    "port": 6379,
+    "database": 0,
+    "source": "application.yml",
+    "runtimeVerified": false
+  },
+  "jarModifiedAfterProcessStart": true
+}

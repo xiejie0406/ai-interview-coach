@@ -1,0 +1,35 @@
+<template>
+  <div class="app-container">
+    <el-alert title="AI 角色管理助手的人设、提示词与模型配置；若依用户角色仍只负责后台操作员授权。发布版本不可原地修改；面试和选品现有运行尚未接入此版本。" type="info" :closable="false" show-icon class="mb20" />
+    <el-form :inline="true" @submit.prevent="load"><el-form-item label="项目"><el-input v-model="project" clearable /></el-form-item><el-form-item><el-button type="primary" @click="load">查询</el-button><el-button @click="project='';load()">重置</el-button></el-form-item></el-form>
+    <div class="mb8"><el-button type="primary" plain v-hasPermi="['ai:role:write']" @click="createDialog=true">新增 AI 角色</el-button></div>
+    <el-row :gutter="18">
+      <el-col :span="9"><el-table v-loading="loading" :data="roles" highlight-current-row @current-change="selectRole"><el-table-column label="角色" min-width="170"><template #default="{ row }"><strong>{{ row.name }}</strong><br><code>{{ row.code }}</code></template></el-table-column><el-table-column prop="project" label="项目" width="110" /><el-table-column label="状态" width="100"><template #default="{ row }">{{ row.status === 'ACTIVE' ? `V${row.activeVersion}` : '草稿' }}</template></el-table-column></el-table></el-col>
+      <el-col :span="15"><el-card shadow="never"><template #header><div class="header"><span>{{ selected?.name || '请选择 AI 角色' }}</span><el-button type="primary" plain :disabled="!selected" v-hasPermi="['ai:role:write']" @click="versionDialog=true">新建版本</el-button></div></template><el-table :data="versions" empty-text="暂无版本"><el-table-column prop="version" label="版本" width="75" /><el-table-column label="模型" min-width="160"><template #default="{ row }">{{ row.provider }} / {{ row.model }}</template></el-table-column><el-table-column prop="contentHash" label="配置哈希" min-width="130" show-overflow-tooltip /><el-table-column prop="status" label="状态" width="95" /><el-table-column label="操作" width="90"><template #default="{ row }"><el-button v-if="row.status === 'DRAFT'" link type="primary" v-hasPermi="['ai:role:publish']" @click="publish(row)">发布</el-button></template></el-table-column></el-table></el-card></el-col>
+    </el-row>
+    <el-dialog v-model="createDialog" title="新增 AI 角色" width="540px"><el-form :model="createForm" label-width="100px"><el-form-item label="项目" required><el-input v-model="createForm.project" /></el-form-item><el-form-item label="角色编码" required><el-input v-model="createForm.code" /></el-form-item><el-form-item label="角色名称" required><el-input v-model="createForm.name" /></el-form-item><el-form-item label="用途" required><el-input v-model="createForm.purpose" type="textarea" /></el-form-item></el-form><template #footer><el-button @click="createDialog=false">取消</el-button><el-button type="primary" :loading="saving" @click="saveRole">保存</el-button></template></el-dialog>
+    <el-dialog v-model="versionDialog" title="新建不可变 AI 角色版本" width="760px" destroy-on-close><el-form :model="versionForm" label-width="112px"><el-form-item label="人设与目标" required><el-input v-model="versionForm.persona" type="textarea" :rows="3" maxlength="5000" show-word-limit /></el-form-item><el-form-item label="系统提示词" required><el-input v-model="versionForm.systemPrompt" type="textarea" :rows="6" maxlength="20000" show-word-limit /></el-form-item><el-row :gutter="16"><el-col :span="12"><el-form-item label="供应商" required><el-input v-model="versionForm.provider" /></el-form-item></el-col><el-col :span="12"><el-form-item label="模型" required><el-input v-model="versionForm.model" /></el-form-item></el-col></el-row><el-form-item label="AI 密钥引用" required><el-select v-model="versionForm.aiSecretAlias" filterable placeholder="选择当前项目的已启用 AI 密钥" style="width:100%"><el-option v-for="item in aiSecrets" :key="item.alias" :label="`${item.displayName} · ${item.alias}`" :value="item.alias" /></el-select></el-form-item><el-form-item label="模型配置 JSON" required><el-input v-model="versionForm.modelConfigJson" type="textarea" :rows="4" /></el-form-item></el-form><template #footer><el-button @click="versionDialog=false">取消</el-button><el-button type="primary" :loading="saving" @click="saveVersion">保存草稿版本</el-button></template></el-dialog>
+  </div>
+</template>
+
+<script setup>
+import { onMounted, reactive, ref, watch } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { createAiRole, createAiRoleVersion, listAiRoles, listAiRoleVersions, listAiRoleSecretOptions, publishAiRoleVersion } from '@/api/system/aiRole'
+
+const roles = ref([]), versions = ref([]), aiSecrets = ref([]), selected = ref(null), project = ref('')
+const loading = ref(false), saving = ref(false), createDialog = ref(false), versionDialog = ref(false)
+const createForm = reactive({ project: '', code: '', name: '', purpose: '' })
+const versionForm = reactive({ persona: '', systemPrompt: '', provider: '', model: '', aiSecretAlias: '', modelConfigJson: '{}' })
+async function load() { loading.value = true; try { const result = await listAiRoles(project.value); roles.value = result.data || []; if (selected.value) { selected.value = roles.value.find(x => x.id === selected.value.id) || null; await loadVersions() } } finally { loading.value = false } }
+async function selectRole(row) { selected.value = row; await loadVersions() }
+async function loadVersions() { if (!selected.value) { versions.value = []; return } const result = await listAiRoleVersions(selected.value.id); versions.value = result.data || [] }
+async function loadSecrets() { if (!selected.value) return; const result = await listAiRoleSecretOptions(selected.value.project); aiSecrets.value = result.data || [] }
+watch(versionDialog, open => { if (open) loadSecrets(); else { Object.assign(versionForm, { persona: '', systemPrompt: '', provider: '', model: '', aiSecretAlias: '', modelConfigJson: '{}' }); aiSecrets.value = [] } })
+async function saveRole() { if (!Object.values(createForm).every(Boolean)) { ElMessage.warning('请填写全部字段'); return } saving.value = true; try { await createAiRole({ ...createForm }); ElMessage.success('AI 角色已创建'); createDialog.value = false; Object.assign(createForm, { project: '', code: '', name: '', purpose: '' }); await load() } finally { saving.value = false } }
+async function saveVersion() { if (!selected.value || !versionForm.persona || !versionForm.systemPrompt || !versionForm.provider || !versionForm.model || !versionForm.aiSecretAlias) { ElMessage.warning('请填写全部必填项'); return } try { JSON.parse(versionForm.modelConfigJson) } catch { ElMessage.warning('模型配置不是合法 JSON'); return } saving.value = true; try { await createAiRoleVersion(selected.value.id, { ...versionForm }); ElMessage.success('草稿版本已创建'); versionDialog.value = false; await loadVersions() } finally { saving.value = false } }
+async function publish(row) { if (!selected.value) return; await ElMessageBox.confirm(`发布 V${row.version} 后将成为本模块的当前版本；现有面试和选品运行尚未接入。`,'发布 AI 角色',{type:'warning'}); await publishAiRoleVersion(selected.value.id, row.version, selected.value.rowVersion); ElMessage.success('已发布'); await load() }
+onMounted(load)
+</script>
+
+<style scoped>.header{display:flex;align-items:center;justify-content:space-between}</style>

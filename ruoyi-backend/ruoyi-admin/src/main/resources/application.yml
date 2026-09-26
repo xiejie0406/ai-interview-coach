@@ -16,7 +16,7 @@ ruoyi:
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8080
-  port: 8080
+  port: ${RUOYI_SERVER_PORT:8081}
   servlet:
     # 应用的访问路径
     context-path: /
@@ -47,12 +47,18 @@ user:
 
 # Spring配置
 spring:
+  config:
+    # APS 配置由独立文件维护；资源缺失时不阻断既有 RuoYi 启动。
+    import: optional:classpath:application-aps.yml
   # 资源信息
   messages:
     # 国际化资源文件路径
     basename: i18n/messages
   profiles:
     active: druid
+  # Aden migration 只允许由独立 AdenMigrationCli 执行；正常应用启动绝不隐式改 Schema。
+  flyway:
+    enabled: false
   # 文件上传
   servlet:
     multipart:
@@ -92,19 +98,115 @@ spring:
           # #连接池最大阻塞等待时间（使用负值表示没有限制）
           max-wait: -1ms
 
+# AI Interview Coach 业务库：只保存 PostgreSQL 业务事实；不承载 RuoYi 账号、密码、角色或菜单。
+interview:
+  # 面试 Java HTTP 模块默认随若依启动；数据库需先准备好，迁移和外部调用仍单独授权。
+  enabled: ${INTERVIEW_ENABLED:true}
+  flyway:
+    # 仅在已准备 PostgreSQL schema/凭据后显式开启；绝不让 Flyway 连接 MySQL。
+    enabled: ${INTERVIEW_FLYWAY_ENABLED:false}
+  datasource:
+    url: ${INTERVIEW_DB_URL:jdbc:postgresql://localhost:5432/ai_interview_coach}
+    username: ${INTERVIEW_DB_USERNAME:ai_interview_coach}
+    password:
+    driver-class-name: org.postgresql.Driver
+  catalog:
+    # 公开题库租户是业务数据配置，不是认证/RBAC 来源；未配置时业务查询应明确失败。
+    public-tenant-id: ${INTERVIEW_CATALOG_PUBLIC_TENANT_ID:}
+  foundation-safety:
+    # 已有 REST 默认随面试模块开放；可分别关闭，外部调用仍使用下方独立开关。
+    business-rest-endpoints-enabled: ${INTERVIEW_BUSINESS_REST_ENDPOINTS_ENABLED:true}
+    catalog-rest-endpoints-enabled: ${INTERVIEW_CATALOG_REST_ENDPOINTS_ENABLED:true}
+    external-provider-calls-enabled: ${INTERVIEW_EXTERNAL_PROVIDER_CALLS_ENABLED:false}
+    object-storage-writes-enabled: ${INTERVIEW_OBJECT_STORAGE_WRITES_ENABLED:false}
+    background-jobs-enabled: false
+  voice-runtime:
+    # 生产默认使用 Redis 保证多实例时 ticket 可恢复；本地/单测若要用内存必须显式设为 memory。
+    ticket-store: ${INTERVIEW_VOICE_TICKET_STORE:redis}
+    ticket-redis-key-prefix: ${INTERVIEW_VOICE_TICKET_REDIS_KEY_PREFIX:interview:voice:ticket:v1:}
+    # 逗号分隔的 Origin pattern；生产必须显式注入 portal 的 https origin，禁止裸 *。
+    allowed-origin-patterns: ${INTERVIEW_VOICE_ALLOWED_ORIGINS:http://localhost:*,http://127.0.0.1:*}
+
+    local-storage-root: ${INTERVIEW_VOICE_STORAGE_ROOT:}
+    # 从平台密钥用途 platform.interview.envelope.active 注入。
+    sensitive-envelope-key-id:
+    sensitive-envelope-key-base64:
+    previous-sensitive-envelope-key-id:
+    previous-sensitive-envelope-key-base64:
+  providers:
+    deepseek:
+      base-url: ${INTERVIEW_DEEPSEEK_BASE_URL:https://api.deepseek.com}
+      interview-model: ${INTERVIEW_DEEPSEEK_INTERVIEW_MODEL:}
+      evaluation-model: ${INTERVIEW_DEEPSEEK_EVALUATION_MODEL:}
+      thinking-mode: ${INTERVIEW_DEEPSEEK_THINKING_MODE:disabled}
+    volcengine-speech:
+      # 鉴权模式和凭据组由 AI 密钥模块统一提供。
+      asr:
+        model: ${INTERVIEW_VOLCENGINE_ASR_MODEL:}
+        # 留空时按 model 映射；控制台实际开通项不同时必须显式覆盖。
+        resource-id: ${INTERVIEW_VOLCENGINE_ASR_RESOURCE_ID:}
+        language: ${INTERVIEW_VOLCENGINE_ASR_LANGUAGE:zh-CN}
+        endpoint: ${INTERVIEW_VOLCENGINE_ASR_ENDPOINT:wss://openspeech.bytedance.com/api/v3/sauc/bigmodel_async}
+      tts:
+        model: ${INTERVIEW_VOLCENGINE_TTS_MODEL:}
+        resource-id: ${INTERVIEW_VOLCENGINE_TTS_RESOURCE_ID:}
+        voice: ${INTERVIEW_VOLCENGINE_TTS_VOICE:}
+        language: ${INTERVIEW_VOLCENGINE_TTS_LANGUAGE:zh-CN}
+        audio-format: ${INTERVIEW_VOLCENGINE_TTS_AUDIO_FORMAT:ogg_opus}
+        sample-rate: ${INTERVIEW_VOLCENGINE_TTS_SAMPLE_RATE:24000}
+        endpoint: ${INTERVIEW_VOLCENGINE_TTS_ENDPOINT:https://openspeech.bytedance.com/api/v3/tts/unidirectional}
+
+# 智能选品与报价：业务数据复用 RuoYi MySQL；迁移默认关闭且首次 baseline 需双开关确认。
+fashion:
+  # 正式业务 API 默认随若依启动；迁移、真实 Provider、Python Worker 仍独立关闭。
+  enabled: ${FASHION_ENABLED:true}
+  image:
+    # 本地样例/拼版 Worker 默认启用；真实 Provider 必须在 IMP-10 生产试运行后显式放行。
+    worker-enabled: ${FASHION_IMAGE_WORKER_ENABLED:true}
+    provider-enabled: ${FASHION_IMAGE_PROVIDER_ENABLED:false}
+    poll-delay: ${FASHION_IMAGE_POLL_DELAY:PT2S}
+    lease-duration: ${FASHION_IMAGE_LEASE_DURATION:PT30S}
+    estimated-cost-per-result: ${FASHION_IMAGE_ESTIMATED_COST_PER_RESULT:1.00}
+  migration:
+    enabled: ${FASHION_MIGRATION_ENABLED:false}
+    expected-database: ${FASHION_MIGRATION_EXPECTED_DATABASE:}
+    baseline-approved: ${FASHION_MIGRATION_BASELINE_APPROVED:false}
+  # Python Runtime 与进程内 Worker 默认关闭；地址是普通部署配置，HMAC 密钥由平台密钥模块装配。
+  ai-runtime:
+    base-url: ${FASHION_AI_RUNTIME_BASE_URL:}
+    worker-enabled: ${FASHION_AI_RUNTIME_WORKER_ENABLED:false}
+    worker-id: ${FASHION_AI_RUNTIME_WORKER_ID:ruoyi-fashion-local}
+    poll-delay: ${FASHION_AI_RUNTIME_POLL_DELAY:PT2S}
+    lease-duration: ${FASHION_AI_RUNTIME_LEASE_DURATION:PT30S}
+    connect-timeout: ${FASHION_AI_RUNTIME_CONNECT_TIMEOUT:PT5S}
+  service-identity:
+    local-service-id: ${FASHION_SERVICE_LOCAL_ID:ruoyi-fashion}
+    peer-service-id: ${FASHION_SERVICE_PEER_ID:fashion-ai-runtime}
+    active-key-id:
+    active-key-base64:
+    previous-key-id:
+    previous-key-base64:
+  customer-contact:
+    # 与服务身份密钥分离；轮换期同时配置 previous key。未配置时拒绝保存明文联系电话。
+    active-key-id:
+    active-key-base64:
+    previous-key-id:
+    previous-key-base64:
+
 # token配置
 token:
   # 令牌自定义标识
   header: Authorization
   # 令牌密钥
-  secret: abcdefghijklmnopqrstuvwxyz
+  # JWT 签名密钥从平台密钥用途 platform.ruoyi.jwt 读取
   # 令牌有效期（默认30分钟）
   expireTime: 30
 
 # MyBatis配置
 mybatis:
   # 搜索指定包别名
-  typeAliasesPackage: com.ruoyi.**.domain
+  # 仅扫描 RuoYi 自有 MyBatis domain；AI 领域对象不属于 MyBatis alias。
+  typeAliasesPackage: com.ruoyi.common.core.domain.entity,com.ruoyi.system.domain,com.ruoyi.quartz.domain,com.ruoyi.generator.domain
   # 配置mapper的扫描，找到所有的mapper.xml映射文件
   mapperLocations: classpath*:mapper/**/*Mapper.xml
   # 加载全局的配置文件
@@ -145,3 +247,9 @@ xss:
   excludes: /system/notice
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+
+# Aden 默认随若依启动；启动前须准备预期数据库与已迁移 schema。
+aden:
+  enabled: ${ADEN_ENABLED:true}
+  schema:
+    expected-database: ${ADEN_EXPECTED_DATABASE:}

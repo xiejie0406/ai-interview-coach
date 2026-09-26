@@ -13,7 +13,11 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 // 表示通过aop框架暴露该代理对象,AopContext能够访问
 @EnableAspectJAutoProxy(exposeProxy = true)
 // 指定要扫描的Mapper类的包的路径
-@MapperScan("com.ruoyi.**.mapper")
+@MapperScan(basePackages = {
+        "com.ruoyi.system.mapper",
+        "com.ruoyi.quartz.mapper",
+        "com.ruoyi.generator.mapper"
+}, sqlSessionFactoryRef = "sqlSessionFactory")
 public class ApplicationConfig
 {
 }

@@ -1,12 +1,12 @@
 # Java AI 多项目工作区协作规范
 
 > 文档类型：项目级协作入口  
-> 规范版本：2026.09-r5  
+> 规范版本：2026.09-r6
 > 文档状态：Approved  
 > owner：用户维护项目方向；Agent 按实际工程维护项目事实  
-> 批准记录：2026-09-10 用户要求按用户级规范整理目录并形成项目规范；2026-09-11 用户批准按项目划分业务数据库边界并要求项目文档使用中文命名；2026-09-12 用户要求按若依、面试、智能选品、智能体桌面端和生产排产分类归档  
+> 批准记录：2026-09-10 用户要求按用户级规范整理目录并形成项目规范；2026-09-11 用户批准按项目划分业务数据库边界并要求项目文档使用中文命名；2026-09-12 用户要求按若依、面试、智能选品、智能体桌面端和生产排产分类归档；2026-09-25 用户批准按 Java、前端、小程序和 Python 技术类型归档工程
 > 创建时间：2026-09-10  
-> 更新时间：2026-09-12  
+> 更新时间：2026-09-25
 > 适用范围：本仓库全部研发与文档工作
 
 本文件只维护本工作区事实和用户级规范的项目化落点。通用流程、授权、证据和文档规则继承 `C:\Users\admin\.codex\AGENTS.md` 与 `C:\Users\admin\.codex\specs\`，不在仓库重复全文。
@@ -14,13 +14,13 @@
 ## 1. 工作区事实
 
 - 本仓库包含共享若依平台和四个相互独立的业务项目：面试项目、智能选品项目、智能体桌面端项目、生产排产项目。
-- 共享若依工程为 `platform-backend/` 与 `admin-web/`；`ruoyi-backend/`、`ruoyi-vue3-frontend/`、`ruoyi-app/` 是上游基线，不作为业务功能首选修改位置。
-- 面试项目主要使用 `platform-backend/ruoyi-interview/`、`portal-web/`、`mobile/` 和相应公共契约。
-- 智能选品项目当前使用 `fashion-ai-runtime/`、`contracts/fashion/`，并按其 Feature 设计接入共享 Java / Admin 工程。
-- 智能体桌面端项目当前使用 `platform-backend/ruoyi-aden/`、`aden-desktop/` 和对应原型。
-- 生产排产项目当前以需求、设计和 `prototype/production-workbench-v2/` 为主；不得从原型存在推断生产实现已完成。
+- 四个活跃工程根目录为 `ruoyi-backend/`、`frontend/`、`miniapp/` 和 `python/`。`ruoyi-backend/pom.xml` 是共享若依 Java / Maven 聚合入口，`ruoyi-admin` 装配各业务 HTTP 模块；上游基线位于各工程的 `_reference/`，只供对照。
+- 面试项目主要使用 `ruoyi-backend/ruoyi-interview/`、`frontend/portal-web/`、`miniapp/interview-mobile/` 和相应公共契约。
+- 智能选品项目使用 `ruoyi-backend/ruoyi-fashion/`、`python/fashion-ai-runtime/`、`contracts/fashion/`，并通过 `frontend/admin-web/` 提供管理界面。
+- 智能体桌面端项目使用 `ruoyi-backend/ruoyi-aden/`、`frontend/desktop/aden-desktop/`、`python/aden-agent-runtime/`、`python/aden-runner/` 和对应原型。
+- 生产排产项目使用 `ruoyi-backend/aps/` 中的 Java 模块，求解 Worker 保持独立进程；需求、设计与 `prototype/production-workbench-v2/` 的状态以项目控制页为准，不得从原型或模块存在推断生产实现已完成。
 - `contracts/` 保存公共 API / 事件契约；具体 Feature 的候选契约可随 Feature 资料包保存。
-- 旧 `frontend/`、`backend/` 已删除；旧 `apps/` 子工程已提升到仓库根目录。旧路径只允许出现在项目归档或明确的迁移记录中。
+- 工程目录的旧新映射、上游基线保留和恢复方法见[迁移设计](文档/若依框架/工程按技术类型归档设计.md)。迁移过渡期保留的旧根目录只作为运行中进程的原路径，不作为第二套活跃工程；`backend/` 与 `apps/` 是更早的旧路径。
 - 当前产品、实现、验证和发布状态必须从对应事实源读取，不能从文件数量、旧阶段或历史报告推断。
 
 ## 2. 开始工作时的加载顺序

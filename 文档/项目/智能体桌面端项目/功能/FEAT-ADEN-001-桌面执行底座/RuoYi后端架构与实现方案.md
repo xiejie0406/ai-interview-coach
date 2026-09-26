@@ -5,7 +5,7 @@
 > owner：Codex 负责候选架构与实现方案；用户负责业务权限、部署和迁移决定；独立安全复核待指定  
 > 上游：[功能规格](功能规格.md)、[总技术设计](技术设计.md)、[Aden 产品需求](../../产品/产品需求文档.md)  
 > 关联：[Python Agent 架构与实现方案](Python%20Agent架构与实现方案.md)、[桌面端架构与实现方案](桌面端架构与实现方案.md)、[十阶段实施任务清单](任务清单.md)  
-> 事实边界：本文拥有 `platform-backend/ruoyi-aden` 的内部架构、数据库和服务端协议语义；具体跨语言字段最终以 `IMP-01` 建立的 `contracts/aden/` OpenAPI / JSON Schema 为唯一机器事实
+> 事实边界：本文拥有 `ruoyi-backend/ruoyi-aden` 的内部架构、数据库和服务端协议语义；具体跨语言字段最终以 `IMP-01` 建立的 `contracts/aden/` OpenAPI / JSON Schema 为唯一机器事实
 
 ## 1. 结论
 
@@ -47,7 +47,7 @@ flowchart LR
 
 | 项目 | 当前事实 | 能证明什么 |
 | --- | --- | --- |
-| Maven 模块 | 根 `platform-backend/pom.xml` 已聚合 `ruoyi-aden`，`ruoyi-admin` 已依赖它 | 模块已进入 RuoYi 构建图，不代表功能完成 |
+| Maven 模块 | 根 `ruoyi-backend/pom.xml` 已聚合 `ruoyi-aden`，`ruoyi-admin` 已依赖它 | 模块已进入 RuoYi 构建图，不代表功能完成 |
 | 主源码 | 5 个 Java 文件：1 个 `package-info`，4 个任务状态类 | 只有纯 Java 状态迁移骨架 |
 | 测试 | 1 个 JUnit 类、7 个测试方法 | 覆盖部分正常 / 非法状态迁移，不是完整并发和持久化证明 |
 | 历史报告 | 工作区可见 2026-09-12 生成的 Surefire XML，记录 7 个测试、0 失败 | 只是已有产物；本轮未重跑，不能写成当前验证通过 |
@@ -69,7 +69,7 @@ RuoYi 官方仓库说明了当前框架的前后端分离、Spring Security、JW
 
 ### 2.3 当前数据库惯例与冲突风险
 
-- RuoYi MySQL 平台库目前通过 `platform-backend/sql/*.sql` 手工初始化或增量导入。
+- RuoYi MySQL 平台库目前通过 `ruoyi-backend/sql/*.sql` 手工初始化或增量导入。
 - `ruoyi-interview` 只为独立 PostgreSQL 数据源配置自定义 Flyway，而且默认关闭。
 - Aden 的 MySQL 迁移机制尚未批准、尚未实现。
 - **不能直接启用默认 `classpath:db/migration` 扫描**：该 classpath 已含 PostgreSQL migration；误扫可能把 PostgreSQL SQL 发给 MySQL。
@@ -82,7 +82,7 @@ RuoYi 官方仓库说明了当前框架的前后端分离、Spring Security、JW
 
 | 层级 | 数量 | 说明 |
 | --- | ---: | --- |
-| Aden Java Maven 模块 | **1** | 已存在的 `platform-backend/ruoyi-aden`；不再新增 `api/domain/infrastructure` 子模块 |
+| Aden Java Maven 模块 | **1** | 已存在的 `ruoyi-backend/ruoyi-aden`；不再新增 `api/domain/infrastructure` 子模块 |
 | 技术层 | **4 + 装配层** | `api`、`application`、`domain`、`infrastructure`；`configuration` 只装配 |
 | 逻辑领域边界 | **6** | workspace、task、runner、agent、action、event/audit |
 | 首个合成闭环实际实现的领域边界 | **4** | workspace、task、runner、event/audit |
@@ -281,11 +281,11 @@ baselineOnMigrate = false
 
 1. `ruoyi-aden` 显式依赖 `flyway-core` 和 `flyway-mysql`，不能依赖其他业务模块的传递依赖。
 2. 提供短生命周期、条件装配的 `AdenMigrationCli`，只支持显式 `baseline / migrate / validate` 三种模式。CLI 固定 datasource、location 与 history table，每个动作前校验预期数据库名、RuoYi 标志表和 `aden_*` 冲突；它不是第二个业务服务，不注册 Web Controller / scheduler，也不常驻。
-3. 对现有非空 RuoYi 数据库执行一次显式 baseline version `0`，先验证数据库名、RuoYi 标志表、`aden_*` 冲突、备份和恢复路径。合成本机 MySQL 一次性隔离实例先导入只读基线 `platform-backend/sql/ry_20260417.sql`，再执行 Aden baseline / migration；空库与错库必须 fail-closed。
+3. 对现有非空 RuoYi 数据库执行一次显式 baseline version `0`，先验证数据库名、RuoYi 标志表、`aden_*` 冲突、备份和恢复路径。合成本机 MySQL 一次性隔离实例先导入只读基线 `ruoyi-backend/sql/ry_20260417.sql`，再执行 Aden baseline / migration；空库与错库必须 fail-closed。
 4. 不启用 `baselineOnMigrate=true`；该选项会减弱连接错误数据库时的安全保护。[Flyway baselineOnMigrate](https://documentation.red-gate.com/flyway/reference/configuration/flyway-namespace/flyway-baseline-on-migrate-setting)
 5. 执行顺序固定为“`AdenMigrationCli migrate` → `AdenMigrationCli validate` → 普通 `ruoyi-admin` 启动”。普通应用只运行 Schema version guard 并在版本不满足时 fail-closed；CLI 内禁用该应用 guard，migration 完成后才 validate，避免 guard 与 migration 形成启动循环，也不让多个应用实例并发改 Schema。
 6. MySQL 8 的单条 InnoDB DDL 可具备 atomic DDL 语义，但 DDL 仍会隐式提交；迁移必须采用 expand / contract、备份、停止条件和 forward-fix，不能承诺整批 DDL 可事务回滚。[MySQL atomic DDL](https://dev.mysql.com/doc/refman/8.0/en/atomic-ddl.html)
-7. RuoYi 菜单和权限继续单独提供幂等 `platform-backend/sql/aden-permissions.sql`，默认不给任何业务角色授权。测试所需合成用户 / 角色 / 权限由 test-only setup 创建；Workspace 与 Runner 仍调用真实受控 create / enroll API，测试 seed 不进入 migration 或普通启动。
+7. RuoYi 菜单和权限继续单独提供幂等 `ruoyi-backend/sql/aden-permissions.sql`，默认不给任何业务角色授权。测试所需合成用户 / 角色 / 权限由 test-only setup 创建；Workspace 与 Runner 仍调用真实受控 create / enroll API，测试 seed 不进入 migration 或普通启动。
 
 Flyway 已作为当前唯一权威迁移事实；若未来要求替换，必须另行修订设计并迁移历史，不能并行维护“版本化 SQL + 人工记录”第二套事实源。
 
@@ -635,7 +635,7 @@ Task 是业务聚合，RunnerDelivery 是一次可租赁执行尝试，二者不
 
 使用本机 MySQL 8 一次性隔离实例，不使用 H2 代替，也不要求 Docker Desktop：
 
-- 先导入 `platform-backend/sql/ry_20260417.sql`，再执行显式 baseline 0、Aden migrate / validate、重复 migrate、checksum 改变、空库和错库保护；
+- 先导入 `ruoyi-backend/sql/ry_20260417.sql`，再执行显式 baseline 0、Aden migrate / validate、重复 migrate、checksum 改变、空库和错库保护；
 - MyBatis Mapper XML 装配；
 - Task + event + outbox + audit 同事务提交 / 回滚；
 - 两个并发写者 CAS、同幂等键并发、同 Workspace event sequence 连续且与提交顺序一致、全局锁序 / 死锁整事务有界重试、两个 Runner `SKIP LOCKED` 竞争；

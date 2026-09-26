@@ -39,13 +39,13 @@ const apsModules = [
 requireFiles(
   'Eight APS Maven module descriptors exist',
   [
-    'platform-backend/aps/pom.xml',
-    ...apsModules.map(module => `platform-backend/aps/${module}/pom.xml`)
+    'ruoyi-backend/aps/pom.xml',
+    ...apsModules.map(module => `ruoyi-backend/aps/${module}/pom.xml`)
   ]
 );
 
-if (exists('platform-backend/aps/pom.xml')) {
-  const aggregator = read('platform-backend/aps/pom.xml');
+if (exists('ruoyi-backend/aps/pom.xml')) {
+  const aggregator = read('ruoyi-backend/aps/pom.xml');
   const declaredModules = [...aggregator.matchAll(/<module>([^<]+)<\/module>/g)].map(match => match[1].trim());
   record(
     'APS aggregator declares the approved module set and order',
@@ -59,8 +59,8 @@ if (exists('platform-backend/aps/pom.xml')) {
   );
 }
 
-if (exists('platform-backend/pom.xml')) {
-  const rootPom = read('platform-backend/pom.xml');
+if (exists('ruoyi-backend/pom.xml')) {
+  const rootPom = read('ruoyi-backend/pom.xml');
   record(
     'Platform reactor includes the APS aggregator',
     /<module>aps<\/module>/.test(rootPom),
@@ -69,10 +69,10 @@ if (exists('platform-backend/pom.xml')) {
 }
 
 const boundaryPomChecks = [
-  ['platform-backend/aps/aps-domain/pom.xml', 'aps-domain-boundary'],
-  ['platform-backend/aps/aps-application/pom.xml', 'aps-application-boundary'],
-  ['platform-backend/aps/aps-solver-contract/pom.xml', 'aps-solver-contract-boundary'],
-  ['platform-backend/aps/aps-constraint-validator/pom.xml', 'aps-constraint-validator-boundary']
+  ['ruoyi-backend/aps/aps-domain/pom.xml', 'aps-domain-boundary'],
+  ['ruoyi-backend/aps/aps-application/pom.xml', 'aps-application-boundary'],
+  ['ruoyi-backend/aps/aps-solver-contract/pom.xml', 'aps-solver-contract-boundary'],
+  ['ruoyi-backend/aps/aps-constraint-validator/pom.xml', 'aps-constraint-validator-boundary']
 ];
 const missingBoundaryRules = boundaryPomChecks
   .filter(([relativePath, executionId]) => !exists(relativePath) || !read(relativePath).includes(`<id>${executionId}</id>`))
@@ -84,35 +84,35 @@ record(
 );
 
 requireFiles('APS runtime configuration is explicitly importable', [
-  'platform-backend/ruoyi-admin/src/main/resources/application.yml',
-  'platform-backend/ruoyi-admin/src/main/resources/application-aps.yml'
+  'ruoyi-backend/ruoyi-admin/src/main/resources/application.yml',
+  'ruoyi-backend/ruoyi-admin/src/main/resources/application-aps.yml'
 ]);
 
 if (
-  exists('platform-backend/ruoyi-admin/src/main/resources/application.yml') &&
-  exists('platform-backend/ruoyi-admin/src/main/resources/application-aps.yml')
+  exists('ruoyi-backend/ruoyi-admin/src/main/resources/application.yml') &&
+  exists('ruoyi-backend/ruoyi-admin/src/main/resources/application-aps.yml')
 ) {
-  const application = read('platform-backend/ruoyi-admin/src/main/resources/application.yml');
-  const apsApplication = read('platform-backend/ruoyi-admin/src/main/resources/application-aps.yml');
+  const application = read('ruoyi-backend/ruoyi-admin/src/main/resources/application.yml');
+  const apsApplication = read('ruoyi-backend/ruoyi-admin/src/main/resources/application-aps.yml');
   record(
     'RuoYi explicitly imports application-aps.yml',
     /optional:classpath:application-aps\.yml/.test(application),
     'spring.config.import'
   );
   record(
-    'APS API and persistence defaults are disabled',
-    /enabled:\s*\$\{APS_ENABLED:false\}/.test(apsApplication) &&
-      /enabled:\s*\$\{APS_API_ENABLED:false\}/.test(apsApplication) &&
-      /enabled:\s*\$\{APS_PERSISTENCE_ENABLED:false\}/.test(apsApplication) &&
-      /enabled:\s*\$\{APS_DATASOURCE_ENABLED:false\}/.test(apsApplication),
-    'aps.enabled=false, aps.api.enabled=false, aps.datasource.enabled=false'
+    'APS API and persistence default to enabled',
+    /enabled:\s*\$\{APS_ENABLED:true\}/.test(apsApplication) &&
+      /enabled:\s*\$\{APS_API_ENABLED:true\}/.test(apsApplication) &&
+      /enabled:\s*\$\{APS_PERSISTENCE_ENABLED:true\}/.test(apsApplication) &&
+      /enabled:\s*\$\{APS_DATASOURCE_ENABLED:true\}/.test(apsApplication),
+    'aps.enabled=true, aps.api.enabled=true, aps.datasource.enabled=true'
   );
   record(
     'APS Worker has three independently disabled runtime gates',
     /enabled:\s*\$\{APS_WORKER_ENABLED:false\}/.test(apsApplication) &&
       /polling-enabled:\s*\$\{APS_WORKER_POLLING_ENABLED:false\}/.test(apsApplication) &&
-      exists('platform-backend/aps/aps-worker/src/main/java/com/ruoyi/aps/worker/ApsWorkerRuntimeConfiguration.java') &&
-      (read('platform-backend/aps/aps-worker/src/main/java/com/ruoyi/aps/worker/ApsWorkerRuntimeConfiguration.java')
+      exists('ruoyi-backend/aps/aps-worker/src/main/java/com/ruoyi/aps/worker/ApsWorkerRuntimeConfiguration.java') &&
+      (read('ruoyi-backend/aps/aps-worker/src/main/java/com/ruoyi/aps/worker/ApsWorkerRuntimeConfiguration.java')
         .match(/@ConditionalOnProperty/g) || []).length === 3,
     'aps.enabled + aps.worker.enabled + aps.worker.polling-enabled'
   );
@@ -181,31 +181,31 @@ for (const relativePath of contractFiles.filter(file => file.endsWith('.json')))
 }
 
 requireFiles('APS frontend TypeScript and test configuration exists', [
-  'admin-web/tsconfig.aps.json',
-  'admin-web/vitest.aps.config.js',
-  'admin-web/playwright.aps.config.js',
-  'admin-web/src/components/aps/许可证说明.md',
-  'admin-web/src/components/aps/gantt/adapter.ts',
-  'admin-web/src/components/aps/timeline/adapter.ts',
-  'admin-web/tests/fixtures/aps/synthetic-plan.ts',
-  'admin-web/tests/unit/aps/gantt-adapter.spec.ts',
-  'admin-web/tests/unit/aps/timeline-adapter.spec.ts',
-  'admin-web/tests/e2e/aps/adapter-render.spec.ts',
-  'admin-web/tests/e2e/aps/fixtures/poc.ts'
+  'frontend/admin-web/tsconfig.aps.json',
+  'frontend/admin-web/vitest.aps.config.js',
+  'frontend/admin-web/playwright.aps.config.js',
+  'frontend/admin-web/src/components/aps/许可证说明.md',
+  'frontend/admin-web/src/components/aps/gantt/adapter.ts',
+  'frontend/admin-web/src/components/aps/timeline/adapter.ts',
+  'frontend/admin-web/tests/fixtures/aps/synthetic-plan.ts',
+  'frontend/admin-web/tests/unit/aps/gantt-adapter.spec.ts',
+  'frontend/admin-web/tests/unit/aps/timeline-adapter.spec.ts',
+  'frontend/admin-web/tests/e2e/aps/adapter-render.spec.ts',
+  'frontend/admin-web/tests/e2e/aps/fixtures/poc.ts'
 ]);
 
 if (
-  exists('admin-web/playwright.aps.config.js') &&
-  exists('admin-web/tests/e2e/aps/adapter-render.spec.ts') &&
-  exists('admin-web/tests/e2e/aps/fixtures/poc.ts')
+  exists('frontend/admin-web/playwright.aps.config.js') &&
+  exists('frontend/admin-web/tests/e2e/aps/adapter-render.spec.ts') &&
+  exists('frontend/admin-web/tests/e2e/aps/fixtures/poc.ts')
 ) {
-  const playwrightConfig = read('admin-web/playwright.aps.config.js');
-  const browserTest = read('admin-web/tests/e2e/aps/adapter-render.spec.ts');
-  const browserFixture = read('admin-web/tests/e2e/aps/fixtures/poc.ts');
+  const playwrightConfig = read('frontend/admin-web/playwright.aps.config.js');
+  const browserTest = read('frontend/admin-web/tests/e2e/aps/adapter-render.spec.ts');
+  const browserFixture = read('frontend/admin-web/tests/e2e/aps/fixtures/poc.ts');
   record(
     'Playwright artifacts stay under the task output boundary',
-    /\.\.\/output\/playwright\/aps-imp01\//.test(playwrightConfig),
-    '../output/playwright/aps-imp01/'
+    /\.\.\/\.\.\/output\/playwright\/aps-imp01\//.test(playwrightConfig),
+    '../../output/playwright/aps-imp01/'
   );
   record(
     'Browser PoC exercises 500 resources, 5,000 segments, disposal, and recreation',
@@ -220,13 +220,13 @@ if (
 }
 
 if (
-  exists('admin-web/src/components/aps/许可证说明.md') &&
-  exists('admin-web/src/components/aps/gantt/adapter.ts') &&
-  exists('admin-web/tests/unit/aps/gantt-adapter.spec.ts')
+  exists('frontend/admin-web/src/components/aps/许可证说明.md') &&
+  exists('frontend/admin-web/src/components/aps/gantt/adapter.ts') &&
+  exists('frontend/admin-web/tests/unit/aps/gantt-adapter.spec.ts')
 ) {
-  const licenseNotice = read('admin-web/src/components/aps/许可证说明.md');
-  const ganttAdapter = read('admin-web/src/components/aps/gantt/adapter.ts');
-  const ganttTest = read('admin-web/tests/unit/aps/gantt-adapter.spec.ts');
+  const licenseNotice = read('frontend/admin-web/src/components/aps/许可证说明.md');
+  const ganttAdapter = read('frontend/admin-web/src/components/aps/gantt/adapter.ts');
+  const ganttTest = read('frontend/admin-web/tests/unit/aps/gantt-adapter.spec.ts');
   record(
     'Frontend retains license evidence and rejects non-MIT DHTMLX builds',
     /dhtmlx-gantt@10\.0\.3/.test(licenseNotice) &&
@@ -245,8 +245,8 @@ if (
   );
 }
 
-if (exists('admin-web/package.json')) {
-  const packageJson = JSON.parse(read('admin-web/package.json'));
+if (exists('frontend/admin-web/package.json')) {
+  const packageJson = JSON.parse(read('frontend/admin-web/package.json'));
   const scripts = packageJson.scripts || {};
   const dependencies = packageJson.dependencies || {};
   const devDependencies = packageJson.devDependencies || {};

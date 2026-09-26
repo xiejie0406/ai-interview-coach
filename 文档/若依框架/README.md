@@ -6,16 +6,22 @@
 
 | 内容 | 入口 | 边界 |
 |---|---|---|
-| 若依后端上游基线 | [工程](../../ruoyi-backend/)、[说明](../../ruoyi-backend/README.md)、[许可原文](../../ruoyi-backend/LICENSE) | 上游对照，不是业务功能首选修改位置 |
-| 若依 Vue 3 前端上游基线 | [工程](../../ruoyi-vue3-frontend/)、[说明](../../ruoyi-vue3-frontend/README.md)、[许可原文](../../ruoyi-vue3-frontend/LICENSE) | 上游对照，不是业务功能首选修改位置 |
-| 若依移动端上游基线 | [工程](../../ruoyi-app/)、[说明](../../ruoyi-app/README.md)、[许可原文](../../ruoyi-app/LICENSE) | 上游对照，不是业务功能首选修改位置 |
-| 当前平台后端 | [`../../platform-backend/`](../../platform-backend/) | 平台身份、认证、角色、菜单和业务模块装配入口 |
-| 当前管理端 | [`../../admin-web/`](../../admin-web/) | 当前管理端业务工程 |
-| 当前门户端 | [`../../portal-web/`](../../portal-web/) | 当前用户门户业务工程 |
-| 当前移动端 | [`../../mobile/`](../../mobile/) | 当前移动端业务工程 |
+| 若依后端上游基线 | [工程](../../ruoyi-backend/_reference/ruoyi-original/)、[说明](../../ruoyi-backend/_reference/ruoyi-original/README.md)、[许可原文](../../ruoyi-backend/_reference/ruoyi-original/LICENSE) | 上游对照，不参与活跃 Maven 构建 |
+| 若依 Vue 3 前端上游基线 | [工程](../../frontend/_reference/ruoyi-vue3-frontend/)、[说明](../../frontend/_reference/ruoyi-vue3-frontend/README.md)、[许可原文](../../frontend/_reference/ruoyi-vue3-frontend/LICENSE) | 上游对照，不参与活跃前端构建 |
+| 若依移动端上游基线 | [工程](../../miniapp/_reference/ruoyi-app/)、[说明](../../miniapp/_reference/ruoyi-app/README.md)、[许可原文](../../miniapp/_reference/ruoyi-app/LICENSE) | 上游对照，不参与活跃小程序构建 |
+| 当前平台后端 | [`../../ruoyi-backend/`](../../ruoyi-backend/) | 平台身份、认证、角色、菜单和业务模块装配入口 |
+| 当前管理端 | [`../../frontend/admin-web/`](../../frontend/admin-web/) | 当前管理端业务工程 |
+| 当前门户端 | [`../../frontend/portal-web/`](../../frontend/portal-web/) | 当前用户门户业务工程 |
+| 当前移动端 | [`../../miniapp/interview-mobile/`](../../miniapp/interview-mobile/) | 当前面试小程序工程 |
+| 当前桌面端 | [`../../frontend/desktop/aden-desktop/`](../../frontend/desktop/aden-desktop/) | 当前 Electron 桌面工程 |
 
 ## 项目集成导航
 
+- [平台密钥、AI 密钥与 AI 角色（三模块线框图及设计草案）](功能/FEAT-RUOYI-001-平台与AI基础设施/README.md)
+- [四项目 Java 业务模块统一装配与启动](Java业务模块统一装配.md)
+- [并行开发与验收隔离方案（待实施）](并行开发与验收隔离方案.md)
+- [按技术类型归档架构](工程按技术类型归档架构.md)与[迁移设计](工程按技术类型归档设计.md)
+- [工程目录迁移与恢复记录](../开发记录/2026-09-25-工程按技术类型目录迁移.md)
 - [面试项目若依集成索引](面试项目集成索引.md)
 - [智能体桌面端的若依控制面设计](../项目/智能体桌面端项目/功能/FEAT-ADEN-001-桌面执行底座/技术设计.md)
 - [智能选品项目的 Java、若依与 Python 边界](../项目/智能选品项目/架构/技术架构设计.md)

@@ -1,0 +1,92 @@
+{
+  "time": "2026-09-26T10:01:09.730943+08:00",
+  "sourceEvidenceMatching": false,
+  "filesCompared": 11,
+  "mismatches": [
+    {
+      "path": "ruoyi-backend/ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java",
+      "line": 235
+    },
+    {
+      "path": "ruoyi-backend/ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java",
+      "line": 236
+    },
+    {
+      "path": "ruoyi-backend/ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java",
+      "line": 237
+    },
+    {
+      "path": "ruoyi-backend/ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java",
+      "line": 238
+    },
+    {
+      "path": "ruoyi-backend/ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java",
+      "line": 239
+    },
+    {
+      "path": "ruoyi-backend/ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java",
+      "line": 240
+    },
+    {
+      "path": "ruoyi-backend/ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java",
+      "line": 241
+    },
+    {
+      "path": "ruoyi-backend/ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java",
+      "line": 242
+    },
+    {
+      "path": "ruoyi-backend/ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java",
+      "line": 243
+    },
+    {
+      "path": "ruoyi-backend/ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java",
+      "line": 244
+    },
+    {
+      "path": "ruoyi-backend/ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java",
+      "line": 245
+    },
+    {
+      "path": "ruoyi-backend/ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java",
+      "line": 246
+    },
+    {
+      "path": "ruoyi-backend/ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java",
+      "line": 247
+    }
+  ],
+  "hashes": {
+    "ruoyi-backend/ruoyi-fashion/scripts/seed_local_demo.py": "f0708e37f4a064afcc8968eea5f5be45bd25d258c52238da1470b476308a5127",
+    "frontend/admin-web/src/views/fashion/import/index.vue": "d5c855d0776a6de0fd490cddf0573909e27ab79f3d41e7a17e85757da50b8162",
+    "frontend/admin-web/src/views/fashion/product/index.vue": "23f175d181e6fbc0c7ce6670c4205a266942937ed681a3895ca9d8e2d7225838",
+    "ruoyi-backend/ruoyi-fashion/src/main/resources/db/fashion-migration/V1__create_fashion_schema.sql": "57f5baf7770628e52f777fc789bb40b3b69e77b31f9df6a986c4af675965ac9a",
+    "frontend/admin-web/src/views/fashion/import/components/CatalogValueImportPanel.vue": "5de3379fe47f1e52cd09ad85d76f395bf7a621cc47f829a698c489c3f58d0810",
+    "frontend/admin-web/src/views/fashion/quote/index.vue": "d9441816320fe5d74ad16008a30ee5261a3b812b9bbfe222a8f8cab24a473e88",
+    "frontend/admin-web/src/views/fashion/workbench/index.vue": "35e6b459e03a54d955ee529840a359451e0a7994b99ba3cea401eb935e54d71b",
+    "python/fashion-ai-runtime/src/fashion_ai/application/demo_provider.py": "dded3d24597918132ad9738852c90f206eaf6daeb992eff570d358f5d93de3c1",
+    "frontend/admin-web/tests/e2e/fashion/catalog-flow.spec.ts": "69dbb72a86cc15c47a27d87f6102ab446e1a8810669bc62013df58b3e6e96f9c",
+    "ruoyi-backend/ruoyi-fashion/src/main/java/com/ruoyi/fashion/controller/rest/importing/FashionProductImportController.java": "fb0bc6847d52611bd19a3cd120b568ff4fba9afd8dd8d19b51f3b946456ea7a5",
+    "ruoyi-backend/ruoyi-framework/src/main/java/com/ruoyi/framework/web/service/TokenService.java": "6ab06ec5a64ea63901ba0864b4efe7edb374f75905d97674ebc78fd83b5b9580"
+  },
+  "publicReadOnlyRequests": {
+    "python": {
+      "http": 200,
+      "status": "ok",
+      "provider": {
+        "mode": "demo",
+        "enabled": true
+      }
+    },
+    "proxy": {
+      "http": 200,
+      "code": 200,
+      "captchaEnabled": true
+    }
+  },
+  "jarModifiedAfterProcessStart": true,
+  "runtimeAcceptance": "Blocked",
+  "reason": "共享代码/产物/DB/缓存未建立任务隔离；磁盘 JAR 修改晚于 JVM 启动，不能绑定已加载版本",
+  "noBusinessWrites": true,
+  "trackedArtifactChangesDuringReview": []
+}

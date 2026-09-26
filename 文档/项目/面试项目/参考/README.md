@@ -7,10 +7,10 @@
 | 范围 | 当前入口 |
 |---|---|
 | 项目工程与端口 | [`README.md`](../../../../README.md) |
-| 后端启动脚本 | [`platform-backend/bin/run-local.ps1`](../../../../platform-backend/bin/run-local.ps1) |
-| 后端主配置 | [`platform-backend/ruoyi-admin/application.yml`](../../../../platform-backend/ruoyi-admin/src/main/resources/application.yml) |
-| Portal Web | [`portal-web/README.md`](../../../../portal-web/README.md)、[`portal-web/package.json`](../../../../portal-web/package.json) |
-| Admin Web | [`admin-web/README.md`](../../../../admin-web/README.md)、[`admin-web/package.json`](../../../../admin-web/package.json) |
+| 后端启动脚本 | [`ruoyi-backend/bin/run-local.ps1`](../../../../ruoyi-backend/bin/run-local.ps1) |
+| 后端主配置 | [`ruoyi-backend/ruoyi-admin/application.yml`](../../../../ruoyi-backend/ruoyi-admin/src/main/resources/application.yml) |
+| Portal Web | [`frontend/portal-web/README.md`](../../../../frontend/portal-web/README.md)、[`frontend/portal-web/package.json`](../../../../frontend/portal-web/package.json) |
+| Admin Web | [`frontend/admin-web/README.md`](../../../../frontend/admin-web/README.md)、[`frontend/admin-web/package.json`](../../../../frontend/admin-web/package.json) |
 | 公共契约 | [`contracts/README.md`](../../../../contracts/README.md) |
 | 当前 Feature 与验证 | [`功能/README.md`](../功能/README.md) |
 

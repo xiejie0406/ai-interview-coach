@@ -1,0 +1,80 @@
+{
+  "at": "2026-09-26T10:04:04.3012030+08:00",
+  "worktrees": [
+    "worktree D:/2025Ai/26-05-23/java-workspace",
+    "HEAD fe35a459ff92d913fe6bde293b2340add392e14f",
+    "branch refs/heads/main",
+    ""
+  ],
+  "listeners": [
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 33307,
+      "OwningProcess": 3344
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 18081,
+      "OwningProcess": 20400
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 8081,
+      "OwningProcess": 30752
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 6379,
+      "OwningProcess": 5732
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 4177,
+      "OwningProcess": 22180
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 4176,
+      "OwningProcess": 10344
+    }
+  ],
+  "redisClients": [
+    {
+      "LocalAddress": "127.0.0.1",
+      "RemoteAddress": "127.0.0.1",
+      "RemotePort": 6379,
+      "OwningProcess": 30752
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "RemoteAddress": "127.0.0.1",
+      "RemotePort": 6379,
+      "OwningProcess": 20400
+    }
+  ],
+  "artifacts": [
+    {
+      "Path": "D:\\2025Ai\\26-05-23\\java-workspace\\target\\aps-live-preview\\aps-api-baseline-utc.jar",
+      "Hash": "98C4E7CB8C9B39800BDB94FEC83CA8723BA152410E6DF8FB7BCB1D7BBE6D2245"
+    },
+    {
+      "Path": "D:\\2025Ai\\26-05-23\\java-workspace\\ruoyi-backend\\aps\\aps-worker\\target\\aps-worker-3.9.2.jar",
+      "Hash": "AA1BF4055983AEBE9EB498EE73CD1B696B0F4BF4B9AACE410B88CE6260923BE8"
+    }
+  ],
+  "sources": [
+    {
+      "Path": "D:\\2025Ai\\26-05-23\\java-workspace\\frontend\\admin-web\\src\\router\\index.js",
+      "Hash": "1C3F7C06EAF3A6BECC30984503D2B964085570030B8D69CBF5AD268C6D1F67FA"
+    },
+    {
+      "Path": "D:\\2025Ai\\26-05-23\\java-workspace\\frontend\\admin-web\\src\\views\\aps\\workbench\\index.vue",
+      "Hash": "7C3AD596490357C1FCF053C31406807872A0328FF44F9EB54E744F41F40BA440"
+    },
+    {
+      "Path": "D:\\2025Ai\\26-05-23\\java-workspace\\frontend\\admin-web\\src\\views\\aps\\execution\\index.vue",
+      "Hash": "952A8687404953E50A1580BECBA0266DB37B64B2B5B0CF054E8F13634C22446D"
+    }
+  ],
+  "conclusion": "API与业务库端口独立；代码工作区、前端HMR源码、Worker构建目录、Redis仍共享，Cookie没有隔离证明；不满足并行写入验收前提。"
+}

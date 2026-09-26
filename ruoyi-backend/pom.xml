@@ -26,7 +26,7 @@
         <fastjson.version>2.0.64</fastjson.version>
         <oshi.version>7.3.0</oshi.version>
         <commons.io.version>2.22.0</commons.io.version>
-        <poi.version>4.1.2</poi.version>
+        <poi.version>5.5.1</poi.version>
         <velocity.version>2.3</velocity.version>
         <jwt.version>0.9.1</jwt.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
@@ -156,6 +156,69 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
+            <!-- AI Interview Coach 业务模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-interview</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- 服装智能选品与报价业务模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-fashion</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- Aden 桌面智能执行平台业务模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>ruoyi-aden</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- APS 生产排程模块 -->
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>aps-domain</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>aps-application</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>aps-infrastructure-mysql</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>aps-solver-contract</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>aps-constraint-validator</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>aps-solver-ortools</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>aps-api</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ruoyi</groupId>
+                <artifactId>aps-worker</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+
             <!-- 系统模块-->
             <dependency>
                 <groupId>com.ruoyi</groupId>
@@ -175,6 +238,10 @@
 
     <modules>
         <module>ruoyi-admin</module>
+        <module>ruoyi-interview</module>
+        <module>ruoyi-fashion</module>
+        <module>ruoyi-aden</module>
+        <module>aps</module>
         <module>ruoyi-framework</module>
         <module>ruoyi-system</module>
         <module>ruoyi-quartz</module>

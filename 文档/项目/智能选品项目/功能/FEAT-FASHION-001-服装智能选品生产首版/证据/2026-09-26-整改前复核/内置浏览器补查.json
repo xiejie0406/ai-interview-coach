@@ -1,0 +1,14 @@
+{
+  "time": "2026-09-26T10:02:32.061754+08:00",
+  "tool": "cua_repl / Codex In-app Browser",
+  "browserId": "1",
+  "tabs": [
+    "8",
+    "3"
+  ],
+  "mode": "IAB；内核版本与无头状态未知",
+  "isolation": "仅本任务标签；不宣称 Cookie 和服务完全隔离",
+  "status": "Blocked",
+  "actual": "按用户最新规范切换 IAB。新标签及本任务旧标签进入商品页都跳转验证码登录页；已请求用户完成登录。旧工作台残留 DOM/截图不算本轮联机成功。",
+  "screenshotStatus": "业务页待登录后补齐；先前独立浏览器的已遮盖登录截图作为历史阻塞证据保留"
+}
