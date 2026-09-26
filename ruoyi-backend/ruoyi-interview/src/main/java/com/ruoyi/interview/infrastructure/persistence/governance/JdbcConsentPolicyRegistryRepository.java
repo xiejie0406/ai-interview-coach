@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 
 /** Tenant-local immutable policy reference registry；正文和 URL 不进入业务数据库。 */
-@Transactional(readOnly = true)
+@Transactional(transactionManager = "interviewTransactionManager", readOnly = true)
 @InterviewEnabled
 @Repository
 public class JdbcConsentPolicyRegistryRepository implements ConsentPolicyRegistryPort {
@@ -28,7 +28,7 @@ public class JdbcConsentPolicyRegistryRepository implements ConsentPolicyRegistr
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void ensureRegistered(TenantId tenantId, ConsentPurpose purpose,
                                  ImmutableVersionRef policyVersion, Instant effectiveFrom) {
         MapSqlParameterSource parameters = new MapSqlParameterSource()

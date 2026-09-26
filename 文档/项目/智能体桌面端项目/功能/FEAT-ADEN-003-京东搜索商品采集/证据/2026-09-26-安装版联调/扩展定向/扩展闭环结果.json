@@ -1,0 +1,331 @@
+{
+  "synthetic": true,
+  "fixtureSku": "81790399098909",
+  "interaction": "后台扩展面板DOM派发，源标签保持活跃；不代替Chrome原生侧栏人工验收",
+  "browser": "140.0.7339.16",
+  "profile": "C:\\Users\\admin\\AppData\\Local\\Temp\\aden-collector-probe-ykRjvT",
+  "events": [
+    {
+      "step": "stage",
+      "name": "launch-chromium",
+      "at": "2026-09-26T05:04:58.923Z"
+    },
+    {
+      "step": "stage",
+      "name": "wait-extension-worker",
+      "at": "2026-09-26T05:05:02.097Z"
+    },
+    {
+      "step": "stage",
+      "name": "inspect-worker-api",
+      "at": "2026-09-26T05:05:02.205Z"
+    },
+    {
+      "step": "workerApiReady",
+      "url": "chrome-extension://mnejmmlalapfhnanlnckfdhmfpbahidm/background.js",
+      "runtimeKeys": [
+        "dynamicId",
+        "id",
+        "onRestartRequired",
+        "onUserScriptMessage",
+        "onMessageExternal",
+        "onMessage",
+        "onConnectNative",
+        "onUserScriptConnect",
+        "onConnectExternal",
+        "onConnect",
+        "onBrowserUpdateAvailable",
+        "onUpdateAvailable",
+        "onSuspendCanceled",
+        "onSuspend",
+        "onInstalled",
+        "onStartup",
+        "connect",
+        "connectNative",
+        "getContexts",
+        "getManifest",
+        "getPlatformInfo",
+        "getURL",
+        "openOptionsPage",
+        "reload",
+        "requestUpdateCheck",
+        "restart",
+        "restartAfterDelay",
+        "sendMessage",
+        "sendNativeMessage",
+        "setUninstallURL",
+        "ContextType",
+        "OnInstalledReason",
+        "OnRestartRequiredReason",
+        "PlatformArch",
+        "PlatformNaclArch",
+        "PlatformOs",
+        "RequestUpdateCheckStatus"
+      ],
+      "connectNative": "function",
+      "storageSession": "function"
+    },
+    {
+      "step": "stage",
+      "name": "open-fixture-source",
+      "at": "2026-09-26T05:05:04.439Z"
+    },
+    {
+      "step": "stage",
+      "name": "open-extension-panel",
+      "at": "2026-09-26T05:05:04.900Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#connect",
+      "at": "2026-09-26T05:05:05.395Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#preview",
+      "at": "2026-09-26T05:05:08.858Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot-sku-rejection",
+      "at": "2026-09-26T05:05:09.005Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot:UAT-JD-14-SKU变化拒绝.png",
+      "at": "2026-09-26T05:05:09.006Z"
+    },
+    {
+      "step": "stage",
+      "name": "reconnect-after-screenshot",
+      "at": "2026-09-26T05:05:09.476Z"
+    },
+    {
+      "step": "skuMismatchRejected",
+      "error": "当前规格与页面 SKU 不一致，请等待页面完成后重试",
+      "captureDisabled": true
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#preview",
+      "at": "2026-09-26T05:05:09.660Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot-challenge-rejection",
+      "at": "2026-09-26T05:05:09.841Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot:UAT-JD-23-验证页拒绝.png",
+      "at": "2026-09-26T05:05:09.843Z"
+    },
+    {
+      "step": "stage",
+      "name": "reconnect-after-screenshot",
+      "at": "2026-09-26T05:05:10.025Z"
+    },
+    {
+      "step": "challengeRejected",
+      "error": "页面需要登录或验证，请手动处理后重新采集",
+      "captureDisabled": true
+    },
+    {
+      "step": "fixtureSetup",
+      "changes": [
+        "temporary SKU mismatch",
+        "temporary data-captcha"
+      ],
+      "restoredSku": "81790399098909",
+      "scope": "探针负例准备；不是插件自动操作"
+    },
+    {
+      "step": "previewPrivacy",
+      "personalTextExcluded": true,
+      "scriptSecretExcluded": true
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#preview",
+      "at": "2026-09-26T05:05:10.696Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#capture",
+      "at": "2026-09-26T05:05:10.845Z"
+    },
+    {
+      "step": "stage",
+      "name": "wait-capture-terminal:after-none",
+      "at": "2026-09-26T05:05:10.864Z"
+    },
+    {
+      "step": "partial",
+      "message": "部分保存，请查看缺失图片清单；主动排除 0 张，超限排除 0 张。仅代表已加载范围。",
+      "navigations": 0,
+      "failures": "image-7：图片请求失败 HTTP 503\nimage-8：图片请求失败 HTTP 503"
+    },
+    {
+      "step": "noAutomaticSourceActions",
+      "navigations": 0,
+      "scrollY": 0,
+      "sku": "81790399098909"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot-partial-capture",
+      "at": "2026-09-26T05:05:12.458Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot:UAT-JD-13-16-扩展部分保存.png",
+      "at": "2026-09-26T05:05:12.459Z"
+    },
+    {
+      "step": "stage",
+      "name": "reconnect-after-screenshot",
+      "at": "2026-09-26T05:05:12.639Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#retry",
+      "at": "2026-09-26T05:05:12.711Z"
+    },
+    {
+      "step": "retry",
+      "message": "重试完成；选定图片已保存，资源清单已追加版本"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot-image-retry",
+      "at": "2026-09-26T05:05:13.290Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot:UAT-JD-16-重试保存.png",
+      "at": "2026-09-26T05:05:13.291Z"
+    },
+    {
+      "step": "stage",
+      "name": "reconnect-after-screenshot",
+      "at": "2026-09-26T05:05:13.467Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#capture",
+      "at": "2026-09-26T05:05:13.680Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot-duplicate-confirmation",
+      "at": "2026-09-26T05:05:13.884Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot:UAT-JD-17-重复确认.png",
+      "at": "2026-09-26T05:05:13.885Z"
+    },
+    {
+      "step": "stage",
+      "name": "reconnect-after-screenshot",
+      "at": "2026-09-26T05:05:14.089Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#confirmCapture",
+      "at": "2026-09-26T05:05:14.195Z"
+    },
+    {
+      "step": "stage",
+      "name": "wait-capture-terminal:after-4d208eec-4b66-4e9d-92ad-0fe601c0be90",
+      "at": "2026-09-26T05:05:14.212Z"
+    },
+    {
+      "step": "version",
+      "message": "本次选定内容已保存；主动排除 0 张，超限排除 0 张。仅代表已加载范围。"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#capture",
+      "at": "2026-09-26T05:05:15.785Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#confirmCapture",
+      "at": "2026-09-26T05:05:15.922Z"
+    },
+    {
+      "step": "stage",
+      "name": "wait-capture-terminal:after-c43e7d99-111d-4d90-90f5-9d953d0e740c",
+      "at": "2026-09-26T05:05:15.941Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#connect",
+      "at": "2026-09-26T05:05:16.442Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#pending",
+      "at": "2026-09-26T05:05:16.600Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#resume",
+      "at": "2026-09-26T05:05:16.752Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot-offline-restore",
+      "at": "2026-09-26T05:05:17.100Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot:UAT-JD-22-真实IDB离线字节恢复.png",
+      "at": "2026-09-26T05:05:17.101Z"
+    },
+    {
+      "step": "offlineSpool",
+      "fault": "Native发送前明确故障注入；后端与IndexedDB真实",
+      "injected": 1,
+      "stored": [
+        {
+          "kind": "asset",
+          "byteLength": 69,
+          "expiresAt": 1790485515989
+        },
+        {
+          "kind": "capture",
+          "expiresAt": 1790485515989
+        }
+      ],
+      "afterRestoreEntries": 0,
+      "sourceRequestsDuringRestore": 0
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#library",
+      "at": "2026-09-26T05:05:17.219Z"
+    },
+    {
+      "step": "sourceClosed",
+      "value": true
+    },
+    {
+      "step": "stage",
+      "name": "complete",
+      "at": "2026-09-26T05:05:17.430Z"
+    }
+  ],
+  "screenshots": [
+    "UAT-JD-14-SKU变化拒绝.png",
+    "UAT-JD-23-验证页拒绝.png",
+    "UAT-JD-13-16-扩展部分保存.png",
+    "UAT-JD-16-重试保存.png",
+    "UAT-JD-17-重复确认.png",
+    "UAT-JD-22-真实IDB离线字节恢复.png"
+  ],
+  "errors": [],
+  "stage": "complete",
+  "stageAt": "2026-09-26T05:05:17.430Z"
+}

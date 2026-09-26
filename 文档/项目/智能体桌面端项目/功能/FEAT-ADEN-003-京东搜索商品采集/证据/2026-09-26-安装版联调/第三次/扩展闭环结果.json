@@ -1,0 +1,12 @@
+{
+  "synthetic": true,
+  "fixtureSku": "81790398348398",
+  "interaction": "后台扩展面板DOM派发，源标签保持活跃；不代替Chrome原生侧栏人工验收",
+  "browser": "140.0.7339.16",
+  "profile": "C:\\Users\\admin\\AppData\\Local\\Temp\\aden-collector-probe-6ipLHV",
+  "events": [],
+  "screenshots": [],
+  "errors": [
+    "worker.evaluate: TypeError: Cannot read properties of undefined (reading 'connectNative')\n    at eval (eval at evaluate (:291:30), <anonymous>:3:36)\n    at UtilityScript.evaluate (<anonymous>:293:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+  ]
+}

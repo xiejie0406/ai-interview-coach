@@ -148,6 +148,9 @@ public class AdenTaskTransactionService {
         AdenTaskLedgerRepository.StoredTask stored = ledger.findTaskForUpdate(
                 command.workspaceId(), command.taskId()).orElseThrow(AdenNotFoundException::new);
         AdenTask current = stored.task();
+        if (current.type() != AdenTaskType.SYNTHETIC_CORE) {
+            throw new AdenApplicationException("ADEN_STATE_TRANSITION_DENIED", "采集任务由采集库操作管理");
+        }
         if (current.version().value() != command.expectedVersion().value()) {
             throw new AdenVersionConflictException(
                     Long.toString(command.expectedVersion().value()), current.state().name());
@@ -220,6 +223,9 @@ public class AdenTaskTransactionService {
         if (inbox.replay() != null) return inbox.replay();
         AdenTask current = ledger.findTaskForUpdate(command.workspaceId(), command.taskId())
                 .orElseThrow(AdenNotFoundException::new).task();
+        if (current.type() != AdenTaskType.SYNTHETIC_CORE) {
+            throw new AdenApplicationException("ADEN_STATE_TRANSITION_DENIED", "采集任务由采集库操作管理");
+        }
         if (current.version().value() != command.expectedVersion().value()) {
             throw new AdenVersionConflictException(
                     Long.toString(command.expectedVersion().value()), current.state().name());

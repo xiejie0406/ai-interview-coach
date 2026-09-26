@@ -10,6 +10,7 @@ import { AdenAuthService } from '../auth/auth-service'
 import { AdenSseCoordinator } from '../transport/sse-client'
 import { DESKTOP_IPC as IPC } from '../../shared/contracts/desktop-api'
 import { registerDesktopIpcHandlers } from '../ipc/register-handlers'
+import { CollectorBridge } from '../collector-bridge/bridge'
 
 declare const __ADEN_PACKAGE_CHANNEL__: 'local-test' | 'release'
 
@@ -34,6 +35,7 @@ function configuredApiBaseUrl(): string | undefined {
 export class AdenAppHost {
   #window: BrowserWindow | null = null
   #disposeIpc: (() => void) | null = null
+  #collector: CollectorBridge | null = null
 
   start(baseDirectory: string): void {
     const development = !app.isPackaged
@@ -66,7 +68,36 @@ export class AdenAppHost {
       sse
     })
 
+    this.#collector = new CollectorBridge({
+      helperPath: app.isPackaged
+        ? join(process.resourcesPath, 'collector', 'collector-pipe.ps1')
+        : join(app.getAppPath(), 'scripts', 'collector-pipe.ps1'),
+      session,
+      api,
+      pipePath: process.env.ADEN_COLLECTOR_PIPE,
+      confirmPair: async (workspaceId) => {
+        const result = await dialog.showMessageBox(window, {
+          type: 'question', title: '连接商品采集扩展',
+          message: '允许 Chrome 商品采集扩展连接当前工作空间？',
+          detail: `扩展可将你主动采集的商品和图片保存到当前工作空间。\n工作空间：${workspaceId}`,
+          buttons: ['允许连接', '取消'], defaultId: 1, cancelId: 1, noLink: true
+        })
+        return result.response === 0
+      },
+      openLibrary: () => {
+        this.activate()
+        this.#send('aden:collection:open-library', {})
+      },
+      onFailure: (code) => process.stderr.write(`${code}\n`)
+    })
+    try { this.#collector.start() } catch {
+      // 扩展桥不可用不阻断既有CORE功能，界面连接时明确返回错误。
+      process.stderr.write('COLLECTOR_BRIDGE_UNAVAILABLE\n')
+    }
+
     window.on('closed', () => {
+      this.#collector?.dispose()
+      this.#collector = null
       this.#disposeIpc?.()
       this.#disposeIpc = null
       this.#window = null

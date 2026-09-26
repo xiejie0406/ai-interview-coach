@@ -14,7 +14,9 @@ public final class AdenDatabasePreconditions {
     public static final Set<String> EXPECTED_BUSINESS_TABLES = Set.of(
             "aden_workspace", "aden_workspace_member", "aden_task", "aden_task_step",
             "aden_runner", "aden_runner_credential", "aden_runner_session", "aden_runner_delivery",
-            "aden_event", "aden_outbox", "aden_inbox", "aden_audit_event");
+            "aden_event", "aden_outbox", "aden_inbox", "aden_audit_event",
+            "aden_collection_item", "aden_collection_snapshot", "aden_collection_manifest",
+            "aden_collection_curation", "aden_collection_upload", "aden_collection_export");
 
     private AdenDatabasePreconditions() {
     }
@@ -27,7 +29,7 @@ public final class AdenDatabasePreconditions {
         }
     }
 
-    /** 启动 guard / validate 的强校验：12 张业务表必须与当前版本完全一致。 */
+    /** 启动 guard / validate 的强校验：18 张业务表必须与当前版本完全一致。 */
     public static void verifyCurrentSchema(DataSource dataSource, String expectedDatabase) {
         try (Connection connection = dataSource.getConnection()) {
             verify(connection, expectedDatabase);

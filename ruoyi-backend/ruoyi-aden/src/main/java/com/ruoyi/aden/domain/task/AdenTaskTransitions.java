@@ -46,6 +46,12 @@ public final class AdenTaskTransitions {
         }
         rule(result, AdenTaskState.QUEUED, AdenTaskActor.RUNNER,
                 AdenTaskCommand.START, AdenTaskState.RUNNING);
+        rule(result, AdenTaskState.QUEUED, AdenTaskActor.COLLECTOR,
+                AdenTaskCommand.START, AdenTaskState.RUNNING);
+        rule(result, AdenTaskState.RUNNING, AdenTaskActor.COLLECTOR,
+                AdenTaskCommand.COMPLETE, AdenTaskState.SUCCEEDED);
+        rule(result, AdenTaskState.RUNNING, AdenTaskActor.COLLECTOR,
+                AdenTaskCommand.FAIL, AdenTaskState.FAILED);
         rule(result, AdenTaskState.RUNNING, AdenTaskActor.RUNNER,
                 AdenTaskCommand.WAIT_FOR_USER, AdenTaskState.WAITING_USER);
         rule(result, AdenTaskState.RUNNING, AdenTaskActor.RUNNER,

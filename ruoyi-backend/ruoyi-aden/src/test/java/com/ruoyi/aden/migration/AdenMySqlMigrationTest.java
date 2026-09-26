@@ -61,9 +61,9 @@ class AdenMySqlMigrationTest {
         AdenDatabasePreconditions.verify(dataSource, databaseName);
         flyway = AdenFlywayFactory.create(dataSource);
         flyway.baseline();
-        assertEquals(4, flyway.migrate().migrationsExecuted);
+        assertEquals(5, flyway.migrate().migrationsExecuted);
         flyway.validate();
-        AdenSchemaGuard.requireVersion(flyway, "4");
+        AdenSchemaGuard.requireVersion(flyway, "5");
         AdenDatabasePreconditions.verifyCurrentSchema(dataSource, databaseName);
         jdbc = new JdbcTemplate(dataSource);
     }
@@ -80,17 +80,17 @@ class AdenMySqlMigrationTest {
                  where table_schema = ? and table_name like 'aden\\_%'
                  order by table_name
                 """, String.class, databaseName);
-        assertEquals(13, tables.size());
+        assertEquals(19, tables.size());
         assertTrue(tables.contains("aden_flyway_schema_history"));
-        assertEquals(12, tables.stream().filter(name -> !name.equals("aden_flyway_schema_history")).count());
-        assertEquals(5, jdbc.queryForObject(
+        assertEquals(18, tables.stream().filter(name -> !name.equals("aden_flyway_schema_history")).count());
+        assertEquals(6, jdbc.queryForObject(
                 "select count(*) from aden_flyway_schema_history where success = 1", Integer.class));
-        assertEquals(44, jdbc.queryForObject("""
+        assertEquals(50, jdbc.queryForObject("""
                 select count(*) from information_schema.columns
                  where table_schema = ? and table_name like 'aden\\_%'
                    and data_type = 'datetime' and datetime_precision = 6
                 """, Integer.class, databaseName));
-        assertEquals(12, jdbc.queryForObject("""
+        assertEquals(18, jdbc.queryForObject("""
                 select count(*) from information_schema.columns
                  where table_schema = ? and table_name like 'aden\\_%'
                    and column_name = 'workspace_id'

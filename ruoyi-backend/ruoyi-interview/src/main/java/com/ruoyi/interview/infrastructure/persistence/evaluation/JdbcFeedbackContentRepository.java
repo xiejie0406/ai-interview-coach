@@ -21,7 +21,7 @@ import java.util.List;
 /** 反馈正文的加密 owner；返回值只是一条受控引用，不包含用户原文。 */
 @InterviewEnabled
 @Repository
-@Transactional(readOnly = true)
+@Transactional(transactionManager = "interviewTransactionManager", readOnly = true)
 public class JdbcFeedbackContentRepository implements FeedbackContentPort {
 
     private final NamedParameterJdbcTemplate jdbc;
@@ -36,7 +36,7 @@ public class JdbcFeedbackContentRepository implements FeedbackContentPort {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public String store(
             TenantId tenantId,
             UserId userId,

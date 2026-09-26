@@ -1,0 +1,29 @@
+{
+  "at": "2026-09-26T13:38:29.2943886+08:00",
+  "phase": "completed",
+  "instanceRoot": "C:\\Users\\admin\\AppData\\Local\\Temp\\aden-col-build-87ad913a\\frontend\\desktop\\aden-desktop\\test-results\\aden-e2e-local-57bcbd3373e74dea9c0e9bcc2c5b8476",
+  "processes": [
+    {
+      "ProcessId": 40896,
+      "Name": "mysqld.exe"
+    },
+    {
+      "ProcessId": 40444,
+      "Name": "mysqld.exe"
+    },
+    {
+      "ProcessId": 40580,
+      "Name": "redis-server.exe"
+    },
+    {
+      "ProcessId": 38600,
+      "Name": "java.exe"
+    }
+  ],
+  "instanceDirectoryExists": false,
+  "remainingOwnedProcesses": 0,
+  "restoredApiBaseUrl": "http://127.0.0.1:8081",
+  "otherInstallationProcesses": 4,
+  "preserved": "独立构建目录、合成Chromium探针profile、证据与交付包保留；共享服务未停止",
+  "result": "Pass"
+}

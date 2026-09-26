@@ -9,7 +9,7 @@ public final class AdenFlywayFactory {
     public static final String LOCATION = "classpath:db/aden-migration";
     public static final String HISTORY_TABLE = "aden_flyway_schema_history";
     public static final String BASELINE_VERSION = "0";
-    public static final String EXPECTED_VERSION = "4";
+    public static final String EXPECTED_VERSION = "5";
 
     private AdenFlywayFactory() {
     }

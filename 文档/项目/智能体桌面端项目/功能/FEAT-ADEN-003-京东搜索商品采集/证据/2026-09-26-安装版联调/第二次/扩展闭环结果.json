@@ -1,0 +1,12 @@
+{
+  "synthetic": true,
+  "fixtureSku": "81790398068234",
+  "interaction": "后台扩展面板DOM派发，源标签保持活跃；不代替Chrome原生侧栏人工验收",
+  "browser": "",
+  "profile": "C:\\Users\\admin\\AppData\\Local\\Temp\\aden-collector-probe-qttJ9j",
+  "events": [],
+  "screenshots": [],
+  "errors": [
+    "browserType.launchPersistentContext: Executable doesn't exist at C:\\Users\\admin\\AppData\\Local\\ms-playwright\\chromium-1193\\chrome-win\\chrome.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+  ]
+}

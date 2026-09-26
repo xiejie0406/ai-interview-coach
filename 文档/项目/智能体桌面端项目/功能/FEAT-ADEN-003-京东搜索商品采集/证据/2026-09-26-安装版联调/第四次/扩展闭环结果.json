@@ -1,0 +1,58 @@
+{
+  "synthetic": true,
+  "fixtureSku": "81790398458981",
+  "interaction": "后台扩展面板DOM派发，源标签保持活跃；不代替Chrome原生侧栏人工验收",
+  "browser": "140.0.7339.16",
+  "profile": "C:\\Users\\admin\\AppData\\Local\\Temp\\aden-collector-probe-h0eP6k",
+  "events": [
+    {
+      "step": "workerApiReady",
+      "url": "chrome-extension://mnejmmlalapfhnanlnckfdhmfpbahidm/background.js",
+      "runtimeKeys": [
+        "dynamicId",
+        "id",
+        "onRestartRequired",
+        "onUserScriptMessage",
+        "onMessageExternal",
+        "onMessage",
+        "onConnectNative",
+        "onUserScriptConnect",
+        "onConnectExternal",
+        "onConnect",
+        "onBrowserUpdateAvailable",
+        "onUpdateAvailable",
+        "onSuspendCanceled",
+        "onSuspend",
+        "onInstalled",
+        "onStartup",
+        "connect",
+        "connectNative",
+        "getContexts",
+        "getManifest",
+        "getPlatformInfo",
+        "getURL",
+        "openOptionsPage",
+        "reload",
+        "requestUpdateCheck",
+        "restart",
+        "restartAfterDelay",
+        "sendMessage",
+        "sendNativeMessage",
+        "setUninstallURL",
+        "ContextType",
+        "OnInstalledReason",
+        "OnRestartRequiredReason",
+        "PlatformArch",
+        "PlatformNaclArch",
+        "PlatformOs",
+        "RequestUpdateCheckStatus"
+      ],
+      "connectNative": "function",
+      "storageSession": "function"
+    }
+  ],
+  "screenshots": [],
+  "errors": [
+    "page.screenshot: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n\u001b[2m  - waiting for fonts to load...\u001b[22m\n\u001b[2m  - fonts loaded\u001b[22m\n"
+  ]
+}

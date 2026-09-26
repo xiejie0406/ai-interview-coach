@@ -33,6 +33,8 @@ public record InterviewSessionSnapshot(
         Optional<String> streamCursor,
         Optional<Instant> recoveryExpiresAt,
         Optional<String> failureCode,
+        Optional<Instant> startedAt,
+        Optional<Instant> completedAt,
         AggregateVersion version
 ) {
     public InterviewSessionSnapshot {
@@ -74,6 +76,8 @@ public record InterviewSessionSnapshot(
         });
         recoveryExpiresAt = recoveryExpiresAt == null ? Optional.empty() : recoveryExpiresAt;
         failureCode = failureCode == null ? Optional.empty() : failureCode;
+        startedAt = startedAt == null ? Optional.empty() : startedAt;
+        completedAt = completedAt == null ? Optional.empty() : completedAt;
         failureCode.ifPresent(code -> {
             DomainPreconditions.require(code.matches("[A-Z][A-Z0-9_]{0,95}"),
                     DomainErrorCode.INVALID_ARGUMENT, "failure code is not a stable reason code");

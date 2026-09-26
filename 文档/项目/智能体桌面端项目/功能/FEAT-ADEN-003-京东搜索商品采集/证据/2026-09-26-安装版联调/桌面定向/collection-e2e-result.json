@@ -1,0 +1,23 @@
+{
+  "result": "Fail",
+  "checks": [
+    {
+      "id": "JD-AC-13",
+      "assertion": "本次仅定向桌面复验，未执行扩展探针",
+      "result": "NotRun"
+    },
+    {
+      "id": "JD-AC-19",
+      "assertion": "安装版人工新增经真实 API/MySQL 回读，来源 MANUAL、价格精确文本保留",
+      "result": "Pass"
+    },
+    {
+      "id": "JD-AC-16",
+      "assertion": "人工图片字节与上传文件一致；安装版解码并显示已存图片（不覆盖真页8图2失败场景）",
+      "result": "Pass"
+    }
+  ],
+  "error": "locator.waitFor: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('人工补充已保存，原始快照保持不变', { exact: true }) to be visible\u001b[22m\n",
+  "rendererErrors": [],
+  "completedAt": "2026-09-26T05:02:58.883Z"
+}

@@ -6,6 +6,11 @@ if (process.platform !== 'win32') throw new Error('Aden 安装包当前只支持
 if (channel !== 'local-test' && channel !== 'release') throw new Error('渠道必须为 local-test 或 release')
 
 const env = { ...process.env, ADEN_PACKAGE_CHANNEL: channel }
+const nativeHost = spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', 'scripts/build-collector-host.ps1'], {
+  cwd: resolve(import.meta.dirname, '..'), env, stdio: 'inherit', windowsHide: true
+})
+if (nativeHost.error) throw nativeHost.error
+if (nativeHost.status !== 0) process.exit(nativeHost.status || 1)
 const build = spawnSync('cmd.exe', ['/d', '/c', 'npm.cmd run build'], {
   cwd: resolve(import.meta.dirname, '..'), env, stdio: 'inherit'
 })

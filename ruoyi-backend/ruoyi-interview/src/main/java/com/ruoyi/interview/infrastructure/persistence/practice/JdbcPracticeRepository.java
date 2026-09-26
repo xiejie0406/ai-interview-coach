@@ -35,7 +35,7 @@ import java.util.Optional;
 
 @InterviewEnabled
 @Repository
-@Transactional(readOnly = true)
+@Transactional(transactionManager = "interviewTransactionManager", readOnly = true)
 public class JdbcPracticeRepository implements PracticeRepository {
 
     private final NamedParameterJdbcTemplate jdbc;
@@ -92,7 +92,7 @@ public class JdbcPracticeRepository implements PracticeRepository {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void save(PracticeAttempt attempt) {
         EncryptedEnvelope draftEnvelope = attempt.draft()
                 .map(draft -> cipher.encrypt(attempt.tenantId(), draftBinding(attempt.id()), draft.text()))

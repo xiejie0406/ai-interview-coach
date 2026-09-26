@@ -163,7 +163,8 @@ public class InterviewController {
     public ResponseEntity<SessionResponse> recover(@PathVariable UUID sessionId, HttpServletRequest request) {
         InterviewSessionSnapshot result = recover.handle(new RecoverInterview.Query(
                 ResourceId.of(sessionId), contexts.query(request)));
-        return ResponseEntity.ok().eTag(HttpVersionPreconditions.etag(result.version()))
+        return ResponseEntity.ok().cacheControl(org.springframework.http.CacheControl.noStore())
+                .eTag(HttpVersionPreconditions.etag(result.version()))
                 .body(SessionResponse.from(result));
     }
 
@@ -197,12 +198,14 @@ public class InterviewController {
                                                         @Pattern(regexp = "^\"v[0-9]+\"$") String ifMatch,
                                                         @Valid @RequestBody SubmitAnswerRequest body,
                                                         HttpServletRequest request) {
-        var submitted = submitAnswer.handle(new SubmitInterviewAnswer.Command(
-                ResourceId.of(sessionId), ResourceId.of(body.turnId()), body.turnSequence(),
-                InterviewAnswerSource.TEXT, body.text(), Optional.empty(),
-                HttpVersionPreconditions.requireIfMatch(ifMatch), contexts.operation(request)));
-        var result = progress.handle(new ProgressInterview.Command(ResourceId.of(sessionId),
-                submitted.snapshot().version(), contexts.operation(request)));
+        var result = transaction.required(() -> {
+            var submitted = submitAnswer.handle(new SubmitInterviewAnswer.Command(
+                    ResourceId.of(sessionId), ResourceId.of(body.turnId()), body.turnSequence(),
+                    InterviewAnswerSource.TEXT, body.text(), Optional.empty(),
+                    HttpVersionPreconditions.requireIfMatch(ifMatch), contexts.operation(request)));
+            return progress.handle(new ProgressInterview.Command(ResourceId.of(sessionId),
+                    submitted.snapshot().version(), contexts.operation(request)));
+        });
         return ResponseEntity.ok().eTag(HttpVersionPreconditions.etag(result.version()))
                 .body(SessionResponse.from(result));
     }
@@ -274,7 +277,8 @@ public class InterviewController {
                                   int lastStableTurnSequence, List<String> pendingJobIds,
                                   ReservationResponse reservation, ReportResponse report,
                                   VoiceSummaryResponse voiceSummary, List<String> allowedCommands,
-                                  String streamCursor, String recoveryExpiresAt, String failureCode, long version) {
+                                  String streamCursor, String recoveryExpiresAt, String failureCode,
+                                  String startedAt, String completedAt, String serverNow, long version) {
         static SessionResponse from(InterviewSessionSnapshot snapshot) {
             return new SessionResponse(snapshot.id().value(), snapshot.state().name(),
                     snapshot.mode() == InterviewMode.VOICE ? "CASCADE_VOICE" : snapshot.mode().name(),
@@ -290,7 +294,10 @@ public class InterviewController {
                     snapshot.allowedCommands().stream()
                             .map(Enum::name).toList(),
                     snapshot.streamCursor().orElse(null), snapshot.recoveryExpiresAt().map(java.time.Instant::toString).orElse(null),
-                    snapshot.failureCode().orElse(null), snapshot.version().value());
+                    snapshot.failureCode().orElse(null),
+                    snapshot.startedAt().map(java.time.Instant::toString).orElse(null),
+                    snapshot.completedAt().map(java.time.Instant::toString).orElse(null),
+                    java.time.Instant.now().toString(), snapshot.version().value());
         }
     }
 }

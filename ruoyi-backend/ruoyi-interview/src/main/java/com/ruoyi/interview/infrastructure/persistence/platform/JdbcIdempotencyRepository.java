@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @InterviewEnabled
 @Repository
-@Transactional(readOnly = true)
+@Transactional(transactionManager = "interviewTransactionManager", readOnly = true)
 public class JdbcIdempotencyRepository implements IdempotencyPort {
 
     private final NamedParameterJdbcTemplate jdbc;
@@ -53,7 +53,7 @@ public class JdbcIdempotencyRepository implements IdempotencyPort {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public boolean claim(IdempotencyRecord record) {
         return jdbc.update("""
                 insert into platform.idempotency_record (
@@ -69,7 +69,7 @@ public class JdbcIdempotencyRepository implements IdempotencyPort {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void save(IdempotencyRecord record) {
         MapSqlParameterSource parameters = parameters(record);
         if (record.version().value() == 0) {

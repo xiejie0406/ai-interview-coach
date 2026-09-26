@@ -1,0 +1,7 @@
+{
+  "result": "Fail",
+  "checks": [],
+  "error": "后端确认完成后应清理暂存\n\n1 !== 0\n",
+  "rendererErrors": [],
+  "completedAt": "2026-09-26T05:33:30.034Z"
+}

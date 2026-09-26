@@ -7,11 +7,12 @@ export type FetchLike = (input: string | URL | Request, init?: RequestInit) => P
 
 export interface ApiRequest {
   readonly path: string
-  readonly method?: 'GET' | 'POST' | 'DELETE'
+  readonly method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
   readonly body?: unknown
   readonly headers?: Readonly<Record<string, string>>
   readonly authenticated?: boolean
-  readonly expectedContentType?: 'json' | 'none'
+  readonly expectedContentType?: 'json' | 'none' | 'binary'
+  readonly maxResponseBytes?: number
   readonly signal?: AbortSignal
 }
 
@@ -104,6 +105,11 @@ export class AdenApiClient {
         return { data: undefined as T, correlationId, context, headers: response.headers }
       }
       const contentType = response.headers.get('content-type')?.toLowerCase() ?? ''
+      if (expected === 'binary') {
+        const bytes = await readBoundedBody(response, request.maxResponseBytes ?? this.limits.maxBodyBytes, correlationId)
+        if (!this.session.isCurrent(context)) throw new AdenTransportError('ABORTED', '会话上下文已经变化', null, correlationId, false)
+        return { data: bytes as T, correlationId, context, headers: response.headers }
+      }
       if (!contentType.includes('application/json')) {
         throw new AdenTransportError('INVALID_CONTENT_TYPE', '服务返回了非 JSON 内容', response.status, correlationId, false)
       }
@@ -115,6 +121,7 @@ export class AdenApiClient {
         throw new AdenTransportError('INVALID_RESPONSE', '服务返回的 JSON 无效', response.status, correlationId, false)
       }
       assertAjaxResultSuccess(data, response.status, correlationId)
+      if (!this.session.isCurrent(context)) throw new AdenTransportError('ABORTED', '会话上下文已经变化', null, correlationId, false)
       return { data: data as T, correlationId, context, headers: response.headers }
     } finally {
       clearTimeout(timeout)

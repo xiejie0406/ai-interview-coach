@@ -1,4 +1,5 @@
 import type { EventBatch, EpochContext } from './operator-events'
+import type { CollectionApi } from './collection'
 import type {
   CreateTaskRequest,
   OperatorTaskCommandRequest,
@@ -19,7 +20,8 @@ export const DESKTOP_IPC = Object.freeze({
   getTask: 'aden:tasks:get',
   commandTask: 'aden:tasks:command',
   eventBatch: 'aden:events:batch',
-  streamStatus: 'aden:events:status'
+  streamStatus: 'aden:events:status',
+  collection: 'aden:collection:execute'
 })
 
 export interface CaptchaChallenge {
@@ -97,6 +99,7 @@ export interface TaskMutationResult {
 }
 
 export interface AdenDesktopApi {
+  readonly collection: CollectionApi
   readonly getRuntimeInfo: () => AdenRuntimeInfo
   readonly auth: {
     readonly captcha: () => Promise<IpcResult<CaptchaChallenge>>

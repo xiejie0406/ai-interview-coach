@@ -57,6 +57,17 @@ try {
   $archive.Dispose()
 }
 
+# 运行中的 Spring Boot JAR 不能被下一次 Maven package 原地覆盖。
+# 按内容哈希复制为不可变启动文件，避免类加载器随后从改写的 JAR 读取到不一致的字节。
+$jarHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $jar).Hash.ToLowerInvariant()
+$launchJar = Join-Path $runtime "ruoyi-admin-$jarHash.jar"
+if (-not (Test-Path -LiteralPath $launchJar)) {
+  Copy-Item -LiteralPath $jar -Destination $launchJar
+}
+if ((Get-FileHash -Algorithm SHA256 -LiteralPath $launchJar).Hash.ToLowerInvariant() -ne $jarHash) {
+  throw "启动 JAR 副本校验失败：$launchJar"
+}
+
 if ($env:ADEN_ENABLED -ne 'false' -and [string]::IsNullOrWhiteSpace($env:ADEN_EXPECTED_DATABASE)) {
   throw 'Aden 默认启用：请设置 ADEN_EXPECTED_DATABASE 并先完成 schema 迁移，或设置 ADEN_ENABLED=false。'
 }
@@ -69,5 +80,5 @@ if ($env:APS_ENABLED -ne 'false' -and $env:APS_REPORTING_ENABLED -ne 'false' -an
   throw 'APS 报表默认启用：请设置 APS_SITE_CODE，或设置 APS_REPORTING_ENABLED=false。'
 }
 
-$process = Start-Process -FilePath 'java' -ArgumentList '-jar', $jar, '--spring.profiles.active=druid,local' -WorkingDirectory (Split-Path $jar) -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden -PassThru
-Write-Output "Started RuoYi PID $($process.Id)."
+$process = Start-Process -FilePath 'java' -ArgumentList '-jar', $launchJar, '--spring.profiles.active=druid,local' -WorkingDirectory (Split-Path $jar) -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden -PassThru
+Write-Output "Started RuoYi PID $($process.Id) from immutable JAR SHA256 $jarHash."

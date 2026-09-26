@@ -5,5 +5,6 @@ public enum AdenTaskActor {
     OPERATOR,
     VALIDATOR,
     COORDINATOR,
-    RUNNER
+    RUNNER,
+    COLLECTOR
 }

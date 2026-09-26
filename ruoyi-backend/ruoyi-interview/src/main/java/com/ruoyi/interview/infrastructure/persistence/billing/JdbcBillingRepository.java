@@ -30,7 +30,7 @@ import java.util.Optional;
 
 @InterviewEnabled
 @Repository
-@Transactional(readOnly = true)
+@Transactional(transactionManager = "interviewTransactionManager", readOnly = true)
 public class JdbcBillingRepository implements BillingRepository {
 
     private final NamedParameterJdbcTemplate jdbc;
@@ -83,7 +83,7 @@ public class JdbcBillingRepository implements BillingRepository {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void saveEntitlement(Entitlement entitlement) {
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("tenantId", entitlement.tenantId().value())
@@ -120,7 +120,7 @@ public class JdbcBillingRepository implements BillingRepository {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void saveReservation(UsageReservation reservation) {
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("tenantId", reservation.tenantId().value())
@@ -158,7 +158,7 @@ public class JdbcBillingRepository implements BillingRepository {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void appendSettlement(UsageSettlement settlement) {
         jdbc.update("""
                 insert into billing.usage_settlement (

@@ -19,6 +19,9 @@ type Snapshot = {
   allowedCommands: string[]
   version: number
   failureCode?: string | null
+  startedAt?: string | null
+  completedAt?: string | null
+  serverNow?: string | null
 }
 type Policy = { purpose: string; versionId: string; requiredForRegistration: boolean }
 type Preflight = { enabled: boolean; consentRequired: boolean; supportedCodecs: string[]; maxDurationSeconds: number; maxBytes: number; unavailableReasonCode?: string | null }
@@ -41,7 +44,6 @@ const waitingForInterviewer = ref(false)
 const voiceNoticeAccepted = ref(false)
 const voiceReadiness = ref<'CHECKING' | 'READY' | 'UNAVAILABLE'>('CHECKING')
 const voiceUnavailableReason = ref('')
-const draftSaved = ref(true)
 const messagesElement = ref<HTMLElement | null>(null)
 const localAnswers = ref<Record<string, LocalAnswer>>({})
 const showTextComposer = ref(false)
@@ -70,10 +72,11 @@ let serverPaused = false
 let ttsAudio: HTMLAudioElement | null = null
 let ttsObjectUrl: string | null = null
 let disposed = false
-let draftTimer: number | undefined
 let elapsedTimer: number | undefined
 let voiceTimer: number | undefined
 let captureGeneration = 0
+let composerTurnKey = ''
+let serverClockOffsetMs = 0
 
 const interviewId = computed(() => String(route.params.interviewId ?? ''))
 const orderedTurns = computed(() => [...(snapshot.value?.turns ?? [])].sort((left, right) => left.sequence - right.sequence))
@@ -114,15 +117,36 @@ async function scrollToBottom() {
 }
 
 function applySnapshot(response: { data: Snapshot; etag?: string }) {
+  const sampledServerTime = Date.parse(response.data.serverNow ?? '')
+  if (Number.isFinite(sampledServerTime)) serverClockOffsetMs = sampledServerTime - Date.now()
+  const activeTurn = response.data.state === 'IN_PROGRESS'
+    ? response.data.turns.findLast(turn => turn.state === 'QUESTION_COMMITTED')
+    : undefined
+  const nextComposerTurnKey = activeTurn ? `${response.data.id}:${activeTurn.turnId}` : ''
+  if (nextComposerTurnKey && composerTurnKey && nextComposerTurnKey !== composerTurnKey) {
+    answer.value = ''
+    transcript.value = null
+    partialTranscript.value = ''
+  }
+  if (nextComposerTurnKey) composerTurnKey = nextComposerTurnKey
   snapshot.value = response.data
   etag.value = response.etag ?? `"v${response.data.version}"`
+  updateElapsed()
+}
+
+function updateElapsed() {
+  const startedAt = Date.parse(snapshot.value?.startedAt ?? '')
+  if (!Number.isFinite(startedAt)) return
+  const completedAt = Date.parse(snapshot.value?.completedAt ?? '')
+  const endAt = Number.isFinite(completedAt) ? completedAt : Date.now() + serverClockOffsetMs
+  elapsedSeconds.value = Math.max(0, Math.floor((endAt - startedAt) / 1000))
 }
 
 async function loadVoiceReadiness() {
   if (!voiceMode.value) return
   voiceReadiness.value = 'CHECKING'
   try {
-    const capabilities = await apiRequest<VoiceCapabilities>('/voice-capabilities')
+    const capabilities = await apiRequest<VoiceCapabilities>('/voice-capabilities', { cache: 'no-store' })
     if (capabilities.configured) {
       voiceReadiness.value = 'READY'
       voiceUnavailableReason.value = ''
@@ -150,7 +174,7 @@ async function load(showLoading = true) {
   if (showLoading) loading.value = true
   error.value = ''
   try {
-    applySnapshot(await apiRequestWithMeta<Snapshot>(`/interviews/${encodeURIComponent(interviewId.value)}`))
+    applySnapshot(await apiRequestWithMeta<Snapshot>(`/interviews/${encodeURIComponent(interviewId.value)}`, { cache: 'no-store' }))
     await loadVoiceReadiness()
     await scrollToBottom()
   } catch (cause) {
@@ -173,7 +197,7 @@ async function startInterview() {
     const message = cause instanceof Error ? cause.message : '开始面试失败'
     // 开始状态可能已提交而首题失败；以服务端快照更新可恢复操作。
     try {
-      applySnapshot(await apiRequestWithMeta<Snapshot>(`/interviews/${encodeURIComponent(interviewId.value)}`))
+      applySnapshot(await apiRequestWithMeta<Snapshot>(`/interviews/${encodeURIComponent(interviewId.value)}`, { cache: 'no-store' }))
     } catch { /* 保留原错误，用户仍可重新加载 */ }
     error.value = message
   } finally {
@@ -186,7 +210,7 @@ async function waitForNextTurn(previousTurnId: string) {
   try {
     for (let attempt = 0; attempt < 15 && !disposed; attempt += 1) {
       await new Promise(resolve => window.setTimeout(resolve, attempt === 0 ? 500 : 900))
-      const response = await apiRequestWithMeta<Snapshot>(`/interviews/${encodeURIComponent(interviewId.value)}`)
+      const response = await apiRequestWithMeta<Snapshot>(`/interviews/${encodeURIComponent(interviewId.value)}`, { cache: 'no-store' })
       applySnapshot(response)
       const active = response.data.turns.find(turn => turn.state === 'QUESTION_COMMITTED')
       if (active?.turnId !== previousTurnId || ['COMPLETED', 'CANCELLED', 'FAILED_FINAL'].includes(response.data.state)) {
@@ -276,12 +300,6 @@ async function completeAndViewFeedback() {
 function repeatCurrentQuestion() {
   const element = document.getElementById(`turn-${currentTurn.value?.turnId ?? ''}`)
   element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-}
-
-function markDraftChanged() {
-  draftSaved.value = false
-  window.clearTimeout(draftTimer)
-  draftTimer = window.setTimeout(() => { draftSaved.value = true }, 500)
 }
 
 function clearAnswer() {
@@ -685,12 +703,14 @@ function toggleTextComposer() {
 }
 
 onMounted(() => {
-  elapsedTimer = window.setInterval(() => { if (snapshot.value?.state === 'IN_PROGRESS') elapsedSeconds.value += 1 }, 1000)
+  elapsedTimer = window.setInterval(() => {
+    if (snapshot.value?.startedAt) updateElapsed()
+    else if (snapshot.value?.state === 'IN_PROGRESS') elapsedSeconds.value += 1
+  }, 1000)
   void load()
 })
 onBeforeUnmount(() => {
   disposed = true
-  window.clearTimeout(draftTimer)
   window.clearInterval(elapsedTimer)
   cancelVoice('COMPONENT_UNMOUNTED')
   releaseTtsAudio()
@@ -721,7 +741,7 @@ onBeforeUnmount(() => {
     <main class="voice-panel conversation-panel">
       <header class="conversation-header">
         <div class="topic-heading"><span class="topic-icon">◉</span><div><strong>Java 后端 · {{ voiceMode ? '语音' : '文字' }}面试</strong><small>{{ voiceMode && !voiceReady ? '语音服务未就绪 · 可用文字回答' : voiceMode ? '按计划提问 · 录音后转写' : '按计划提问 · 输入文字回答' }}</small></div></div>
-        <div class="timer">面试时长 <strong>{{ formatElapsed() }}</strong></div>
+        <div class="timer">{{ snapshot?.startedAt ? '距开始' : '本页计时' }} <strong>{{ formatElapsed() }}</strong></div>
       </header>
       <div ref="messagesElement" class="conversation-scroll" aria-live="polite">
         <div class="conversation-inner">
@@ -732,7 +752,7 @@ onBeforeUnmount(() => {
           <template v-for="turn in orderedTurns" :key="turn.turnId">
             <article :id="`turn-${turn.turnId}`" class="turn ai-turn"><span class="speaker-avatar ai-avatar">AI</span><div class="turn-body"><div class="speaker">AI 面试官 · {{ turn.kind === 'FOLLOW_UP' ? '根据回答追问' : voiceMode && voiceReady ? '语音提问' : '文字提问' }}</div><div class="bubble question-bubble"><div class="question-tag">{{ turn.kind === 'FOLLOW_UP' ? '↳ 根据回答追问' : '● 面试问题' }}</div><p>{{ turn.questionText ?? '问题正在生成中…' }}</p><div v-if="voiceMode && voiceReady" class="voice-row"><button class="mini-play" type="button" aria-label="定位当前问题" @click="repeatCurrentQuestion">▶</button><span class="mini-wave" aria-hidden="true"><i v-for="bar in 7" :key="bar"></i></span><span>语音模式</span></div></div></div></article>
             <article v-if="localAnswers[turn.turnId]" class="turn user-turn"><div class="turn-body"><div class="speaker user-speaker">我 · {{ localAnswers[turn.turnId].source === 'VOICE' ? '语音回答' : '文字回答' }}</div><div class="bubble answer-bubble"><p>{{ localAnswers[turn.turnId].text }}</p><div class="voice-row answer-voice-row"><span>{{ localAnswers[turn.turnId].source === 'VOICE' ? formatDuration(localAnswers[turn.turnId].durationMs) : '已发送' }}</span><span v-if="localAnswers[turn.turnId].source === 'VOICE'" class="mini-wave" aria-hidden="true"><i v-for="bar in 7" :key="bar"></i></span></div></div></div><span class="speaker-avatar me-avatar">我</span></article>
-            <div v-else-if="['ANSWER_CONFIRMED', 'CLOSED'].includes(turn.state)" class="answer-recovery-note">该题已回答；当前会话快照未返回历史答案正文。</div>
+            <div v-else-if="['ANSWER_CONFIRMED', 'CLOSED'].includes(turn.state)" class="answer-recovery-note">回答已由服务端确认；历史正文暂不在房间回显。</div>
             <div v-else-if="turn.state === 'SKIPPED'" class="answer-recovery-note">该题已跳过。</div>
           </template>
           <div v-if="voiceMode && (voiceState === 'LISTENING' || partialTranscript)" class="live-card"><div class="live-top"><span class="listen"><i class="pulse"></i>正在录音</span><span>语音模式</span></div><div class="live-text">{{ partialTranscript || '请直接回答，完成后点击“结束回答”进行转写。' }}<i class="caret"></i></div></div>
@@ -752,7 +772,7 @@ onBeforeUnmount(() => {
             <button class="voice-orb" type="button" :disabled="busy || waitingForInterviewer || ttsState === 'PLAYING'" :aria-label="voiceState === 'LISTENING' ? '结束语音回答' : '开始语音回答'" @click="toggleVoiceDock">{{ voiceState === 'LISTENING' ? '■' : ttsState === 'PLAYING' ? '🔊' : '🎙' }}</button>
             <div class="dock-actions"><button class="icon-btn" type="button" aria-label="定位当前问题" @click="repeatCurrentQuestion">↻</button><button v-if="ttsState === 'PLAYING' || ttsState === 'BUFFERING'" class="icon-btn" type="button" aria-label="停止播放" @click="cancelTts">■</button><button v-if="voiceState === 'LISTENING'" class="end-btn" type="button" @click="finishVoice">结束回答</button><button class="icon-btn" type="button" aria-label="切换文字回答" @click="toggleTextComposer">⌨</button></div>
           </div>
-          <div v-else class="composer-shell"><div v-if="transcript" class="transcript-notice"><strong>语音已转写，请检查后发送</strong><span v-if="lowConfidence">{{ lowConfidence }} 处低置信术语需要确认</span></div><textarea v-model="answer" rows="3" maxlength="30000" aria-label="面试回答" :placeholder="voiceMode && voiceReady ? '输入回答，或切回语音模式……' : '输入文字回答……'" @input="markDraftChanged" @keydown.ctrl.enter.prevent="submitAnswer" /><div class="composer-toolbar"><div class="composer-tools"><button v-if="voiceMode && voiceReady" class="quiet-action" type="button" @click="toggleTextComposer">切回语音</button><button class="quiet-action" type="button" :disabled="busy || !answer" @click="clearAnswer">清空</button><span class="draft-label">{{ draftSaved ? '草稿已保存' : '正在保存草稿' }}</span></div><button class="primary-action" type="button" :disabled="busy || waitingForInterviewer || !answer.trim()" @click="submitAnswer">{{ busy ? '正在发送…' : transcript ? '确认转写并发送' : '发送' }}</button></div></div>
+          <div v-else class="composer-shell"><div v-if="transcript" class="transcript-notice"><strong>语音已转写，请检查后发送</strong><span v-if="lowConfidence">{{ lowConfidence }} 处低置信术语需要确认</span></div><textarea v-model="answer" rows="3" maxlength="30000" aria-label="面试回答" :placeholder="voiceMode && voiceReady ? '输入回答，或切回语音模式……' : '输入文字回答……'" @keydown.ctrl.enter.prevent="submitAnswer" /><div class="composer-toolbar"><div class="composer-tools"><button v-if="voiceMode && voiceReady" class="quiet-action" type="button" @click="toggleTextComposer">切回语音</button><button class="quiet-action" type="button" :disabled="busy || !answer" @click="clearAnswer">清空</button><span class="draft-label">草稿仅在当前页面，发送后保存</span></div><button class="primary-action" type="button" :disabled="busy || waitingForInterviewer || !answer.trim()" @click="submitAnswer">{{ busy ? '正在发送…' : transcript ? '确认转写并发送' : '发送' }}</button></div></div>
           <div class="compact-session-actions">
             <button v-if="snapshot?.allowedCommands?.includes('SKIP')" class="secondary-action" type="button" :disabled="busy" @click="command('skip')">跳过当前题</button>
             <button v-if="snapshot?.allowedCommands?.includes('COMPLETE')" class="danger-outline" type="button" :disabled="busy" @click="completeAndViewFeedback">结束并查看反馈</button>

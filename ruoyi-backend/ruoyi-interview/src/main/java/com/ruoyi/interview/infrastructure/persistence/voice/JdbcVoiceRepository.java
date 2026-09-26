@@ -38,7 +38,7 @@ import java.util.Optional;
 
 @InterviewEnabled
 @Repository
-@Transactional(readOnly = true)
+@Transactional(transactionManager = "interviewTransactionManager", readOnly = true)
 public class JdbcVoiceRepository implements VoiceRepository {
 
     private final NamedParameterJdbcTemplate jdbc;
@@ -95,7 +95,7 @@ public class JdbcVoiceRepository implements VoiceRepository {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void saveArtifact(AudioArtifact artifact) {
         Optional<AudioArtifact> persisted = findArtifact(artifact.tenantId(), artifact.id());
         if (persisted.isPresent()
@@ -193,7 +193,7 @@ public class JdbcVoiceRepository implements VoiceRepository {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void saveTranscript(Transcript transcript) {
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("tenantId", transcript.tenantId().value())
@@ -237,7 +237,7 @@ public class JdbcVoiceRepository implements VoiceRepository {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void saveExecution(VoiceTurnExecution execution) {
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("tenantId", execution.tenantId().value())

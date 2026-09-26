@@ -1,5 +1,8 @@
 [CmdletBinding()]
-param([switch]$SkipBuild, [switch]$InteractiveUat, [switch]$InstalledDesktop, [string]$BackendJarPath)
+param([switch]$SkipBuild, [switch]$InteractiveUat, [switch]$InstalledDesktop, [string]$BackendJarPath,
+    [ValidateSet('synthetic','collection')][string]$Scenario = 'synthetic',
+    [string]$DesktopExecutablePath, [string]$EvidenceDirectory,
+    [ValidateRange(0,900)][int]$DebugHoldSeconds = 0)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -123,8 +126,8 @@ function Add-SyntheticManagedSecret {
 
 Assert-DisposableRoot
 if ($InstalledDesktop) {
-    $installRoot = Join-Path $env:LOCALAPPDATA 'Programs\Aden Local Test'
-    $installedExe = Join-Path $installRoot 'Aden Local Test.exe'
+    $installRoot = if ($DesktopExecutablePath) { Split-Path -Parent ([IO.Path]::GetFullPath($DesktopExecutablePath)) } else { Join-Path $env:LOCALAPPDATA 'Programs\Aden Local Test' }
+    $installedExe = if ($DesktopExecutablePath) { [IO.Path]::GetFullPath($DesktopExecutablePath) } else { Join-Path $installRoot 'Aden Local Test.exe' }
     $installedConfigPath = Join-Path $installRoot 'resources\app\local-test.json'
     if (-not (Test-Path -LiteralPath $installedExe -PathType Leaf) -or
         -not (Test-Path -LiteralPath $installedConfigPath -PathType Leaf)) {
@@ -140,7 +143,7 @@ foreach ($binary in @($mysqld, $mysql, $mysqlAdmin, $redisServer, $redisCli)) {
 }
 
 $savedEnvironment = @{}
-$environmentNames = @('MYSQL_PWD','ADEN_E2E_DB_PASSWORD','RUOYI_DB_URL','RUOYI_DB_USERNAME','RUOYI_DB_PASSWORD','RUOYI_MANAGED_SECRET_MASTER_KEY_ID','RUOYI_MANAGED_SECRET_MASTER_KEY_BASE64','ADEN_E2E_API_ORIGIN','ADEN_E2E_WORKSPACE_NAME','ADEN_E2E_RUNNER_TOKEN','ADEN_API_BASE_URL','ADEN_E2E_DESKTOP_EXE','ADEN_E2E_EVIDENCE_DIR')
+$environmentNames = @('MYSQL_PWD','ADEN_E2E_DB_PASSWORD','RUOYI_DB_URL','RUOYI_DB_USERNAME','RUOYI_DB_PASSWORD','RUOYI_MANAGED_SECRET_MASTER_KEY_ID','RUOYI_MANAGED_SECRET_MASTER_KEY_BASE64','ADEN_E2E_API_ORIGIN','ADEN_E2E_WORKSPACE_NAME','ADEN_E2E_RUNNER_TOKEN','ADEN_API_BASE_URL','ADEN_E2E_DESKTOP_EXE','ADEN_E2E_EVIDENCE_DIR','ADEN_COLLECTION_FIXTURE_ORIGIN','ADEN_COLLECTOR_PIPE')
 foreach ($name in $environmentNames) { $savedEnvironment[$name] = [Environment]::GetEnvironmentVariable($name, 'Process') }
 
 try {
@@ -188,12 +191,27 @@ try {
     $jdbc = "jdbc:mysql://127.0.0.1:$mysqlPort/$database"
     $migrationMain = 'com.ruoyi.aden.migration.AdenMigrationCli'
     $migrationPom = Join-Path $backendRoot 'ruoyi-aden\pom.xml'
+    [string[]]$mavenMode = if ($SkipBuild) { @('-o') } else { @() }
     foreach ($command in @('baseline','migrate','validate')) {
         $migrationArgs = "$command --url=$jdbc --username=root --expected-database=$database --password-env=ADEN_E2E_DB_PASSWORD"
-        Invoke-Checked -FilePath 'mvn' -Arguments @('-q','-f',$migrationPom,"-Dexec.mainClass=$migrationMain","-Dexec.args=$migrationArgs",'org.codehaus.mojo:exec-maven-plugin:3.5.0:java')
+        Invoke-Checked -FilePath 'mvn' -Arguments ($mavenMode + @('-q','-f',$migrationPom,"-Dexec.mainClass=$migrationMain","-Dexec.args=$migrationArgs",'org.codehaus.mojo:exec-maven-plugin:3.5.0:java'))
     }
     Source-Sql -Path (Join-Path $backendRoot 'sql\aden-permissions.sql')
+    if ($Scenario -eq 'collection') { Source-Sql -Path (Join-Path $backendRoot 'sql\aden-collection-permissions.sql') }
     Source-Sql -Path (Join-Path $backendRoot 'ruoyi-aden\src\test\resources\fixtures\aden-e2e-seed.sql')
+    if ($Scenario -eq 'collection') {
+        $testEnvNames = @('ADEN_TEST_DB_ADMIN_URL','ADEN_TEST_DB_USERNAME','ADEN_TEST_DB_PASSWORD')
+        $testEnvPrevious = @{}
+        foreach ($name in $testEnvNames) { $testEnvPrevious[$name] = [Environment]::GetEnvironmentVariable($name, 'Process') }
+        try {
+            $env:ADEN_TEST_DB_ADMIN_URL = "jdbc:mysql://127.0.0.1:$mysqlPort/mysql?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false"
+            $env:ADEN_TEST_DB_USERNAME = 'root'
+            $env:ADEN_TEST_DB_PASSWORD = $dbPassword
+            Invoke-Checked -FilePath 'mvn' -Arguments ($mavenMode + @('-f',(Join-Path $backendRoot 'pom.xml'),'-pl','ruoyi-aden','-am','-Dtest=AdenWorkspaceMySqlTest#collectionPersistsVersionsAssetsExportsAndRejectsLateUploads,AdenCollectionFilesTest,AdenTaskTransitionMatrixTest,AdenMigrationStaticContractTest','-Dsurefire.failIfNoSpecifiedTests=false','test'))
+        } finally {
+            foreach ($name in $testEnvNames) { [Environment]::SetEnvironmentVariable($name, $testEnvPrevious[$name], 'Process') }
+        }
+    }
     Source-Sql -Path (Join-Path $backendRoot 'sql\ruoyi-managed-secrets.sql')
     $env:RUOYI_MANAGED_SECRET_MASTER_KEY_ID = 'e2e-root-v1'
     $env:RUOYI_MANAGED_SECRET_MASTER_KEY_BASE64 = [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
@@ -245,7 +263,15 @@ try {
     $backendJar = Join-Path $instanceRoot 'ruoyi-admin-e2e.jar'
     Copy-Item -LiteralPath $sourceBackendJar -Destination $backendJar
     # 共享 ruoyi-admin 还包含与本 Feature 无关的业务 Bean；懒加载确保本验收只实例化真实登录与 Aden 链路。
-    $backendProcess = Start-Process -FilePath 'java' -ArgumentList @('-jar',"`"$backendJar`"","--server.address=127.0.0.1","--server.port=$backendPort",'--spring.profiles.active=druid,test','--spring.main.lazy-initialization=true','--fashion.image.worker-enabled=false','--fashion.delivery.worker-enabled=false','--interview.enabled=false','--logging.level.com.ruoyi.aden=DEBUG','--aden.enabled=true',"--aden.schema.expected-database=$database",'--spring.data.redis.host=127.0.0.1',"--spring.data.redis.port=$redisPort",'--spring.data.redis.database=15') -WindowStyle Hidden -RedirectStandardOutput (Join-Path $logRoot 'backend-out.log') -RedirectStandardError (Join-Path $logRoot 'backend-error.log') -PassThru
+    $collectionArguments = @()
+    if ($Scenario -eq 'collection') {
+        $fixturePort = Get-FreeTcpPort
+        $env:ADEN_COLLECTION_FIXTURE_ORIGIN = "http://127.0.0.1:$fixturePort"
+        $env:ADEN_COLLECTOR_PIPE = "\\.\pipe\aden-collector-test-$([guid]::NewGuid().ToString('N'))"
+        $collectionArguments = @('--aden.collection.enabled=true',"--aden.collection.storage-root=$instanceRoot/collection-storage","--aden.collection.fixture-origin=$env:ADEN_COLLECTION_FIXTURE_ORIGIN")
+    }
+    $backendArguments = @('-jar',"`"$backendJar`"","--server.address=127.0.0.1","--server.port=$backendPort",'--spring.profiles.active=druid,test','--spring.main.lazy-initialization=true','--fashion.image.worker-enabled=false','--fashion.delivery.worker-enabled=false','--interview.enabled=false','--logging.level.com.ruoyi.aden=DEBUG','--aden.enabled=true',"--aden.schema.expected-database=$database",'--spring.data.redis.host=127.0.0.1',"--spring.data.redis.port=$redisPort",'--spring.data.redis.database=15') + $collectionArguments
+    $backendProcess = Start-Process -FilePath 'java' -ArgumentList $backendArguments -WindowStyle Hidden -RedirectStandardOutput (Join-Path $logRoot 'backend-out.log') -RedirectStandardError (Join-Path $logRoot 'backend-error.log') -PassThru
     $origin = "http://127.0.0.1:$backendPort"
     Wait-HttpReady -Url "$origin/captchaImage"
     [void](Assert-LoopbackListener -Port $backendPort -Component 'RuoYi' -ExpectedCommandLineFragment $backendJar)
@@ -266,12 +292,32 @@ try {
         $testConfig = @{ channel='local-test'; apiBaseUrl=$origin } | ConvertTo-Json -Compress
         [IO.File]::WriteAllText($installedConfigPath, $testConfig, [Text.UTF8Encoding]::new($false))
         $env:ADEN_E2E_DESKTOP_EXE = $installedExe
-        if (-not $InteractiveUat) {
+        if ($EvidenceDirectory) { $env:ADEN_E2E_EVIDENCE_DIR = [IO.Path]::GetFullPath($EvidenceDirectory) }
+        elseif (-not $InteractiveUat -and $Scenario -eq 'synthetic') {
             $env:ADEN_E2E_EVIDENCE_DIR = Join-Path $workspaceRoot '文档\项目\智能体桌面端项目\功能\FEAT-ADEN-002-桌面安装包与本地同步\证据\2026-09-26-安装版验收\screenshots'
         }
     }
     Push-Location $desktopRoot
-    try { Invoke-Checked -FilePath 'node' -Arguments @('tests/e2e/synthetic.e2e.mjs') }
+    try {
+        if ($DebugHoldSeconds -gt 0) {
+            $contextPath = Join-Path $resultRoot 'collection-debug-context.json'
+            $stopPath = Join-Path $resultRoot 'collection-debug-finish'
+            if (Test-Path -LiteralPath $stopPath) { Remove-Item -LiteralPath $stopPath }
+            @{ ADEN_E2E_API_ORIGIN=$env:ADEN_E2E_API_ORIGIN; ADEN_E2E_WORKSPACE_NAME=$env:ADEN_E2E_WORKSPACE_NAME;
+               ADEN_E2E_DESKTOP_EXE=$env:ADEN_E2E_DESKTOP_EXE; ADEN_COLLECTION_FIXTURE_ORIGIN=$env:ADEN_COLLECTION_FIXTURE_ORIGIN;
+               ADEN_COLLECTOR_PIPE=$env:ADEN_COLLECTOR_PIPE; ADEN_E2E_EVIDENCE_DIR=$env:ADEN_E2E_EVIDENCE_DIR
+             } | ConvertTo-Json | Set-Content -LiteralPath $contextPath -Encoding utf8
+        }
+        try { Invoke-Checked -FilePath 'node' -Arguments @("tests/e2e/$Scenario.e2e.mjs") }
+        catch {
+            if ($DebugHoldSeconds -gt 0) {
+                Write-Host "技术测试失败，隔离服务最多保留 $DebugHoldSeconds 秒供定向复验；创建 $stopPath 可立即清理。上下文不含凭据。"
+                $deadline = [DateTime]::UtcNow.AddSeconds($DebugHoldSeconds)
+                while ([DateTime]::UtcNow -lt $deadline -and -not (Test-Path -LiteralPath $stopPath)) { Start-Sleep -Seconds 2 }
+            }
+            throw
+        }
+    }
     finally { Pop-Location }
     Write-Host "Aden 本地合成 E2E 通过：MySQL/Redis/RuoYi 均为本轮 loopback 临时实例。"
     if ($InteractiveUat) {

@@ -55,7 +55,7 @@ import java.util.Optional;
 /** Evaluation/Report schema 的 JDBC owner；所有聚合写入必须加入 application 事务。 */
 @InterviewEnabled
 @Repository
-@Transactional(readOnly = true)
+@Transactional(transactionManager = "interviewTransactionManager", readOnly = true)
 public class JdbcEvaluationRepository implements EvaluationRepository {
 
     private static final String REPORT_COMPOSITION_FORMAT = "report-composition-v1";
@@ -84,7 +84,7 @@ public class JdbcEvaluationRepository implements EvaluationRepository {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void saveRun(EvaluationRun run) {
         run.evidenceBundle().ifPresent(bundle -> appendEvidenceBundle(run.tenantId(), bundle));
         run.rubricJudgement().ifPresent(score -> appendRubricJudgement(run.tenantId(), score));
@@ -194,7 +194,7 @@ public class JdbcEvaluationRepository implements EvaluationRepository {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void saveReport(EvaluationReport report) {
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("tenantId", report.tenantId().value())

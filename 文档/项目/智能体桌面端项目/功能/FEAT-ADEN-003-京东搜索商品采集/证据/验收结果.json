@@ -1,0 +1,624 @@
+{
+  "title": "京东详情页采集 · 安装版合成闭环与验收覆盖报告",
+  "environment": {
+    "日期": "2026-09-26",
+    "实际通道": "Playwright Electron + 独立Chromium扩展技术探针；非日常Chrome接管，非Chrome原生侧栏人工验收。",
+    "浏览器": "Chromium 140.0.7339.16（最终完成信号复验JSON记录）",
+    "数据": "本地合成SKU/图片；临时独立MySQL、Redis、Java；未访问真实京东，未写真实商品。",
+    "交互限制": "扩展面板后台DOM派发；配对和原生文件选择/保存对话框为定向技术替身。",
+    "时间": "最终完成信号复验：扩展完成2026-09-26T05:36:38.700Z；桌面完整闭环完成2026-09-26T05:36:53.828Z。",
+    "清理": "最终环境清理result=Pass：本次MySQL 2、Redis 1、Java 1均退出，实例目录不存在；安装配置恢复http://127.0.0.1:8081；其他Aden Local Test 4进程保留。保留构建目录、合成Chromium profile、证据和交付包。",
+    "布局与像素": "BrowserWindow.setContentSize请求1024×900与1440×1000；实际PNG为1164×984与1572×1090，受Windows缩放影响，不把请求值当实际截图像素/视口。",
+    "报告视觉检查": "报告整页视觉检查未执行：Codex内置浏览器URL安全策略明确拒绝本地HTML；遵守拒绝，不切换其他浏览器或本地HTTP绕过。业务截图已逐张view_image回读。",
+    "报告静态检查": "{\"ids\": 12, \"imageOccurrences\": 20, \"htmlLinks\": 99, \"markdownLinks\": 89, \"statusConsistent\": true, \"Pass\": 3, \"NotRun\": 9}；本次静态检查通过，不是报告整页视觉检查。"
+  },
+  "versions": {
+    "Feature": "FEAT-ADEN-003 / v0.3.0 工作区实现",
+    "安装路径": "C:\\Users\\admin\\AppData\\Local\\Programs\\Aden Collection Test\\Aden Collection Test.exe",
+    "最终候选包": {
+      "version": "0.2.0",
+      "path": "frontend/desktop/aden-desktop/dist/collection-delivery/Aden-Collection-Test-0.2.0-Setup.exe",
+      "sha256": "A2C643465EEDB260722F5802DC550302A8AB0FDFFCD1D4AD3B92AD4F7209B021",
+      "extensionZipSha256": "940fcf300e85cfbdd2c1ac7e66f7772409eee34b0c916136d4e64a490332fb03",
+      "HostSha256": "232D75D8313DF1B2D73C7227D3EB9F33131933CB972F2C724ECA575B5140C271",
+      "status": "正确渠道最终安装包完整合成闭环通过；扩展最终完成信号复验与桌面完整管理导出均Pass，用户接受与真实京东试点仍待执行。",
+      "mainSha256": "9433478E97912DF2A2FB9F677485EB4BB601B6F7CAF4E90FDAFC8E43DB2D63C5",
+      "extensionZipBytes": 16088
+    },
+    "截图核对": "主智能体已逐张view_image回读最终完成信号复验16张PNG，内容可读；原第七次和桌面复验二共16张历史截图亦已回读。8张图片解码由JSON断言证明，截图仅显示计数及可见部分。",
+    "构建渠道失败": "先前桌面定向复验使用旧local-test main与修复后renderer，证明该测试基线的业务路径；不能证明39E469整包能启动。",
+    "撤回候选包": {
+      "version": "0.2.0",
+      "path": "frontend/desktop/aden-desktop/dist/collection-delivery/Aden-Collection-Test-0.2.0-Setup.exe",
+      "sha256": "39E4693371ACB625FA2D41FFEBCB5AC8D9F1E2A76F03349CC9B95DE7BCEF812F",
+      "extensionZipSha256": "408e87c1772673ae8fb8c998a4e5d731c8840da67ea47fe14e61331ff2851271",
+      "HostSha256": "232D75D8313DF1B2D73C7227D3EB9F33131933CB972F2C724ECA575B5140C271",
+      "status": "39E469候选因直接build缺ADEN_PACKAGE_CHANNEL=local-test导致main按release拒绝HTTP，已撤回并由A2C643正确渠道包替代；此处保留旧哈希及旧ZIP历史。"
+    }
+  },
+  "userDecision": "待确认",
+  "limitations": [
+    "整项UAT按原设计的可判定条件记录；合成AC13/17/18已有完整对应证据记Pass，其余保留NotRun并说明已通过子检查，不把真实京东或原生侧栏能力扩写为已验收。",
+    "真实京东DOM/CDN/来源允许范围、Chrome原生侧栏与权限交互尚未试点。",
+    "正式V4库必须先执行CLI migrate/validate到V5，不重新baseline、不导入合成seed；即便collection关闭SchemaGuard仍要求V5。",
+    "权限SQL只新增7个权限，不替正式角色授权；storage-root应独立于安装目录，正式fixture-origin留空。",
+    "长期过期导出、孤立文件及中断上传完整回收策略尚未实现；配额计原图字节，不等于总磁盘占用。长期正式运行前需补齐。",
+    "线上CI仅静态核查，未执行；签名、Chrome商店、自动更新和生产发布未执行。",
+    "保留既有失败、修复与复验证据，当前报告不覆盖或删除历史失败。",
+    "报告整页视觉检查未执行：Codex内置浏览器URL安全策略明确拒绝本地HTML；遵守拒绝，不切换其他浏览器或本地HTTP绕过。业务截图已逐张view_image回读。"
+  ],
+  "items": [
+    {
+      "id": "UAT-JD-13",
+      "goal": "当前详情页手动采集与无自动浏览",
+      "steps": [
+        "打开合成详情，选择SKU，连接并预览，点击采集",
+        "观察导航、滚动和SKU"
+      ],
+      "expected": "捕获当前商品，导航/滚动/切规格计数均为0，无自动搜索流程",
+      "actual": {
+        "已通过子检查": [
+          "真实扩展/Native Host/安装版/隔离后端闭环完成，stage=complete、errors=[]。",
+          "SKU 81790400958075；记录导航0、scrollY=0、SKU未变。"
+        ],
+        "整项状态": "本项合成场景判定条件由扩展/安装版操作与后端回读证据共同支撑，记Pass；用户接受待确认，真实京东与原生Chrome界面不在本次通过声明中。"
+      },
+      "result": "Pass",
+      "screenshotStatus": "已截图",
+      "evidence": [
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/UAT-JD-13-16-扩展部分保存.png",
+          "label": "UAT-JD-13-16-扩展部分保存.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/扩展闭环结果.json",
+          "label": "扩展闭环结果.json"
+        }
+      ],
+      "limitations": [
+        "Chrome原生侧栏、工具栏activeTab授予和真实京东详情未人工验收；扩展面板以后台DOM派发操作，源标签保持活跃。"
+      ],
+      "executedAt": "主闭环2026-09-26T05:35:58.091Z至05:36:53.828Z；其他定向测试见原始日志",
+      "history": [
+        "最终完成信号复验：正确渠道安装包与修复后扩展独立Node完整运行退出0，result=Pass，rendererErrors=[]；本项仍按完整AC覆盖范围判定，子检查通过不扩大未执行矩阵。"
+      ]
+    },
+    {
+      "id": "UAT-JD-14",
+      "goal": "页面身份与权限边界拒绝",
+      "steps": [
+        "构造页面SKU与当前规格不一致的合成详情",
+        "检查拒绝提示与采集按钮",
+        "其余未授权、跨空间及撤权组合按后续矩阵执行"
+      ],
+      "expected": "不产生混合商品或越权数据，提示可行处理方式",
+      "actual": {
+        "已通过子检查": [
+          "SKU不一致时返回“当前规格与页面 SKU 不一致，请等待页面完成后重试”，captureDisabled=true。",
+          "协议/后端定向测试另覆盖权限与空间边界，不自动等同于完整UI矩阵。"
+        ],
+        "整项状态": "原清单全部边界矩阵尚未完整执行；保留NotRun，不将子检查Pass扩大为整项通过。"
+      },
+      "result": "NotRun",
+      "screenshotStatus": "已截图",
+      "evidence": [
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/UAT-JD-14-SKU变化拒绝.png",
+          "label": "UAT-JD-14-SKU变化拒绝.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/扩展闭环结果.json",
+          "label": "扩展闭环结果.json"
+        },
+        {
+          "path": "2026-09-26-安装版联调/com.ruoyi.aden.infrastructure.persistence.AdenWorkspaceMySqlTest.txt",
+          "label": "com.ruoyi.aden.infrastructure.persistence.AdenWorkspaceMySqlTest.txt"
+        },
+        {
+          "path": "2026-09-26-安装版联调/管道桥测试.log",
+          "label": "管道桥测试.log"
+        }
+      ],
+      "limitations": [
+        "未逐项完成原生未授权页、跨空间、导航中切SKU、撤权的安装版组合矩阵。"
+      ],
+      "executedAt": "主闭环2026-09-26T05:35:58.091Z至05:36:53.828Z；其他定向测试见原始日志",
+      "history": [
+        "最终完成信号复验：正确渠道安装包与修复后扩展独立Node完整运行退出0，result=Pass，rendererErrors=[]；本项仍按完整AC覆盖范围判定，子检查通过不扩大未执行矩阵。"
+      ]
+    },
+    {
+      "id": "UAT-JD-15",
+      "goal": "商品内容范围、隐私排除与安全回看",
+      "steps": [
+        "合成商品含个人区块与脚本样本，预览捕获",
+        "安装版以原文方式回看历史内容"
+      ],
+      "expected": "已存区块与标注一致；未加载透明；个人字段不入库，回看不执行源脚本或远程请求",
+      "actual": {
+        "已通过子检查": [
+          "previewPrivacy记录personalTextExcluded=true、scriptSecretExcluded=true。",
+          "最终完成信号复验旧版本包含<script>原文时按文本展示，未处理Renderer异常为空。"
+        ],
+        "整项状态": "原清单全部边界矩阵尚未完整执行；保留NotRun，不将子检查Pass扩大为整项通过。"
+      },
+      "result": "NotRun",
+      "screenshotStatus": "已截图",
+      "evidence": [
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/扩展闭环结果.json",
+          "label": "扩展闭环结果.json"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/JD-AC-17-历史版本只读回看.png",
+          "label": "JD-AC-17-历史版本只读回看.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/collection-e2e-result.json",
+          "label": "collection-e2e-result.json"
+        }
+      ],
+      "limitations": [
+        "尚未逐项覆盖所有未加载区块、图片引用和回看网络断言；无真实平台字段完整性/正式金标验收。"
+      ],
+      "executedAt": "主闭环2026-09-26T05:35:58.091Z至05:36:53.828Z；其他定向测试见原始日志",
+      "history": [
+        "最终完成信号复验：正确渠道安装包与修复后扩展独立Node完整运行退出0，result=Pass，rendererErrors=[]；本项仍按完整AC覆盖范围判定，子检查通过不扩大未执行矩阵。"
+      ]
+    },
+    {
+      "id": "UAT-JD-16",
+      "goal": "图片部分保存、重试与关闭源页后回看",
+      "steps": [
+        "8张合成候选图中2张HTTP503",
+        "重试失败图并再采集新版本",
+        "关闭源页，在安装版解码已存8图"
+      ],
+      "expected": "6/8状态匹配；失败原因可见；只重试失败资源；关闭源页可回看",
+      "actual": {
+        "已通过子检查": [
+          "扩展先6/8，image-7和image-8为HTTP503；重试后8/8，新快照8/8。",
+          "sourceClosed=true，offlineImageReview.decodedLocalImages=8。",
+          "桌面人工PNG上传及服务端实际字节比对通过。"
+        ],
+        "整项状态": "原清单全部边界矩阵尚未完整执行；保留NotRun，不将子检查Pass扩大为整项通过。"
+      },
+      "result": "NotRun",
+      "screenshotStatus": "已截图",
+      "evidence": [
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/UAT-JD-13-16-扩展部分保存.png",
+          "label": "UAT-JD-13-16-扩展部分保存.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/UAT-JD-16-重试保存.png",
+          "label": "UAT-JD-16-重试保存.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/UAT-JD-16-关闭源页后八张历史图片.png",
+          "label": "UAT-JD-16-关闭源页后八张历史图片.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/扩展闭环结果.json",
+          "label": "扩展闭环结果.json"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/JD-AC-16-人工图片真实回看.png",
+          "label": "JD-AC-16-人工图片真实回看.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/com.ruoyi.aden.application.collection.AdenCollectionFilesTest.txt",
+          "label": "com.ruoyi.aden.application.collection.AdenCollectionFilesTest.txt"
+        }
+      ],
+      "limitations": [
+        "实际闭环未穷尽单图/总量超限、错误类型和非法重定向组合；这些仅部分由单元/集成测试覆盖，整项不升级Pass。",
+        "关闭源页截图显示8/8及图片顶部；8张实际解码的证明来自扩展JSON断言，不能仅凭一张截图推断8张内容均清晰。"
+      ],
+      "executedAt": "主闭环2026-09-26T05:35:58.091Z至05:36:53.828Z；其他定向测试见原始日志",
+      "history": [
+        "最终完成信号复验：正确渠道安装包与修复后扩展独立Node完整运行退出0，result=Pass，rendererErrors=[]；本项仍按完整AC覆盖范围判定，子检查通过不扩大未执行矩阵。"
+      ]
+    },
+    {
+      "id": "UAT-JD-17",
+      "goal": "幂等、新快照与历史版本",
+      "steps": [
+        "同SKU再次采集并确认新增快照",
+        "安装版切换合成API准备的旧版本",
+        "单独检查幂等及大历史分页"
+      ],
+      "expected": "同请求仅一次；另次捕获新增版本；旧字段和图片保持不变",
+      "actual": {
+        "已通过子检查": [
+          "扩展重复确认后新增快照，图片8/8。",
+          "最终完成信号复验回看旧版本只读内容通过；当前页采用摘要分页和单版本正文。",
+          "后端真实MySQL测试含幂等、版本及大量历史读取边界。"
+        ],
+        "整项状态": "本项合成场景判定条件由扩展/安装版操作与后端回读证据共同支撑，记Pass；用户接受待确认，真实京东与原生Chrome界面不在本次通过声明中。"
+      },
+      "result": "Pass",
+      "screenshotStatus": "已截图",
+      "evidence": [
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/UAT-JD-17-重复确认.png",
+          "label": "UAT-JD-17-重复确认.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/JD-AC-17-历史版本只读回看.png",
+          "label": "JD-AC-17-历史版本只读回看.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/扩展闭环结果.json",
+          "label": "扩展闭环结果.json"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/collection-e2e-result.json",
+          "label": "collection-e2e-result.json"
+        },
+        {
+          "path": "2026-09-26-安装版联调/com.ruoyi.aden.infrastructure.persistence.AdenWorkspaceMySqlTest.txt",
+          "label": "com.ruoyi.aden.infrastructure.persistence.AdenWorkspaceMySqlTest.txt"
+        }
+      ],
+      "limitations": [
+        "扩展重复确认、后端同capture幂等和安装版历史回看共同支撑本项；并非在UI中穷举所有ACK丢失时序（该故障矩阵归22）。"
+      ],
+      "executedAt": "主闭环2026-09-26T05:35:58.091Z至05:36:53.828Z；其他定向测试见原始日志",
+      "history": [
+        "最终完成信号复验：正确渠道安装包与修复后扩展独立Node完整运行退出0，result=Pass，rendererErrors=[]；本项仍按完整AC覆盖范围判定，子检查通过不扩大未执行矩阵。"
+      ]
+    },
+    {
+      "id": "UAT-JD-18",
+      "goal": "人工整理与原始快照隔离",
+      "steps": [
+        "填写备注/标签/纠错，设主图",
+        "移除图片并保存，再恢复",
+        "回读原始字段与整理修订"
+      ],
+      "expected": "原快照不变；人工内容明确；导出与选定整理版本一致",
+      "actual": {
+        "已通过子检查": [
+          "最终完成信号复验主图、移除、恢复、人工价格99.9900及标题纠错真实持久化。",
+          "原始公式样式标题未覆盖，ZIP中人工标题与冻结整理结果一致。",
+          "原Proxy无法克隆缺陷已修复，deep JSON DTO与structuredClone回归通过；列表图片计数刷新问题和选中hover对比已修复。"
+        ],
+        "整项状态": "本项合成场景判定条件由扩展/安装版操作与后端回读证据共同支撑，记Pass；用户接受待确认，真实京东与原生Chrome界面不在本次通过声明中。"
+      },
+      "result": "Pass",
+      "screenshotStatus": "已截图",
+      "evidence": [
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/JD-AC-18-人工补充与图片恢复.png",
+          "label": "JD-AC-18-人工补充与图片恢复.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/collection-e2e-result.json",
+          "label": "collection-e2e-result.json"
+        },
+        {
+          "path": "2026-09-26-安装版联调/桌面定向/collection-e2e-failure.png",
+          "label": "collection-e2e-failure.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/桌面定向/collection-e2e-result.json",
+          "label": "collection-e2e-result.json"
+        }
+      ],
+      "limitations": [
+        "原生侧栏、真实京东与并发编辑冲突组合不在本项通过声明中；用户接受待确认。"
+      ],
+      "executedAt": "主闭环2026-09-26T05:35:58.091Z至05:36:53.828Z；其他定向测试见原始日志",
+      "history": [
+        "最终完成信号复验：正确渠道安装包与修复后扩展独立Node完整运行退出0，result=Pass，rendererErrors=[]；本项仍按完整AC覆盖范围判定，子检查通过不扩大未执行矩阵。"
+      ]
+    },
+    {
+      "id": "UAT-JD-19",
+      "goal": "手动新增、字段校验与本地图片",
+      "steps": [
+        "安装版填写标题、价格、来源链接与备注",
+        "检查非法价格拒绝并上传本地PNG",
+        "API/MySQL回读"
+      ],
+      "expected": "合法记录来源MANUAL；错误字段提示；粘贴链接不自动访问",
+      "actual": {
+        "已通过子检查": [
+          "最终完成信号复验合法新增通过，价格精确文本123.4500保留，来源MANUAL。",
+          "非法价格场景已有截图；本地PNG实际字节保存并可解码。"
+        ],
+        "整项状态": "原清单全部边界矩阵尚未完整执行；保留NotRun，不将子检查Pass扩大为整项通过。"
+      },
+      "result": "NotRun",
+      "screenshotStatus": "已截图",
+      "evidence": [
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/JD-AC-19-非法价格拒绝.png",
+          "label": "JD-AC-19-非法价格拒绝.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/JD-AC-19-新增前商品库.png",
+          "label": "JD-AC-19-新增前商品库.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/JD-AC-16-人工图片真实回看.png",
+          "label": "JD-AC-16-人工图片真实回看.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/collection-e2e-result.json",
+          "label": "collection-e2e-result.json"
+        }
+      ],
+      "limitations": [
+        "无标题、各非法价格形式与原生文件选择人工操作完整矩阵未完成；文件选择对话框为技术替身。"
+      ],
+      "executedAt": "主闭环2026-09-26T05:35:58.091Z至05:36:53.828Z；其他定向测试见原始日志",
+      "history": [
+        "最终完成信号复验：正确渠道安装包与修复后扩展独立Node完整运行退出0，result=Pass，rendererErrors=[]；本项仍按完整AC覆盖范围判定，子检查通过不扩大未执行矩阵。"
+      ]
+    },
+    {
+      "id": "UAT-JD-20",
+      "goal": "删除、回收站恢复与迟到写入",
+      "steps": [
+        "选择商品移入回收站",
+        "切换回收站恢复并回读deleted",
+        "后端定向测试删除代次"
+      ],
+      "expected": "默认列表及新导出排除已删，无自动复活，恢复版本/图片一致，部分失败逐项说明",
+      "actual": {
+        "已通过子检查": [
+          "最终完成信号复验删除/恢复与真实后端deleted状态一致，恢复后仍可导出已存图片。",
+          "后端测试覆盖部分权限/代次/迟到写入边界。"
+        ],
+        "整项状态": "原清单全部边界矩阵尚未完整执行；保留NotRun，不将子检查Pass扩大为整项通过。"
+      },
+      "result": "NotRun",
+      "screenshotStatus": "已截图",
+      "evidence": [
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/JD-AC-20-回收站.png",
+          "label": "JD-AC-20-回收站.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/collection-e2e-result.json",
+          "label": "collection-e2e-result.json"
+        },
+        {
+          "path": "2026-09-26-安装版联调/com.ruoyi.aden.infrastructure.persistence.AdenWorkspaceMySqlTest.txt",
+          "label": "com.ruoyi.aden.infrastructure.persistence.AdenWorkspaceMySqlTest.txt"
+        }
+      ],
+      "limitations": [
+        "安装版批量部分失败、同时上传与删除、回收站同SKU重采完整矩阵尚未逐项执行。"
+      ],
+      "executedAt": "主闭环2026-09-26T05:35:58.091Z至05:36:53.828Z；其他定向测试见原始日志",
+      "history": [
+        "最终完成信号复验：正确渠道安装包与修复后扩展独立Node完整运行退出0，result=Pass，rendererErrors=[]；本项仍按完整AC覆盖范围判定，子检查通过不扩大未执行矩阵。"
+      ]
+    },
+    {
+      "id": "UAT-JD-21",
+      "goal": "XLSX与图片ZIP一致性及下载权限",
+      "steps": [
+        "选择2商品导出Excel与ZIP",
+        "真实解包回读表格/快照/图片",
+        "后端检查冻结与删除/授权边界"
+      ],
+      "expected": "版本冻结、数量一致、长ID精确，无公式注入/路径穿越；删除撤权拒绝旧导出；缺失清单明确",
+      "actual": {
+        "已通过子检查": [
+          "最终完成信号复验真实XLSX四表、2商品、长SKU90071992547409931234、公式样式文本、图片字节和2份快照JSON检查通过。",
+          "ZIP冻结人工标题/价格与选择的内容一致；后端相关权限与冻结测试作为技术证据。"
+        ],
+        "整项状态": "原清单全部边界矩阵尚未完整执行；保留NotRun，不将子检查Pass扩大为整项通过。"
+      },
+      "result": "NotRun",
+      "screenshotStatus": "已截图",
+      "evidence": [
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/JD-AC-21-导出成功.png",
+          "label": "JD-AC-21-导出成功.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/安装版商品采集.xlsx",
+          "label": "安装版商品采集.xlsx"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/安装版商品采集.zip",
+          "label": "安装版商品采集.zip"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/collection-e2e-result.json",
+          "label": "collection-e2e-result.json"
+        },
+        {
+          "path": "2026-09-26-安装版联调/com.ruoyi.aden.infrastructure.persistence.AdenWorkspaceMySqlTest.txt",
+          "label": "com.ruoyi.aden.infrastructure.persistence.AdenWorkspaceMySqlTest.txt"
+        }
+      ],
+      "limitations": [
+        "未在安装版同时编辑/删除/撤权期间导出的全部组合逐项验收；Excel缩略图可选项未承诺本轮通过。"
+      ],
+      "executedAt": "主闭环2026-09-26T05:35:58.091Z至05:36:53.828Z；其他定向测试见原始日志",
+      "history": [
+        "最终完成信号复验：正确渠道安装包与修复后扩展独立Node完整运行退出0，result=Pass，rendererErrors=[]；本项仍按完整AC覆盖范围判定，子检查通过不扩大未执行矩阵。"
+      ]
+    },
+    {
+      "id": "UAT-JD-22",
+      "goal": "离线暂存、恢复与上下文隔离",
+      "steps": [
+        "Native发送前注入故障",
+        "读取真实IndexedDB字节",
+        "恢复并检查暂存清空和源请求数"
+      ],
+      "expected": "不伪报保存；限额暂存可续传，幂等无重复，不同空间不串数据",
+      "actual": {
+        "已通过子检查": [
+          "真实IndexedDB存入69字节asset和capture元数据；恢复后afterRestoreEntries=0、sourceRequestsDuringRestore=0。",
+          "扩展23项单测包含Worker重建、24小时TTL、身份隔离和配额串行边界。"
+        ],
+        "整项状态": "原清单全部边界矩阵尚未完整执行；保留NotRun，不将子检查Pass扩大为整项通过。"
+      },
+      "result": "NotRun",
+      "screenshotStatus": "已截图",
+      "evidence": [
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/UAT-JD-22-真实IDB离线字节恢复.png",
+          "label": "UAT-JD-22-真实IDB离线字节恢复.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/扩展闭环结果.json",
+          "label": "扩展闭环结果.json"
+        },
+        {
+          "path": "2026-09-26-安装版联调/扩展测试-最终.log",
+          "label": "扩展测试-最终.log"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终本地包闭环/collection-e2e-result.json",
+          "label": "纠正渠道首次完整运行：IDB完成信号时序失败历史"
+        }
+      ],
+      "limitations": [
+        "未逐项安装版验证真实Worker/Host/桌面/API进程全部断开、ACK丢失、过期与撤权组合；本次为明确故障注入。"
+      ],
+      "executedAt": "主闭环2026-09-26T05:35:58.091Z至05:36:53.828Z；其他定向测试见原始日志",
+      "history": [
+        "纠正渠道A2C643安装包启动成功，扩展部分6/8、重试8/8及新快照通过；离线恢复后端已成功，但UI完成广播先于await清理IDB，探针立即读取仍1行而断言期望0，最终本地包闭环中断（rendererErrors=[]）。该时序缺陷修复及再次完整复验待结果，主证据仍保留第七次与桌面复验二。",
+        "完成信号时序已修复：capture/retry/resume在后端提交成功后等待本地暂存清理，再发完成状态；清理失败仍保留后端结果并明确提示本地清理失败。新增2项测试后扩展23/23通过；最终完成信号复验正在执行，尚不提前记通过。",
+        "最终完成信号复验：正确渠道安装包与修复后扩展独立Node完整运行退出0，result=Pass，rendererErrors=[]；本项仍按完整AC覆盖范围判定，子检查通过不扩大未执行矩阵。"
+      ]
+    },
+    {
+      "id": "UAT-JD-23",
+      "goal": "验证页、恶意来源、配额和只读权限",
+      "steps": [
+        "合成验证码标记页预览",
+        "检查拒绝和按钮禁用",
+        "后端/单元检查恶意来源及权限"
+      ],
+      "expected": "遇限制停止；权限在服务端生效；已存部分可按权限查看",
+      "actual": {
+        "已通过子检查": [
+          "challengeRejected返回“页面需要登录或验证，请手动处理后重新采集”，captureDisabled=true。",
+          "扩展/后端定向测试覆盖来源白名单、格式与权限相关边界。"
+        ],
+        "整项状态": "原清单全部边界矩阵尚未完整执行；保留NotRun，不将子检查Pass扩大为整项通过。"
+      },
+      "result": "NotRun",
+      "screenshotStatus": "已截图",
+      "evidence": [
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/UAT-JD-23-验证页拒绝.png",
+          "label": "UAT-JD-23-验证页拒绝.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/扩展闭环结果.json",
+          "label": "扩展闭环结果.json"
+        },
+        {
+          "path": "2026-09-26-安装版联调/扩展测试-最终.log",
+          "label": "扩展测试-最终.log"
+        },
+        {
+          "path": "2026-09-26-安装版联调/com.ruoyi.aden.infrastructure.persistence.AdenWorkspaceMySqlTest.txt",
+          "label": "com.ruoyi.aden.infrastructure.persistence.AdenWorkspaceMySqlTest.txt"
+        }
+      ],
+      "limitations": [
+        "未逐项完成真实登录验证、只读角色、配额不足、各恶意URL/非法重定向的安装版矩阵；不得解读为真实京东无风控。"
+      ],
+      "executedAt": "主闭环2026-09-26T05:35:58.091Z至05:36:53.828Z；其他定向测试见原始日志",
+      "history": [
+        "最终完成信号复验：正确渠道安装包与修复后扩展独立Node完整运行退出0，result=Pass，rendererErrors=[]；本项仍按完整AC覆盖范围判定，子检查通过不扩大未执行矩阵。"
+      ]
+    },
+    {
+      "id": "UAT-JD-24",
+      "goal": "安装生命周期与安装版完整闭环",
+      "steps": [
+        "独立安装候选版本，执行采集/管理/导出",
+        "1024/1440布局截图",
+        "安装/升级/卸载与注册数据边界由主智能体补录"
+      ],
+      "expected": "Host注册版本可回读；安装版闭环；卸载不误删采集文件或其他安装；逐项报告",
+      "actual": {
+        "已通过子检查": [
+          "最终完成信号复验指定安装路径运行完整管理导出技术脚本，result=Pass，rendererErrors=[]。",
+          "主智能体完成16张截图回读；布局请求值与实际截图像素分别记录，选中Tab深绿白字复验可读。",
+          "安装生命周期JSON result=Pass：升级/卸载/重装均退出0；HKCU注册正确且卸载删除自身项；6个后端存储文件哈希未变，其他安装SHA未变，4个原进程保留。该生命周期属于39E撤回候选，仅证明钩子与数据保留；版本0.2.0及Host哈希已记录。"
+        ],
+        "整项状态": "原清单全部边界矩阵尚未完整执行；保留NotRun，不将子检查Pass扩大为整项通过。",
+        "最终主证据": "最终完成信号复验完整安装版扩展→桌面→XLSX/ZIP路径Pass，全部8组脚本checks通过，rendererErrors=[]，独立Node退出0；原父runner因早先IDB竞态退出1仍保留为失败历史。"
+      },
+      "result": "NotRun",
+      "screenshotStatus": "已截图",
+      "evidence": [
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/JD-AC-24-安装版1024商品库.png",
+          "label": "JD-AC-24-安装版1024商品库.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/JD-AC-24-安装版1440商品库.png",
+          "label": "JD-AC-24-安装版1440商品库.png"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终完成信号复验/collection-e2e-result.json",
+          "label": "collection-e2e-result.json"
+        },
+        {
+          "path": "2026-09-26-安装版联调/安装生命周期.json",
+          "label": "安装升级、卸载、重装与数据保留记录"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终安装包闭环/collection-e2e-result.json",
+          "label": "渠道构建错误导致启动失败（历史，保留）"
+        },
+        {
+          "path": "2026-09-26-安装版联调/desktop-build-channel-corrected.log",
+          "label": "纠正渠道构建证据：desktop-build-channel-corrected.log"
+        },
+        {
+          "path": "2026-09-26-安装版联调/package-channel-corrected.log",
+          "label": "纠正渠道构建证据：package-channel-corrected.log"
+        },
+        {
+          "path": "2026-09-26-安装版联调/测试包构建配置.cjs",
+          "label": "纠正渠道构建证据：测试包构建配置.cjs"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终本地包闭环/collection-e2e-result.json",
+          "label": "纠正渠道首次完整运行：IDB完成信号时序失败历史"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终渠道修复安装.json",
+          "label": "纠正渠道安装包安装与main哈希回读"
+        },
+        {
+          "path": "2026-09-26-安装版联调/最终环境清理.json",
+          "label": "最终临时进程与实例清理"
+        },
+        {
+          "path": "2026-09-26-安装版联调/collection-completion-final-e2e.log",
+          "label": "修复后独立Node完整闭环退出0"
+        }
+      ],
+      "limitations": [
+        "原生配对与文件框使用技术替身；真实京东与较广异常矩阵未完整执行，因此整项保持NotRun。",
+        "报告整页视觉检查被内置浏览器URL安全策略阻止，未绕过。"
+      ],
+      "executedAt": "主闭环2026-09-26T05:35:58.091Z至05:36:53.828Z；其他定向测试见原始日志",
+      "history": [
+        "39E469包安装升级卸载钩子验证通过，但随后的最终安装包闭环启动失败：直接npm run build缺少local-test渠道环境变量，main按release拒绝HTTP。保留失败JSON。",
+        "标准package.mjs已正确注入渠道；本次为构建调用参数错误。已显式local-test重建，纠正后包SHA256为A2C643465EEDB260722F5802DC550302A8AB0FDFFCD1D4AD3B92AD4F7209B021；新包完整闭环待结果。",
+        "纠正渠道A2C643安装包启动成功，扩展部分6/8、重试8/8及新快照通过；离线恢复后端已成功，但UI完成广播先于await清理IDB，探针立即读取仍1行而断言期望0，最终本地包闭环中断（rendererErrors=[]）。该时序缺陷修复及再次完整复验待结果，主证据仍保留第七次与桌面复验二。",
+        "完成信号时序已修复：capture/retry/resume在后端提交成功后等待本地暂存清理，再发完成状态；清理失败仍保留后端结果并明确提示本地清理失败。新增2项测试后扩展23/23通过；最终完成信号复验正在执行，尚不提前记通过。",
+        "最终完成信号复验：正确渠道安装包与修复后扩展独立Node完整运行退出0，result=Pass，rendererErrors=[]；本项仍按完整AC覆盖范围判定，子检查通过不扩大未执行矩阵。",
+        "最终完整复验成功后仍保留父runner退出1及早期IDB时序失败记录；独立Node最终日志退出0是本轮完整复验结果，不覆盖父历史。"
+      ]
+    }
+  ]
+}

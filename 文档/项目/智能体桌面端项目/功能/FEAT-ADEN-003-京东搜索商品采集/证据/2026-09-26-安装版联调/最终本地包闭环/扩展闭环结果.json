@@ -1,0 +1,295 @@
+{
+  "synthetic": true,
+  "fixtureSku": "81790400789612",
+  "interaction": "后台扩展面板DOM派发，源标签保持活跃；不代替Chrome原生侧栏人工验收",
+  "browser": "140.0.7339.16",
+  "profile": "C:\\Users\\admin\\AppData\\Local\\Temp\\aden-collector-probe-MEnSRB",
+  "events": [
+    {
+      "step": "stage",
+      "name": "launch-chromium",
+      "at": "2026-09-26T05:33:09.626Z"
+    },
+    {
+      "step": "stage",
+      "name": "wait-extension-worker",
+      "at": "2026-09-26T05:33:11.084Z"
+    },
+    {
+      "step": "stage",
+      "name": "inspect-worker-api",
+      "at": "2026-09-26T05:33:11.085Z"
+    },
+    {
+      "step": "workerApiReady",
+      "url": "chrome-extension://mnejmmlalapfhnanlnckfdhmfpbahidm/background.js",
+      "runtimeKeys": [
+        "dynamicId",
+        "id",
+        "onRestartRequired",
+        "onUserScriptMessage",
+        "onMessageExternal",
+        "onMessage",
+        "onConnectNative",
+        "onUserScriptConnect",
+        "onConnectExternal",
+        "onConnect",
+        "onBrowserUpdateAvailable",
+        "onUpdateAvailable",
+        "onSuspendCanceled",
+        "onSuspend",
+        "onInstalled",
+        "onStartup",
+        "connect",
+        "connectNative",
+        "getContexts",
+        "getManifest",
+        "getPlatformInfo",
+        "getURL",
+        "openOptionsPage",
+        "reload",
+        "requestUpdateCheck",
+        "restart",
+        "restartAfterDelay",
+        "sendMessage",
+        "sendNativeMessage",
+        "setUninstallURL",
+        "ContextType",
+        "OnInstalledReason",
+        "OnRestartRequiredReason",
+        "PlatformArch",
+        "PlatformNaclArch",
+        "PlatformOs",
+        "RequestUpdateCheckStatus"
+      ],
+      "connectNative": "function",
+      "storageSession": "function"
+    },
+    {
+      "step": "stage",
+      "name": "open-fixture-source",
+      "at": "2026-09-26T05:33:12.365Z"
+    },
+    {
+      "step": "stage",
+      "name": "open-extension-panel",
+      "at": "2026-09-26T05:33:12.699Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#connect",
+      "at": "2026-09-26T05:33:13.098Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#preview",
+      "at": "2026-09-26T05:33:15.720Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot-sku-rejection",
+      "at": "2026-09-26T05:33:15.917Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot:UAT-JD-14-SKU变化拒绝.png",
+      "at": "2026-09-26T05:33:15.919Z"
+    },
+    {
+      "step": "stage",
+      "name": "reconnect-after-screenshot",
+      "at": "2026-09-26T05:33:16.435Z"
+    },
+    {
+      "step": "skuMismatchRejected",
+      "error": "当前规格与页面 SKU 不一致，请等待页面完成后重试",
+      "captureDisabled": true
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#preview",
+      "at": "2026-09-26T05:33:16.866Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot-challenge-rejection",
+      "at": "2026-09-26T05:33:18.542Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot:UAT-JD-23-验证页拒绝.png",
+      "at": "2026-09-26T05:33:18.545Z"
+    },
+    {
+      "step": "stage",
+      "name": "reconnect-after-screenshot",
+      "at": "2026-09-26T05:33:18.750Z"
+    },
+    {
+      "step": "challengeRejected",
+      "error": "页面需要登录或验证，请手动处理后重新采集",
+      "captureDisabled": true
+    },
+    {
+      "step": "fixtureSetup",
+      "changes": [
+        "temporary SKU mismatch",
+        "temporary data-captcha"
+      ],
+      "restoredSku": "81790400789612",
+      "scope": "探针负例准备；不是插件自动操作"
+    },
+    {
+      "step": "previewPrivacy",
+      "personalTextExcluded": true,
+      "scriptSecretExcluded": true
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#preview",
+      "at": "2026-09-26T05:33:20.354Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#capture",
+      "at": "2026-09-26T05:33:20.551Z"
+    },
+    {
+      "step": "stage",
+      "name": "wait-capture-terminal:after-none",
+      "at": "2026-09-26T05:33:20.571Z"
+    },
+    {
+      "step": "partial",
+      "message": "部分保存，请查看缺失图片清单；主动排除 0 张，超限排除 0 张。仅代表已加载范围。；图片 6/8 已保存",
+      "navigations": 0,
+      "failures": "image-7：图片请求失败 HTTP 503\nimage-8：图片请求失败 HTTP 503"
+    },
+    {
+      "step": "noAutomaticSourceActions",
+      "navigations": 0,
+      "scrollY": 0,
+      "sku": "81790400789612"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot-partial-capture",
+      "at": "2026-09-26T05:33:22.886Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot:UAT-JD-13-16-扩展部分保存.png",
+      "at": "2026-09-26T05:33:22.887Z"
+    },
+    {
+      "step": "stage",
+      "name": "reconnect-after-screenshot",
+      "at": "2026-09-26T05:33:23.077Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#retry",
+      "at": "2026-09-26T05:33:23.147Z"
+    },
+    {
+      "step": "retry",
+      "message": "重试完成；选定图片已保存，资源清单已追加版本；图片 8/8 已保存"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot-image-retry",
+      "at": "2026-09-26T05:33:23.861Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot:UAT-JD-16-重试保存.png",
+      "at": "2026-09-26T05:33:23.862Z"
+    },
+    {
+      "step": "stage",
+      "name": "reconnect-after-screenshot",
+      "at": "2026-09-26T05:33:24.054Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#capture",
+      "at": "2026-09-26T05:33:24.139Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot-duplicate-confirmation",
+      "at": "2026-09-26T05:33:24.282Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot:UAT-JD-17-重复确认.png",
+      "at": "2026-09-26T05:33:24.283Z"
+    },
+    {
+      "step": "stage",
+      "name": "reconnect-after-screenshot",
+      "at": "2026-09-26T05:33:24.503Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#confirmCapture",
+      "at": "2026-09-26T05:33:24.761Z"
+    },
+    {
+      "step": "stage",
+      "name": "wait-capture-terminal:after-0dabd445-3622-45fc-bb26-a2e25935d1ea",
+      "at": "2026-09-26T05:33:24.788Z"
+    },
+    {
+      "step": "version",
+      "message": "本次选定内容已保存；主动排除 0 张，超限排除 0 张。仅代表已加载范围。；图片 8/8 已保存"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#capture",
+      "at": "2026-09-26T05:33:26.610Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#confirmCapture",
+      "at": "2026-09-26T05:33:26.825Z"
+    },
+    {
+      "step": "stage",
+      "name": "wait-capture-terminal:after-9da3db5c-7a61-4369-9fe2-8ff9ff4a9db5",
+      "at": "2026-09-26T05:33:26.908Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#connect",
+      "at": "2026-09-26T05:33:27.439Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#pending",
+      "at": "2026-09-26T05:33:27.590Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#resume",
+      "at": "2026-09-26T05:33:27.741Z"
+    }
+  ],
+  "screenshots": [
+    "UAT-JD-14-SKU变化拒绝.png",
+    "UAT-JD-23-验证页拒绝.png",
+    "UAT-JD-13-16-扩展部分保存.png",
+    "UAT-JD-16-重试保存.png",
+    "UAT-JD-17-重复确认.png",
+    "扩展失败-0.png",
+    "扩展失败-1.png"
+  ],
+  "errors": [
+    "后端确认完成后应清理暂存\n\n1 !== 0\n"
+  ],
+  "stage": "panel-action:#resume",
+  "stageAt": "2026-09-26T05:33:27.741Z",
+  "failedStage": "panel-action:#resume",
+  "errorStack": "AssertionError [ERR_ASSERTION]: 后端确认完成后应清理暂存\n\n1 !== 0\n\n    at runExtensionProbe (file:///C:/Users/admin/AppData/Local/Temp/aden-col-build-87ad913a/frontend/desktop/aden-desktop/tests/e2e/collection-extension-probe.mjs:247:14)\n    at async file:///C:/Users/admin/AppData/Local/Temp/aden-col-build-87ad913a/frontend/desktop/aden-desktop/tests/e2e/collection.e2e.mjs:60:29",
+  "failedAt": "2026-09-26T05:33:28.096Z"
+}

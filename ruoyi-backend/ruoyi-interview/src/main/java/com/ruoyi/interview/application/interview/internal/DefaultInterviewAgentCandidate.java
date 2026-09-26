@@ -41,6 +41,8 @@ public final class DefaultInterviewAgentCandidate implements InterviewAgentCandi
     @Override
     public Result propose(Query query) {
         if (query.remainingFollowUpBudget() <= 0) return next(Optional.empty());
+        // 离线或未配置模型时按确认计划继续，不构造缺少 modelAlias 的 ProviderConfigRef。
+        if (modelAlias.isBlank()) return next(Optional.of("MODEL_NOT_CONFIGURED"));
         var request = new ChatModelRequest(PROMPT, SCHEMA,
                 new ProviderConfigRef("INTERVIEW_AGENT", "deepseek", modelAlias, 1),
                 List.of(

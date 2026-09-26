@@ -1,0 +1,178 @@
+{
+  "synthetic": true,
+  "fixtureSku": "81790398716550",
+  "interaction": "后台扩展面板DOM派发，源标签保持活跃；不代替Chrome原生侧栏人工验收",
+  "browser": "140.0.7339.16",
+  "profile": "C:\\Users\\admin\\AppData\\Local\\Temp\\aden-collector-probe-dJvXwe",
+  "events": [
+    {
+      "step": "stage",
+      "name": "launch-chromium",
+      "at": "2026-09-26T04:58:36.562Z"
+    },
+    {
+      "step": "stage",
+      "name": "wait-extension-worker",
+      "at": "2026-09-26T04:58:38.973Z"
+    },
+    {
+      "step": "stage",
+      "name": "inspect-worker-api",
+      "at": "2026-09-26T04:58:39.121Z"
+    },
+    {
+      "step": "workerApiReady",
+      "url": "chrome-extension://mnejmmlalapfhnanlnckfdhmfpbahidm/background.js",
+      "runtimeKeys": [
+        "dynamicId",
+        "id",
+        "onRestartRequired",
+        "onUserScriptMessage",
+        "onMessageExternal",
+        "onMessage",
+        "onConnectNative",
+        "onUserScriptConnect",
+        "onConnectExternal",
+        "onConnect",
+        "onBrowserUpdateAvailable",
+        "onUpdateAvailable",
+        "onSuspendCanceled",
+        "onSuspend",
+        "onInstalled",
+        "onStartup",
+        "connect",
+        "connectNative",
+        "getContexts",
+        "getManifest",
+        "getPlatformInfo",
+        "getURL",
+        "openOptionsPage",
+        "reload",
+        "requestUpdateCheck",
+        "restart",
+        "restartAfterDelay",
+        "sendMessage",
+        "sendNativeMessage",
+        "setUninstallURL",
+        "ContextType",
+        "OnInstalledReason",
+        "OnRestartRequiredReason",
+        "PlatformArch",
+        "PlatformNaclArch",
+        "PlatformOs",
+        "RequestUpdateCheckStatus"
+      ],
+      "connectNative": "function",
+      "storageSession": "function"
+    },
+    {
+      "step": "stage",
+      "name": "open-fixture-source",
+      "at": "2026-09-26T04:58:43.889Z"
+    },
+    {
+      "step": "stage",
+      "name": "open-extension-panel",
+      "at": "2026-09-26T04:58:44.203Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#connect",
+      "at": "2026-09-26T04:58:44.808Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#preview",
+      "at": "2026-09-26T04:58:49.436Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot-sku-rejection",
+      "at": "2026-09-26T04:58:49.634Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot:UAT-JD-14-SKU变化拒绝.png",
+      "at": "2026-09-26T04:58:49.635Z"
+    },
+    {
+      "step": "stage",
+      "name": "reconnect-after-screenshot",
+      "at": "2026-09-26T04:58:50.155Z"
+    },
+    {
+      "step": "skuMismatchRejected",
+      "error": "当前页授权失效，请点击工具栏重新授权",
+      "captureDisabled": true
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#preview",
+      "at": "2026-09-26T04:58:51.479Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot-challenge-rejection",
+      "at": "2026-09-26T04:58:51.657Z"
+    },
+    {
+      "step": "stage",
+      "name": "screenshot:UAT-JD-23-验证页拒绝.png",
+      "at": "2026-09-26T04:58:51.658Z"
+    },
+    {
+      "step": "stage",
+      "name": "reconnect-after-screenshot",
+      "at": "2026-09-26T04:58:51.847Z"
+    },
+    {
+      "step": "challengeRejected",
+      "error": "当前页授权失效，请点击工具栏重新授权",
+      "captureDisabled": true
+    },
+    {
+      "step": "fixtureSetup",
+      "changes": [
+        "temporary SKU mismatch",
+        "temporary data-captcha"
+      ],
+      "restoredSku": "81790398716550",
+      "scope": "探针负例准备；不是插件自动操作"
+    },
+    {
+      "step": "previewPrivacy",
+      "personalTextExcluded": true,
+      "scriptSecretExcluded": true
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#preview",
+      "at": "2026-09-26T04:58:52.808Z"
+    },
+    {
+      "step": "stage",
+      "name": "panel-action:#capture",
+      "at": "2026-09-26T04:58:52.993Z"
+    },
+    {
+      "step": "stage",
+      "name": "wait-capture-terminal:after-none",
+      "at": "2026-09-26T04:58:53.038Z"
+    }
+  ],
+  "screenshots": [
+    "UAT-JD-14-SKU变化拒绝.png",
+    "UAT-JD-23-验证页拒绝.png",
+    "扩展失败-0.png",
+    "扩展失败-1.png",
+    "扩展失败-2.png"
+  ],
+  "errors": [
+    "Cannot read properties of undefined (reading 'contentSaved')"
+  ],
+  "stage": "wait-capture-terminal:after-none",
+  "stageAt": "2026-09-26T04:58:53.038Z",
+  "failedStage": "wait-capture-terminal:after-none",
+  "errorStack": "TypeError: Cannot read properties of undefined (reading 'contentSaved')\n    at waitCapture (file:///C:/Users/admin/AppData/Local/Temp/aden-col-build-87ad913a/frontend/desktop/aden-desktop/tests/e2e/collection-extension-probe.mjs:133:24)\n    at async runExtensionProbe (file:///C:/Users/admin/AppData/Local/Temp/aden-col-build-87ad913a/frontend/desktop/aden-desktop/tests/e2e/collection-extension-probe.mjs:170:17)\n    at async file:///C:/Users/admin/AppData/Local/Temp/aden-col-build-87ad913a/frontend/desktop/aden-desktop/tests/e2e/collection.e2e.mjs:56:27",
+  "failedAt": "2026-09-26T04:58:53.117Z"
+}

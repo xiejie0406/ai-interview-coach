@@ -26,7 +26,7 @@ import java.util.Optional;
 
 @InterviewEnabled
 @Repository
-@Transactional(readOnly = true)
+@Transactional(transactionManager = "interviewTransactionManager", readOnly = true)
 public class JdbcOutboxRepository implements OutboxPort {
 
     private static final String SELECT_JOIN = """
@@ -57,7 +57,7 @@ public class JdbcOutboxRepository implements OutboxPort {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void save(OutboxEvent event) {
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("tenantId", event.tenantId().value())
@@ -124,7 +124,7 @@ public class JdbcOutboxRepository implements OutboxPort {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public List<OutboxEvent> findPublishable(Instant availableBefore, int limit) {
         // Locks the mutable delivery row while the immutable event payload remains append-only.
         return jdbc.query(SELECT_JOIN + """
@@ -139,7 +139,7 @@ public class JdbcOutboxRepository implements OutboxPort {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public List<OutboxEvent> findExpiredClaims(Instant expiredBefore, int limit) {
         return jdbc.query(SELECT_JOIN + """
                  where d.state = 'CLAIMED' and d.claim_expires_at <= :expiredBefore

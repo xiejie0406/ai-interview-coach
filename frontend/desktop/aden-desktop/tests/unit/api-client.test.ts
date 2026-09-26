@@ -7,6 +7,16 @@ import { AdenTransportError } from '../../src/main/transport/error-mapper'
 const config = resolveRuntimeConfig('https://aden.example.test', false)
 
 describe('AdenApiClient', () => {
+  it('bounds binary files and rejects bytes delivered after session expiry', async () => {
+    const session = authenticatedSession()
+    const api = new AdenApiClient(config, session, async () => new Response(new Uint8Array(20)))
+    await expect(api.request({ path: '/asset', expectedContentType: 'binary', maxResponseBytes: 10 })).rejects.toMatchObject({ code: 'RESPONSE_TOO_LARGE' })
+    let finish: (() => void) | undefined
+    const late = new AdenApiClient(config, session, async () => new Response(new ReadableStream({ start(controller) { finish = () => { session.clear(); controller.enqueue(new Uint8Array([1])); controller.close() } } })))
+    const pending = late.request({ path: '/asset', expectedContentType: 'binary' })
+    await Promise.resolve(); finish?.()
+    await expect(pending).rejects.toMatchObject({ code: 'ABORTED' })
+  })
   it.each([301, 302, 307, 308])('rejects HTTP %i without replaying credentials', async (status) => {
     const session = authenticatedSession()
     const fetcher = vi.fn<FetchLike>(async () => new Response(null, {

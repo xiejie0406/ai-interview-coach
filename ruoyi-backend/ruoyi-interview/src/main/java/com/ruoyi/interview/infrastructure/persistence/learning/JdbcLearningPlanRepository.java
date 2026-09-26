@@ -38,7 +38,7 @@ import java.util.Optional;
 /** LearningPlan/Item 的 JDBC owner；支持 plan 一次合法前进两个 aggregate version。 */
 @InterviewEnabled
 @Repository
-@Transactional(readOnly = true)
+@Transactional(transactionManager = "interviewTransactionManager", readOnly = true)
 public class JdbcLearningPlanRepository implements LearningPlanRepository {
 
     private static final String ITEM_CONTENT_FORMAT = "learning-item-content-v1";
@@ -111,7 +111,7 @@ public class JdbcLearningPlanRepository implements LearningPlanRepository {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void save(LearningPlan plan) {
         EncryptedEnvelope limitations = cipher.encrypt(plan.tenantId(), limitationsBinding(plan.id()),
                 encodeList(LIMITATIONS_FORMAT, plan.limitations()));

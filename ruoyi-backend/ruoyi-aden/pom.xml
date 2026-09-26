@@ -21,6 +21,12 @@
     </properties>
 
     <dependencies>
+        <!-- 官方纯 Java WebP ImageIO reader；图片原字节保留，不依赖本机 native codec。 -->
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-webp</artifactId>
+            <version>3.13.1</version>
+        </dependency>
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common</artifactId>

@@ -45,7 +45,7 @@ import java.util.Optional;
 
 @InterviewEnabled
 @Repository
-@Transactional(readOnly = true)
+@Transactional(transactionManager = "interviewTransactionManager", readOnly = true)
 public class JdbcInterviewRepository implements InterviewRepository {
 
     private final NamedParameterJdbcTemplate jdbc;
@@ -92,7 +92,7 @@ public class JdbcInterviewRepository implements InterviewRepository {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void savePlan(InterviewPlan plan) {
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("tenantId", plan.tenantId().value())
@@ -150,7 +150,7 @@ public class JdbcInterviewRepository implements InterviewRepository {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void saveSession(InterviewSession session) {
         InterviewPlanReference reference = session.planReference();
         MapSqlParameterSource parameters = new MapSqlParameterSource()

@@ -11,6 +11,8 @@ import { parseOperatorTaskCommand } from '../../shared/contracts/operator-task-c
 import { DESKTOP_IPC as IPC } from '../../shared/contracts/desktop-api'
 import { assertPlainPayload, assertTrustedSender } from './validate-sender'
 import { serializeTransportError } from '../transport/error-mapper'
+import { CollectionService } from '../collection/collection-service'
+import type { CollectionOperation } from '../../shared/contracts/collection'
 
 const BOOTSTRAP_PERMISSIONS = ['aden:task:list', 'aden:runner:list', 'aden:capability:list', 'aden:event:subscribe']
 
@@ -26,6 +28,7 @@ export function registerDesktopIpcHandlers(options: {
   const { ipcMain, trust, session, api, auth, sse } = options
   const permissions = new Set<string>()
   const channels: string[] = []
+  const collection = new CollectionService(api, session)
   const handle = (channel: string, handler: (payload: unknown) => Promise<unknown> | unknown): void => {
     channels.push(channel)
     ipcMain.handle(channel, async (event, payload) => {
@@ -41,6 +44,15 @@ export function registerDesktopIpcHandlers(options: {
     })
   }
 
+  handle(IPC.collection, (payload) => {
+    if (!isRecord(payload) || typeof payload.action !== 'string') throw new TypeError('采集库参数非法')
+    exactKeys(payload, ['workspaceId', 'sessionEpoch', 'workspaceEpoch', 'action', 'input'])
+    const permission: Record<string, string> = { list: 'read', detail: 'read', versions: 'read', snapshot: 'read', image: 'read', create: 'create', curation: 'edit', upload: 'edit', trash: 'delete', restore: 'restore', export: 'export' }
+    if (!permission[payload.action]) throw new TypeError('未知采集库操作')
+    requirePermissions(permissions, [`aden:collection:${permission[payload.action]}`])
+    assertContext(payload, session, stringField(payload, 'workspaceId', 36))
+    return collection.execute(payload as unknown as CollectionOperation)
+  })
   handle(IPC.captcha, () => auth.captcha())
   handle(IPC.login, async (payload) => {
     const input = parseLogin(payload)

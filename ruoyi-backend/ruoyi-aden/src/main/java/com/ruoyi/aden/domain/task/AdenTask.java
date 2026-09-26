@@ -35,6 +35,9 @@ public record AdenTask(
         if (type == AdenTaskType.SYNTHETIC_CORE && capability != AdenCapabilityCode.CORE) {
             throw new IllegalArgumentException("SYNTHETIC_CORE 任务只能使用 CORE capability");
         }
+        if (type != AdenTaskType.SYNTHETIC_CORE && capability != AdenCapabilityCode.COL) {
+            throw new IllegalArgumentException("商品采集任务只能使用 COL capability");
+        }
     }
 
     public AdenTaskTransition transition(AdenTaskActor actor, AdenTaskCommand command, Instant occurredAt) {

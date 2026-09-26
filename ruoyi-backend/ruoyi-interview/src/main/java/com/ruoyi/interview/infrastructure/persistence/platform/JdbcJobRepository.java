@@ -24,7 +24,7 @@ import java.util.Optional;
 
 @InterviewEnabled
 @Repository
-@Transactional(readOnly = true)
+@Transactional(transactionManager = "interviewTransactionManager", readOnly = true)
 public class JdbcJobRepository implements JobPort {
 
     private final NamedParameterJdbcTemplate jdbc;
@@ -59,7 +59,7 @@ public class JdbcJobRepository implements JobPort {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void save(Job job) {
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("tenantId", job.tenantId().value())
@@ -101,7 +101,7 @@ public class JdbcJobRepository implements JobPort {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public List<Job> findClaimable(String jobType, Instant availableBefore, int limit) {
         // MANDATORY keeps these row locks alive until the caller claims and saves each Job.
         return jdbc.query("""
@@ -118,7 +118,7 @@ public class JdbcJobRepository implements JobPort {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public List<Job> findRetryable(Instant availableBefore, int limit) {
         return jdbc.query("""
                 select * from platform.job
@@ -133,7 +133,7 @@ public class JdbcJobRepository implements JobPort {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public List<Job> findExpiredRunningLeases(Instant expiredBefore, int limit) {
         return jdbc.query("""
                 select * from platform.job

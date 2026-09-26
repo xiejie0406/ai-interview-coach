@@ -52,6 +52,8 @@ final class InterviewViews {
                 projection.streamCursor(),
                 session.recoveryExpiresAt(),
                 session.failureCode(),
+                session.startedAt(),
+                session.completedAt(),
                 session.version());
     }
 }

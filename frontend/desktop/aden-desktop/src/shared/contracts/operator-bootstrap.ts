@@ -67,13 +67,14 @@ export function parseTaskSnapshot(value: unknown): TaskSnapshot {
     'allowedCommands', 'steps', 'reasonCode', 'createdAt', 'updatedAt', 'correlationId'
   ], 'TaskSnapshot', ['reasonCode'])
   uuid(task.taskId, 'taskId'); uuid(task.workspaceId, 'task.workspaceId')
-  if (task.taskType !== 'SYNTHETIC_CORE' || task.capabilityCode !== 'CORE') throw new TypeError('当前 Task 类型或能力非法')
+  if (!((task.taskType === 'SYNTHETIC_CORE' && task.capabilityCode === 'CORE') || (['JD_DETAIL_CAPTURE', 'MANUAL_COLLECTION_ENTRY'].includes(String(task.taskType)) && task.capabilityCode === 'COL'))) throw new TypeError('当前 Task 类型或能力非法')
   nonEmpty(task.title, 'task.title', 120)
   if (typeof task.state !== 'string' || !TASK_STATES.has(task.state)) throw new TypeError('task.state 非法')
   parseCanonicalInt64(task.version)
   if (!Array.isArray(task.allowedCommands) || task.allowedCommands.some((item) => !['SUBMIT_FOR_VALIDATION', 'REQUEST_CANCEL'].includes(item))) {
     throw new TypeError('task.allowedCommands 非法')
   }
+  if (task.capabilityCode === 'COL' && task.allowedCommands.length !== 0) throw new TypeError('采集任务仅允许只读投影')
   if (!Array.isArray(task.steps)) throw new TypeError('task.steps 非法')
   for (const stepValue of task.steps) {
     const step = record(stepValue, 'TaskStepSnapshot')

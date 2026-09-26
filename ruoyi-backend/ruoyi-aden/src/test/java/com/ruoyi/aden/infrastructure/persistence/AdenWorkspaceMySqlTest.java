@@ -104,6 +104,67 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AdenWorkspaceMySqlTest {
+    @Test
+    void collectionPersistsVersionsAssetsExportsAndRejectsLateUploads(@org.junit.jupiter.api.io.TempDir Path files) throws Exception {
+        var principal = new AdenOperatorPrincipal(991,"collection-test",Set.of("*:*:*"));
+        String ws = UUID.randomUUID().toString();
+        var workspaceService = service(repository, ws, UUID.randomUUID().toString());
+        transactions.execute(status -> workspaceService.create(principal,"采集测试",UUID.randomUUID().toString()));
+        var collection = new com.ruoyi.aden.application.collection.AdenCollectionService(
+            new AdenCollectionStore(jdbc.getDataSource()),new com.ruoyi.aden.infrastructure.storage.AdenCollectionFiles(files.toString()),
+            new AdenWorkspaceAccessGuard(repository,(p,w,c)->{}),taskLedgerRepository,taskCasRepository,objectMapper,
+            new AdenRequestFingerprint(objectMapper),1024*1024);
+        var body = java.util.Map.<String,Object>of("idempotencyKey","manual-test","title","=HYPERLINK(\"https://invalid\")","price","12.30");
+        var created = transactions.execute(status -> collection.manual(principal,ws,body));
+        String itemId = created.get("itemId").toString(), snapshotId=created.get("snapshotId").toString();
+        assertEquals("SAVED",created.get("status"));
+        var replay=transactions.execute(status->collection.manual(principal,ws,body));
+        assertEquals(itemId,replay.get("itemId"));
+        assertEquals(1,jdbc.queryForObject("select count(*) from aden_collection_snapshot where workspace_id=?",Integer.class,ws));
+        assertEquals("MANUAL_COLLECTION_ENTRY",jdbc.queryForObject("select task_type from aden_task where workspace_id=?",String.class,ws));
+        assertEquals("SUCCEEDED",jdbc.queryForObject("select task_state from aden_task where workspace_id=?",String.class,ws));
+        byte[] png;
+        try(var output=new java.io.ByteArrayOutputStream()) {
+            javax.imageio.ImageIO.write(new java.awt.image.BufferedImage(2,2,java.awt.image.BufferedImage.TYPE_INT_RGB),"png",output); png=output.toByteArray();
+        }
+        var chunk = com.ruoyi.aden.application.collection.AdenCollectionService.map("imageId","manual_1","snapshotId",snapshotId,"generation",1,"offset",0,"totalSize",png.length,"sha256",com.ruoyi.aden.infrastructure.storage.AdenCollectionFiles.sha256(png),"mimeType","image/png","dataBase64",java.util.Base64.getEncoder().encodeToString(png));
+        var upload=transactions.execute(status->collection.uploadManualImage(principal,ws,itemId,chunk));
+        assertEquals(true,upload.get("complete"));
+        var repeated=transactions.execute(status->collection.uploadManualImage(principal,ws,itemId,chunk));
+        assertEquals(upload,repeated);
+        org.junit.jupiter.api.Assertions.assertArrayEquals(png,transactions.execute(status->collection.asset(principal,ws,upload.get("assetId").toString())).bytes());
+        var export=transactions.execute(status->collection.export(principal,ws,java.util.Map.of("itemIds",List.of(itemId),"format","ZIP")));
+        byte[] exported=transactions.execute(status->collection.download(principal,ws,export.get("exportId").toString())).bytes();
+        try(var zip=new java.util.zip.ZipInputStream(new java.io.ByteArrayInputStream(exported))) {
+            boolean hasImage=false,hasWorkbook=false; java.util.zip.ZipEntry entry;
+            while((entry=zip.getNextEntry())!=null) {
+                if(entry.getName().endsWith(".png")) { hasImage=true; org.junit.jupiter.api.Assertions.assertArrayEquals(png,zip.readAllBytes()); }
+                if(entry.getName().endsWith(".xlsx")) { hasWorkbook=true; try(var book=new org.apache.poi.xssf.usermodel.XSSFWorkbook(new java.io.ByteArrayInputStream(zip.readAllBytes()))) { assertEquals(org.apache.poi.ss.usermodel.CellType.STRING,book.getSheetAt(0).getRow(1).getCell(4).getCellType()); } }
+            } assertTrue(hasImage && hasWorkbook);
+        }
+        transactions.execute(status->collection.trash(principal,ws,List.of(itemId),false));
+        assertThrows(com.ruoyi.aden.application.error.AdenApplicationException.class,()->transactions.execute(status->collection.uploadManualImage(principal,ws,itemId,chunk)));
+        assertThrows(com.ruoyi.aden.application.error.AdenApplicationException.class,()->transactions.execute(status->collection.download(principal,ws,export.get("exportId").toString())));
+        transactions.execute(status->collection.trash(principal,ws,List.of(itemId),true));
+        assertThrows(com.ruoyi.aden.application.error.AdenApplicationException.class,()->transactions.execute(status->collection.download(principal,ws,export.get("exportId").toString())));
+        assertEquals(false,transactions.execute(status->collection.detail(principal,ws,itemId)).get("deleted"));
+        assertThrows(com.ruoyi.aden.application.error.AdenAccessDeniedException.class,()->transactions.execute(status->collection.list(new AdenOperatorPrincipal(992,"denied",Set.of()),ws,"",false,1,20)));
+        String jdItem=null,firstCapture=null;
+        for(int version=0;version<25;version++) {
+            String captureId=UUID.randomUUID().toString(); if(firstCapture==null)firstCapture=captureId;
+            var captured=transactions.execute(status->collection.capture(principal,ws,java.util.Map.of("captureId",captureId,"fields",java.util.Map.of("title","版本分页商品","sku","100001","sourceUrl","https://item.jd.com/100001.html"),"blocks",List.of(java.util.Map.of("type","text","text","x".repeat(100000))),"images",List.of())));
+            jdItem=captured.get("itemId").toString();
+            transactions.execute(status->collection.complete(principal,ws,captureId,java.util.Map.of("generation",1,"failures",List.of())));
+        }
+        String versionedItem=jdItem, oldest=firstCapture;
+        var bounded=transactions.execute(status->collection.detail(principal,ws,versionedItem));
+        assertEquals(25L,((Number)bounded.get("snapshotCount")).longValue());
+        assertEquals(1,((List<?>)bounded.get("snapshots")).size());
+        assertTrue(objectMapper.writeValueAsBytes(bounded).length<400000);
+        var secondPage=transactions.execute(status->collection.snapshots(principal,ws,versionedItem,2,20));
+        assertEquals(5,((List<?>)secondPage.get("items")).size());
+        assertEquals(oldest,transactions.execute(status->collection.itemSnapshot(principal,ws,versionedItem,oldest)).get("snapshotId"));
+    }
     private static final Instant NOW = Instant.parse("2026-09-13T02:00:00.123456Z");
     private static String adminUrl;
     private static String username;

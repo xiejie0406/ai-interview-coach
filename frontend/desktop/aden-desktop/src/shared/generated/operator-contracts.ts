@@ -58,7 +58,7 @@ export type CreateTaskRequest = { readonly taskType: "SYNTHETIC_CORE"; readonly 
 
 export type TaskStepSnapshot = { readonly stepId: Uuid; readonly ordinal: number; readonly state: TaskStepState; readonly attemptNo: number; readonly version: CanonicalInt64String; readonly progressPercent?: number }
 
-export type TaskSnapshot = { readonly taskId: Uuid; readonly workspaceId: Uuid; readonly taskType: "SYNTHETIC_CORE"; readonly capabilityCode: "CORE"; readonly title: string; readonly state: TaskState; readonly version: CanonicalInt64String; readonly allowedCommands: readonly (OperatorTaskCommand)[]; readonly steps: readonly (TaskStepSnapshot)[]; readonly reasonCode?: string | null; readonly createdAt: UtcDateTime; readonly updatedAt: UtcDateTime; readonly correlationId: CorrelationId }
+export type TaskSnapshot = { readonly taskId: Uuid; readonly workspaceId: Uuid; readonly taskType: "SYNTHETIC_CORE" | "JD_DETAIL_CAPTURE" | "MANUAL_COLLECTION_ENTRY"; readonly capabilityCode: "CORE" | "COL"; readonly title: string; readonly state: TaskState; readonly version: CanonicalInt64String; readonly allowedCommands: readonly (OperatorTaskCommand)[]; readonly steps: readonly (TaskStepSnapshot)[]; readonly reasonCode?: string | null; readonly createdAt: UtcDateTime; readonly updatedAt: UtcDateTime; readonly correlationId: CorrelationId }
 
 export type OperatorTaskCommandRequest = { readonly command: "SUBMIT_FOR_VALIDATION" } | { readonly command: "REQUEST_CANCEL"; readonly reasonCode: string }
 

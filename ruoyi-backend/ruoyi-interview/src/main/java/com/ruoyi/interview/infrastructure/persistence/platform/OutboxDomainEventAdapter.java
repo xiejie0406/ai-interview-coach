@@ -36,7 +36,7 @@ public class OutboxDomainEventAdapter implements DomainEventPort {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void append(List<DomainEvent> events) {
         for (DomainEvent event : events) {
             DomainEventEnvelopePolicy.Envelope envelope = envelopes.classify(event);

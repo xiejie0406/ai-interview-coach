@@ -21,11 +21,11 @@ class AdenMigrationStaticContractTest {
             Pattern.CASE_INSENSITIVE);
 
     @Test
-    void migrationsCreateExactlyTheTwelveApprovedWorkspaceScopedTables() throws IOException {
+    void migrationsCreateCoreAndApprovedCollectionWorkspaceScopedTables() throws IOException {
         List<Path> migrations = Files.list(migrationDirectory()).sorted().toList();
         assertEquals(List.of(
                 "V1__aden_workspace.sql", "V2__aden_task.sql",
-                "V3__aden_runner.sql", "V4__aden_reliability.sql"),
+                "V3__aden_runner.sql", "V4__aden_reliability.sql", "V5__aden_collection.sql"),
                 migrations.stream().map(path -> path.getFileName().toString()).toList());
 
         List<String> tables = new ArrayList<>();
@@ -46,9 +46,13 @@ class AdenMigrationStaticContractTest {
         assertEquals(List.of(
                 "aden_workspace", "aden_workspace_member", "aden_task", "aden_task_step",
                 "aden_runner", "aden_runner_credential", "aden_runner_session", "aden_runner_delivery",
-                "aden_event", "aden_outbox", "aden_inbox", "aden_audit_event"), tables);
-        assertEquals(12L, workspaceColumns);
-        assertEquals(44L, utcDateTimeColumns);
+                "aden_event", "aden_outbox", "aden_inbox", "aden_audit_event",
+                "aden_collection_item", "aden_collection_snapshot", "aden_collection_manifest",
+                "aden_collection_curation", "aden_collection_upload", "aden_collection_export"), tables);
+        assertEquals(18L, workspaceColumns);
+        assertEquals(new java.util.HashSet<>(tables), AdenDatabasePreconditions.EXPECTED_BUSINESS_TABLES,
+                "DDL 表集合必须同步到启动 guard、CLI migrate/validate 共用的严格白名单");
+        assertEquals(50L, utcDateTimeColumns);
         assertTrue(Files.readString(migrations.get(0)).contains("last_event_seq bigint"));
 
         String runnerSql = Files.readString(migrations.get(2), StandardCharsets.UTF_8);

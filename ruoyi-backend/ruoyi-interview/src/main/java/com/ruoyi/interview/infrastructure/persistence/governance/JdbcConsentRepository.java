@@ -27,7 +27,7 @@ import java.util.Set;
 
 @InterviewEnabled
 @Repository
-@Transactional(readOnly = true)
+@Transactional(transactionManager = "interviewTransactionManager", readOnly = true)
 public class JdbcConsentRepository implements ConsentRepository {
 
     private final NamedParameterJdbcTemplate jdbc;
@@ -37,7 +37,7 @@ public class JdbcConsentRepository implements ConsentRepository {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public void append(ConsentRecord record) {
         jdbc.update("""
                 insert into governance.consent_record (

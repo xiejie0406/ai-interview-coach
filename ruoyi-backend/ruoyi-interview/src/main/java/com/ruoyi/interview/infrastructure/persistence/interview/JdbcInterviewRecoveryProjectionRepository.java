@@ -26,7 +26,7 @@ import java.util.Optional;
  */
 @InterviewEnabled
 @Repository
-@Transactional(readOnly = true)
+@Transactional(transactionManager = "interviewTransactionManager", readOnly = true)
 public class JdbcInterviewRecoveryProjectionRepository implements InterviewRecoveryProjectionPort {
 
     private final NamedParameterJdbcTemplate jdbc;

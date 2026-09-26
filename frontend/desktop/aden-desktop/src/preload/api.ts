@@ -1,4 +1,5 @@
 import { ipcRenderer, type IpcRendererEvent } from 'electron'
+import type { CollectionOperation } from '../shared/contracts/collection'
 import {
   DESKTOP_IPC as IPC,
   type AdenDesktopApi,
@@ -37,6 +38,7 @@ interface IpcEnvelope<T> {
 export function createPreloadApi(runtime: AdenRuntimeInfo): AdenDesktopApi {
   return Object.freeze({
     getRuntimeInfo: () => runtime,
+    collection: Object.freeze({ execute: <T>(operation: CollectionOperation) => invoke<T>(IPC.collection, operation), onOpenLibrary: (listener: () => void) => subscribe('aden:collection:open-library', listener) }),
     auth: Object.freeze({
       captcha: () => invoke<CaptchaChallenge>(IPC.captcha, null),
       login: (input: LoginInput) => invoke<AuthenticatedUser>(IPC.login, input),

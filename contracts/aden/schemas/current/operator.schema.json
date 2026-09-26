@@ -5,42 +5,104 @@
     "CreateWorkspaceRequest": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["displayName"],
+      "required": [
+        "displayName"
+      ],
       "properties": {
-        "displayName": {"type": "string", "minLength": 1, "maxLength": 80, "pattern": "^[^\\r\\n]+$"}
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "^[^\\r\\n]+$"
+        }
       }
     },
     "WorkspaceSnapshot": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["workspaceId", "displayName", "role", "status", "version", "createdAt"],
+      "required": [
+        "workspaceId",
+        "displayName",
+        "role",
+        "status",
+        "version",
+        "createdAt"
+      ],
       "properties": {
-        "workspaceId": {"$ref": "./common.schema.json#/$defs/Uuid"},
-        "displayName": {"type": "string", "minLength": 1, "maxLength": 80},
-        "role": {"$ref": "./common.schema.json#/$defs/WorkspaceRole"},
-        "status": {"$ref": "./common.schema.json#/$defs/WorkspaceStatus"},
-        "version": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
-        "createdAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"}
+        "workspaceId": {
+          "$ref": "./common.schema.json#/$defs/Uuid"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "role": {
+          "$ref": "./common.schema.json#/$defs/WorkspaceRole"
+        },
+        "status": {
+          "$ref": "./common.schema.json#/$defs/WorkspaceStatus"
+        },
+        "version": {
+          "$ref": "./common.schema.json#/$defs/CanonicalInt64String"
+        },
+        "createdAt": {
+          "$ref": "./common.schema.json#/$defs/UtcDateTime"
+        }
       }
     },
     "WorkspaceListResponse": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["items"],
+      "required": [
+        "items"
+      ],
       "properties": {
-        "items": {"type": "array", "maxItems": 100, "items": {"$ref": "#/$defs/WorkspaceSnapshot"}}
+        "items": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/WorkspaceSnapshot"
+          }
+        }
       }
     },
     "CapabilityProjection": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["capabilityCode", "status", "nextGate", "externalActionsEnabled", "projectionVersion"],
+      "required": [
+        "capabilityCode",
+        "status",
+        "nextGate",
+        "externalActionsEnabled",
+        "projectionVersion"
+      ],
       "properties": {
-        "capabilityCode": {"$ref": "./common.schema.json#/$defs/CapabilityCode"},
-        "status": {"type": "string", "enum": ["AVAILABLE", "GATED", "DISABLED", "EXPERIMENTAL"]},
-        "nextGate": {"type": ["string", "null"], "maxLength": 240},
-        "externalActionsEnabled": {"const": false},
-        "projectionVersion": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"}
+        "capabilityCode": {
+          "$ref": "./common.schema.json#/$defs/CapabilityCode"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "AVAILABLE",
+            "GATED",
+            "DISABLED",
+            "EXPERIMENTAL"
+          ]
+        },
+        "nextGate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 240
+        },
+        "externalActionsEnabled": {
+          "const": false
+        },
+        "projectionVersion": {
+          "$ref": "./common.schema.json#/$defs/CanonicalInt64String"
+        }
       }
     },
     "CapabilityProjectionList": {
@@ -48,97 +110,323 @@
       "minItems": 4,
       "maxItems": 4,
       "uniqueItems": true,
-      "items": {"$ref": "#/$defs/CapabilityProjection"},
+      "items": {
+        "$ref": "#/$defs/CapabilityProjection"
+      },
       "allOf": [
-        {"contains": {"type": "object", "required": ["capabilityCode"], "properties": {"capabilityCode": {"const": "CORE"}}}, "minContains": 1, "maxContains": 1},
-        {"contains": {"type": "object", "required": ["capabilityCode"], "properties": {"capabilityCode": {"const": "WX"}}}, "minContains": 1, "maxContains": 1},
-        {"contains": {"type": "object", "required": ["capabilityCode"], "properties": {"capabilityCode": {"const": "PUR"}}}, "minContains": 1, "maxContains": 1},
-        {"contains": {"type": "object", "required": ["capabilityCode"], "properties": {"capabilityCode": {"const": "COL"}}}, "minContains": 1, "maxContains": 1}
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "capabilityCode"
+            ],
+            "properties": {
+              "capabilityCode": {
+                "const": "CORE"
+              }
+            }
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "capabilityCode"
+            ],
+            "properties": {
+              "capabilityCode": {
+                "const": "WX"
+              }
+            }
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "capabilityCode"
+            ],
+            "properties": {
+              "capabilityCode": {
+                "const": "PUR"
+              }
+            }
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "capabilityCode"
+            ],
+            "properties": {
+              "capabilityCode": {
+                "const": "COL"
+              }
+            }
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
       ]
     },
     "CapabilityListResponse": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["workspaceId", "items"],
+      "required": [
+        "workspaceId",
+        "items"
+      ],
       "properties": {
-        "workspaceId": {"$ref": "./common.schema.json#/$defs/Uuid"},
-        "items": {"$ref": "#/$defs/CapabilityProjectionList"}
+        "workspaceId": {
+          "$ref": "./common.schema.json#/$defs/Uuid"
+        },
+        "items": {
+          "$ref": "#/$defs/CapabilityProjectionList"
+        }
       }
     },
     "SyntheticTaskInput": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fixtureId", "instruction"],
+      "required": [
+        "fixtureId",
+        "instruction"
+      ],
       "properties": {
-        "fixtureId": {"type": "string", "pattern": "^fixture:[a-z0-9][a-z0-9._-]{2,63}$"},
-        "instruction": {"type": "string", "minLength": 1, "maxLength": 1000},
-        "expectedOutcome": {"type": "string", "enum": ["SUCCEED", "FAIL_VALIDATION", "CANCEL_AT_SAFE_POINT"]}
+        "fixtureId": {
+          "type": "string",
+          "pattern": "^fixture:[a-z0-9][a-z0-9._-]{2,63}$"
+        },
+        "instruction": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "expectedOutcome": {
+          "type": "string",
+          "enum": [
+            "SUCCEED",
+            "FAIL_VALIDATION",
+            "CANCEL_AT_SAFE_POINT"
+          ]
+        }
       }
     },
     "CreateTaskRequest": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["taskType", "capabilityCode", "title", "input"],
+      "required": [
+        "taskType",
+        "capabilityCode",
+        "title",
+        "input"
+      ],
       "properties": {
-        "taskType": {"const": "SYNTHETIC_CORE"},
-        "capabilityCode": {"const": "CORE"},
-        "title": {"type": "string", "minLength": 1, "maxLength": 120, "pattern": "^[^\\r\\n]+$"},
-        "input": {"$ref": "#/$defs/SyntheticTaskInput"}
+        "taskType": {
+          "const": "SYNTHETIC_CORE"
+        },
+        "capabilityCode": {
+          "const": "CORE"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "pattern": "^[^\\r\\n]+$"
+        },
+        "input": {
+          "$ref": "#/$defs/SyntheticTaskInput"
+        }
       }
     },
     "TaskStepSnapshot": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["stepId", "ordinal", "state", "attemptNo", "version"],
+      "required": [
+        "stepId",
+        "ordinal",
+        "state",
+        "attemptNo",
+        "version"
+      ],
       "properties": {
-        "stepId": {"$ref": "./common.schema.json#/$defs/Uuid"},
-        "ordinal": {"type": "integer", "minimum": 1, "maximum": 64},
-        "state": {"$ref": "./common.schema.json#/$defs/TaskStepState"},
-        "attemptNo": {"type": "integer", "minimum": 0, "maximum": 100},
-        "version": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
-        "progressPercent": {"type": "integer", "minimum": 0, "maximum": 100}
+        "stepId": {
+          "$ref": "./common.schema.json#/$defs/Uuid"
+        },
+        "ordinal": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        },
+        "state": {
+          "$ref": "./common.schema.json#/$defs/TaskStepState"
+        },
+        "attemptNo": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "version": {
+          "$ref": "./common.schema.json#/$defs/CanonicalInt64String"
+        },
+        "progressPercent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
       }
     },
     "TaskSnapshot": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["taskId", "workspaceId", "taskType", "capabilityCode", "title", "state", "version", "allowedCommands", "steps", "createdAt", "updatedAt", "correlationId"],
+      "required": [
+        "taskId",
+        "workspaceId",
+        "taskType",
+        "capabilityCode",
+        "title",
+        "state",
+        "version",
+        "allowedCommands",
+        "steps",
+        "createdAt",
+        "updatedAt",
+        "correlationId"
+      ],
       "properties": {
-        "taskId": {"$ref": "./common.schema.json#/$defs/Uuid"},
-        "workspaceId": {"$ref": "./common.schema.json#/$defs/Uuid"},
-        "taskType": {"const": "SYNTHETIC_CORE"},
-        "capabilityCode": {"const": "CORE"},
-        "title": {"type": "string", "minLength": 1, "maxLength": 120},
-        "state": {"$ref": "./common.schema.json#/$defs/TaskState"},
-        "version": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
+        "taskId": {
+          "$ref": "./common.schema.json#/$defs/Uuid"
+        },
+        "workspaceId": {
+          "$ref": "./common.schema.json#/$defs/Uuid"
+        },
+        "taskType": {
+          "type": "string",
+          "enum": [
+            "SYNTHETIC_CORE",
+            "JD_DETAIL_CAPTURE",
+            "MANUAL_COLLECTION_ENTRY"
+          ]
+        },
+        "capabilityCode": {
+          "type": "string",
+          "enum": [
+            "CORE",
+            "COL"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "state": {
+          "$ref": "./common.schema.json#/$defs/TaskState"
+        },
+        "version": {
+          "$ref": "./common.schema.json#/$defs/CanonicalInt64String"
+        },
         "allowedCommands": {
           "type": "array",
           "uniqueItems": true,
           "maxItems": 2,
-          "items": {"$ref": "./common.schema.json#/$defs/OperatorTaskCommand"}
+          "items": {
+            "$ref": "./common.schema.json#/$defs/OperatorTaskCommand"
+          }
         },
-        "steps": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/TaskStepSnapshot"}},
-        "reasonCode": {"type": ["string", "null"], "pattern": "^[A-Z][A-Z0-9_]{2,63}$"},
-        "createdAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"},
-        "updatedAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"},
-        "correlationId": {"$ref": "./common.schema.json#/$defs/CorrelationId"}
-      }
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/TaskStepSnapshot"
+          }
+        },
+        "reasonCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z][A-Z0-9_]{2,63}$"
+        },
+        "createdAt": {
+          "$ref": "./common.schema.json#/$defs/UtcDateTime"
+        },
+        "updatedAt": {
+          "$ref": "./common.schema.json#/$defs/UtcDateTime"
+        },
+        "correlationId": {
+          "$ref": "./common.schema.json#/$defs/CorrelationId"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "capabilityCode": {
+                "const": "CORE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "taskType": {
+                "const": "SYNTHETIC_CORE"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "taskType": {
+                "enum": [
+                  "JD_DETAIL_CAPTURE",
+                  "MANUAL_COLLECTION_ENTRY"
+                ]
+              },
+              "allowedCommands": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
     },
     "OperatorTaskCommandRequest": {
       "oneOf": [
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["command"],
-          "properties": {"command": {"const": "SUBMIT_FOR_VALIDATION"}}
+          "required": [
+            "command"
+          ],
+          "properties": {
+            "command": {
+              "const": "SUBMIT_FOR_VALIDATION"
+            }
+          }
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["command", "reasonCode"],
+          "required": [
+            "command",
+            "reasonCode"
+          ],
           "properties": {
-            "command": {"const": "REQUEST_CANCEL"},
-            "reasonCode": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$"}
+            "command": {
+              "const": "REQUEST_CANCEL"
+            },
+            "reasonCode": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9_]{2,63}$"
+            }
           }
         }
       ]
@@ -146,81 +434,234 @@
     "TaskPage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["items", "nextCursor", "queryHash"],
+      "required": [
+        "items",
+        "nextCursor",
+        "queryHash"
+      ],
       "properties": {
-        "items": {"type": "array", "maxItems": 100, "items": {"$ref": "#/$defs/TaskSnapshot"}},
-        "nextCursor": {"oneOf": [{"$ref": "./common.schema.json#/$defs/PageCursor"}, {"type": "null"}]},
-        "queryHash": {"$ref": "./common.schema.json#/$defs/Sha256"}
+        "items": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/TaskSnapshot"
+          }
+        },
+        "nextCursor": {
+          "oneOf": [
+            {
+              "$ref": "./common.schema.json#/$defs/PageCursor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "queryHash": {
+          "$ref": "./common.schema.json#/$defs/Sha256"
+        }
       }
     },
     "RunnerSummary": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["runnerId", "displayName", "presence", "capabilities", "currentSessionEpoch"],
+      "required": [
+        "runnerId",
+        "displayName",
+        "presence",
+        "capabilities",
+        "currentSessionEpoch"
+      ],
       "properties": {
-        "runnerId": {"$ref": "./common.schema.json#/$defs/Uuid"},
-        "displayName": {"type": "string", "minLength": 1, "maxLength": 80},
-        "presence": {"$ref": "./common.schema.json#/$defs/RunnerPresence"},
-        "capabilities": {"type": "array", "minItems": 1, "maxItems": 4, "uniqueItems": true, "items": {"$ref": "./common.schema.json#/$defs/CapabilityCode"}},
-        "currentSessionEpoch": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
-        "lastSeenAt": {"oneOf": [{"$ref": "./common.schema.json#/$defs/UtcDateTime"}, {"type": "null"}]}
+        "runnerId": {
+          "$ref": "./common.schema.json#/$defs/Uuid"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "presence": {
+          "$ref": "./common.schema.json#/$defs/RunnerPresence"
+        },
+        "capabilities": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "./common.schema.json#/$defs/CapabilityCode"
+          }
+        },
+        "currentSessionEpoch": {
+          "$ref": "./common.schema.json#/$defs/CanonicalInt64String"
+        },
+        "lastSeenAt": {
+          "oneOf": [
+            {
+              "$ref": "./common.schema.json#/$defs/UtcDateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
       }
     },
     "RunnerListResponse": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["workspaceId", "items"],
+      "required": [
+        "workspaceId",
+        "items"
+      ],
       "properties": {
-        "workspaceId": {"$ref": "./common.schema.json#/$defs/Uuid"},
-        "items": {"type": "array", "maxItems": 100, "items": {"$ref": "#/$defs/RunnerSummary"}}
+        "workspaceId": {
+          "$ref": "./common.schema.json#/$defs/Uuid"
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/RunnerSummary"
+          }
+        }
       }
     },
     "EnrollRunnerRequest": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["displayName", "capabilities"],
+      "required": [
+        "displayName",
+        "capabilities"
+      ],
       "properties": {
-        "displayName": {"type": "string", "minLength": 1, "maxLength": 80, "pattern": "^[^\\r\\n]+$"},
-        "capabilities": {"type": "array", "minItems": 1, "maxItems": 4, "uniqueItems": true, "items": {"$ref": "./common.schema.json#/$defs/CapabilityCode"}}
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "^[^\\r\\n]+$"
+        },
+        "capabilities": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "./common.schema.json#/$defs/CapabilityCode"
+          }
+        }
       }
     },
     "RunnerEnrollmentResponse": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["runnerId", "credentialId", "credentialToken", "credentialEpoch", "expiresAt", "issuedAt"],
+      "required": [
+        "runnerId",
+        "credentialId",
+        "credentialToken",
+        "credentialEpoch",
+        "expiresAt",
+        "issuedAt"
+      ],
       "properties": {
-        "runnerId": {"$ref": "./common.schema.json#/$defs/Uuid"},
-        "credentialId": {"$ref": "./common.schema.json#/$defs/Uuid"},
-        "credentialToken": {"type": "string", "minLength": 64, "maxLength": 512, "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$", "writeOnly": true},
-        "credentialEpoch": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
-        "expiresAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"},
-        "issuedAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"}
+        "runnerId": {
+          "$ref": "./common.schema.json#/$defs/Uuid"
+        },
+        "credentialId": {
+          "$ref": "./common.schema.json#/$defs/Uuid"
+        },
+        "credentialToken": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 512,
+          "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$",
+          "writeOnly": true
+        },
+        "credentialEpoch": {
+          "$ref": "./common.schema.json#/$defs/CanonicalInt64String"
+        },
+        "expiresAt": {
+          "$ref": "./common.schema.json#/$defs/UtcDateTime"
+        },
+        "issuedAt": {
+          "$ref": "./common.schema.json#/$defs/UtcDateTime"
+        }
       }
     },
     "WorkspaceBootstrapSnapshot": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["schemaVersion", "workspace", "tasks", "runners", "capabilities", "snapshotQueryHash", "streamFilter", "streamWatermark", "streamCursor", "generatedAt"],
+      "required": [
+        "schemaVersion",
+        "workspace",
+        "tasks",
+        "runners",
+        "capabilities",
+        "snapshotQueryHash",
+        "streamFilter",
+        "streamWatermark",
+        "streamCursor",
+        "generatedAt"
+      ],
       "properties": {
-        "schemaVersion": {"const": 1},
-        "workspace": {"$ref": "#/$defs/WorkspaceSnapshot"},
-        "tasks": {"$ref": "#/$defs/TaskPage"},
-        "runners": {"type": "array", "maxItems": 100, "items": {"$ref": "#/$defs/RunnerSummary"}},
-        "capabilities": {"$ref": "#/$defs/CapabilityProjectionList"},
-        "snapshotQueryHash": {"$ref": "./common.schema.json#/$defs/Sha256"},
-        "streamFilter": {"const": "workspace-all-v1"},
-        "streamWatermark": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
-        "streamCursor": {"$ref": "./common.schema.json#/$defs/StreamCursor"},
-        "generatedAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"}
+        "schemaVersion": {
+          "const": 1
+        },
+        "workspace": {
+          "$ref": "#/$defs/WorkspaceSnapshot"
+        },
+        "tasks": {
+          "$ref": "#/$defs/TaskPage"
+        },
+        "runners": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/RunnerSummary"
+          }
+        },
+        "capabilities": {
+          "$ref": "#/$defs/CapabilityProjectionList"
+        },
+        "snapshotQueryHash": {
+          "$ref": "./common.schema.json#/$defs/Sha256"
+        },
+        "streamFilter": {
+          "const": "workspace-all-v1"
+        },
+        "streamWatermark": {
+          "$ref": "./common.schema.json#/$defs/CanonicalInt64String"
+        },
+        "streamCursor": {
+          "$ref": "./common.schema.json#/$defs/StreamCursor"
+        },
+        "generatedAt": {
+          "$ref": "./common.schema.json#/$defs/UtcDateTime"
+        }
       }
     },
     "PublicProjectionState": {
       "type": "string",
       "enum": [
-        "DRAFT", "VALIDATING", "QUEUED", "RUNNING", "WAITING_USER", "WAITING_EXTERNAL",
-        "CANCEL_REQUESTED", "SUCCEEDED", "FAILED", "CANCELED",
-        "ONLINE", "OFFLINE", "LEASED", "QUARANTINED",
-        "AVAILABLE", "GATED", "DISABLED", "EXPERIMENTAL"
+        "DRAFT",
+        "VALIDATING",
+        "QUEUED",
+        "RUNNING",
+        "WAITING_USER",
+        "WAITING_EXTERNAL",
+        "CANCEL_REQUESTED",
+        "SUCCEEDED",
+        "FAILED",
+        "CANCELED",
+        "ONLINE",
+        "OFFLINE",
+        "LEASED",
+        "QUARANTINED",
+        "AVAILABLE",
+        "GATED",
+        "DISABLED",
+        "EXPERIMENTAL"
       ]
     },
     "PublicEventData": {
@@ -228,58 +669,174 @@
       "additionalProperties": false,
       "minProperties": 1,
       "properties": {
-        "from": {"$ref": "#/$defs/PublicProjectionState"},
-        "to": {"$ref": "#/$defs/PublicProjectionState"},
-        "reasonCode": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$"},
-        "progressPercent": {"type": "integer", "minimum": 0, "maximum": 100},
-        "runnerId": {"$ref": "./common.schema.json#/$defs/Uuid"},
-        "capabilityCode": {"$ref": "./common.schema.json#/$defs/CapabilityCode"},
-        "externalActionsEnabled": {"const": false}
+        "from": {
+          "$ref": "#/$defs/PublicProjectionState"
+        },
+        "to": {
+          "$ref": "#/$defs/PublicProjectionState"
+        },
+        "reasonCode": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]{2,63}$"
+        },
+        "progressPercent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "runnerId": {
+          "$ref": "./common.schema.json#/$defs/Uuid"
+        },
+        "capabilityCode": {
+          "$ref": "./common.schema.json#/$defs/CapabilityCode"
+        },
+        "externalActionsEnabled": {
+          "const": false
+        }
       }
     },
     "EventEnvelope": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["schemaVersion", "eventId", "workspaceId", "eventType", "aggregateType", "aggregateId", "aggregateVersion", "sequence", "occurredAt", "correlationId", "data"],
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "workspaceId",
+        "eventType",
+        "aggregateType",
+        "aggregateId",
+        "aggregateVersion",
+        "sequence",
+        "occurredAt",
+        "correlationId",
+        "data"
+      ],
       "properties": {
-        "schemaVersion": {"const": 1},
-        "eventId": {"$ref": "./common.schema.json#/$defs/Uuid"},
-        "workspaceId": {"$ref": "./common.schema.json#/$defs/Uuid"},
+        "schemaVersion": {
+          "const": 1
+        },
+        "eventId": {
+          "$ref": "./common.schema.json#/$defs/Uuid"
+        },
+        "workspaceId": {
+          "$ref": "./common.schema.json#/$defs/Uuid"
+        },
         "eventType": {
           "type": "string",
-          "enum": ["aden.task.created.v1", "aden.task.state-changed.v1", "aden.task.progressed.v1", "aden.runner.status-changed.v1", "aden.capability.changed.v1", "aden.audit.recorded.v1"]
+          "enum": [
+            "aden.task.created.v1",
+            "aden.task.state-changed.v1",
+            "aden.task.progressed.v1",
+            "aden.runner.status-changed.v1",
+            "aden.capability.changed.v1",
+            "aden.audit.recorded.v1"
+          ]
         },
-        "aggregateType": {"type": "string", "enum": ["TASK", "RUNNER", "CAPABILITY", "AUDIT"]},
-        "aggregateId": {"$ref": "./common.schema.json#/$defs/Uuid"},
-        "aggregateVersion": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
-        "sequence": {"$ref": "./common.schema.json#/$defs/CanonicalInt64String"},
-        "occurredAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"},
-        "correlationId": {"$ref": "./common.schema.json#/$defs/CorrelationId"},
-        "data": {"$ref": "#/$defs/PublicEventData"}
+        "aggregateType": {
+          "type": "string",
+          "enum": [
+            "TASK",
+            "RUNNER",
+            "CAPABILITY",
+            "AUDIT"
+          ]
+        },
+        "aggregateId": {
+          "$ref": "./common.schema.json#/$defs/Uuid"
+        },
+        "aggregateVersion": {
+          "$ref": "./common.schema.json#/$defs/CanonicalInt64String"
+        },
+        "sequence": {
+          "$ref": "./common.schema.json#/$defs/CanonicalInt64String"
+        },
+        "occurredAt": {
+          "$ref": "./common.schema.json#/$defs/UtcDateTime"
+        },
+        "correlationId": {
+          "$ref": "./common.schema.json#/$defs/CorrelationId"
+        },
+        "data": {
+          "$ref": "#/$defs/PublicEventData"
+        }
       }
     },
     "AuditEventSummary": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["auditEventId", "workspaceId", "action", "outcome", "occurredAt", "correlationId"],
+      "required": [
+        "auditEventId",
+        "workspaceId",
+        "action",
+        "outcome",
+        "occurredAt",
+        "correlationId"
+      ],
       "properties": {
-        "auditEventId": {"$ref": "./common.schema.json#/$defs/Uuid"},
-        "workspaceId": {"$ref": "./common.schema.json#/$defs/Uuid"},
-        "action": {"type": "string", "pattern": "^aden\\.[a-z0-9.-]{3,100}$"},
-        "outcome": {"type": "string", "enum": ["SUCCEEDED", "DENIED", "FAILED"]},
-        "subjectType": {"type": "string", "enum": ["OPERATOR", "RUNNER", "SYSTEM"]},
-        "subjectId": {"type": "string", "minLength": 1, "maxLength": 128},
-        "occurredAt": {"$ref": "./common.schema.json#/$defs/UtcDateTime"},
-        "correlationId": {"$ref": "./common.schema.json#/$defs/CorrelationId"}
+        "auditEventId": {
+          "$ref": "./common.schema.json#/$defs/Uuid"
+        },
+        "workspaceId": {
+          "$ref": "./common.schema.json#/$defs/Uuid"
+        },
+        "action": {
+          "type": "string",
+          "pattern": "^aden\\.[a-z0-9.-]{3,100}$"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "SUCCEEDED",
+            "DENIED",
+            "FAILED"
+          ]
+        },
+        "subjectType": {
+          "type": "string",
+          "enum": [
+            "OPERATOR",
+            "RUNNER",
+            "SYSTEM"
+          ]
+        },
+        "subjectId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "occurredAt": {
+          "$ref": "./common.schema.json#/$defs/UtcDateTime"
+        },
+        "correlationId": {
+          "$ref": "./common.schema.json#/$defs/CorrelationId"
+        }
       }
     },
     "AuditEventPage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["items", "nextCursor"],
+      "required": [
+        "items",
+        "nextCursor"
+      ],
       "properties": {
-        "items": {"type": "array", "maxItems": 100, "items": {"$ref": "#/$defs/AuditEventSummary"}},
-        "nextCursor": {"oneOf": [{"$ref": "./common.schema.json#/$defs/PageCursor"}, {"type": "null"}]}
+        "items": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/AuditEventSummary"
+          }
+        },
+        "nextCursor": {
+          "oneOf": [
+            {
+              "$ref": "./common.schema.json#/$defs/PageCursor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
       }
     }
   }

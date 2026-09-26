@@ -1,0 +1,1801 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Aden 用户主动详情采集 API",
+    "version": "1.0.0",
+    "description": "真实RuoYi Workspace权限。captureId绑定actor+payloadHash幂等。generation拒绝删除/恢复后的迟到上传。附件不由后端联网抓取。完成时状态SAVED/PARTIAL；资源清单追加版本；导出固定创建时版本。feature默认关闭，启用需显式存储目录。fixture-origin只能为隔离环境精确loopback origin。内置TwelveMonkeys 3.13.1 WebP解码器；JPEG/PNG/WebP校验魔数、容器完整性、25MP上限，保留原图并生成320px PNG缩略图。"
+  },
+  "security": [
+    {
+      "bearer": []
+    }
+  ],
+  "paths": {
+    "/api/v1/aden/collection/workspaces/{workspaceId}/items": {
+      "get": {
+        "operationId": "listItems",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deleted",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事务已提交或鉴权读取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数/来源/资源校验失败"
+          },
+          "403": {
+            "description": "权限不足"
+          },
+          "404": {
+            "description": "资源不可访问"
+          },
+          "409": {
+            "description": "回收站、generation或幂等冲突"
+          },
+          "412": {
+            "description": "人工修订乐观锁冲突"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createManualItem",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事务已提交或鉴权读取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数/来源/资源校验失败"
+          },
+          "403": {
+            "description": "权限不足"
+          },
+          "404": {
+            "description": "资源不可访问"
+          },
+          "409": {
+            "description": "回收站、generation或幂等冲突"
+          },
+          "412": {
+            "description": "人工修订乐观锁冲突"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManualItem"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/items/lookup": {
+      "get": {
+        "operationId": "lookupSku",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sku",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{1,32}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事务已提交或鉴权读取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lookup"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数/来源/资源校验失败"
+          },
+          "403": {
+            "description": "权限不足"
+          },
+          "404": {
+            "description": "资源不可访问"
+          },
+          "409": {
+            "description": "回收站、generation或幂等冲突"
+          },
+          "412": {
+            "description": "人工修订乐观锁冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/items/{id}": {
+      "get": {
+        "operationId": "getItem",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事务已提交或鉴权读取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数/来源/资源校验失败"
+          },
+          "403": {
+            "description": "权限不足"
+          },
+          "404": {
+            "description": "资源不可访问"
+          },
+          "409": {
+            "description": "回收站、generation或幂等冲突"
+          },
+          "412": {
+            "description": "人工修订乐观锁冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/items/{id}/curation": {
+      "put": {
+        "operationId": "updateCuration",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事务已提交或鉴权读取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Curation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数/来源/资源校验失败"
+          },
+          "403": {
+            "description": "权限不足"
+          },
+          "404": {
+            "description": "资源不可访问"
+          },
+          "409": {
+            "description": "回收站、generation或幂等冲突"
+          },
+          "412": {
+            "description": "人工修订乐观锁冲突"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Curation"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/items/trash": {
+      "post": {
+        "operationId": "trashItems",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事务已提交或鉴权读取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResults"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数/来源/资源校验失败"
+          },
+          "403": {
+            "description": "权限不足"
+          },
+          "404": {
+            "description": "资源不可访问"
+          },
+          "409": {
+            "description": "回收站、generation或幂等冲突"
+          },
+          "412": {
+            "description": "人工修订乐观锁冲突"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemIds"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/items/restore": {
+      "post": {
+        "operationId": "restoreItems",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事务已提交或鉴权读取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchResults"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数/来源/资源校验失败"
+          },
+          "403": {
+            "description": "权限不足"
+          },
+          "404": {
+            "description": "资源不可访问"
+          },
+          "409": {
+            "description": "回收站、generation或幂等冲突"
+          },
+          "412": {
+            "description": "人工修订乐观锁冲突"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemIds"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/captures": {
+      "post": {
+        "operationId": "captureCurrentPage",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事务已提交或鉴权读取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureSnapshot"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数/来源/资源校验失败"
+          },
+          "403": {
+            "description": "权限不足"
+          },
+          "404": {
+            "description": "资源不可访问"
+          },
+          "409": {
+            "description": "回收站、generation或幂等冲突"
+          },
+          "412": {
+            "description": "人工修订乐观锁冲突"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Capture"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/captures/{id}": {
+      "get": {
+        "operationId": "getCapture",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事务已提交或鉴权读取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureSnapshot"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数/来源/资源校验失败"
+          },
+          "403": {
+            "description": "权限不足"
+          },
+          "404": {
+            "description": "资源不可访问"
+          },
+          "409": {
+            "description": "回收站、generation或幂等冲突"
+          },
+          "412": {
+            "description": "人工修订乐观锁冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/captures/{id}/assets/{imageId}/chunks": {
+      "post": {
+        "operationId": "uploadCapturedImage",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "imageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事务已提交或鉴权读取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChunkAck"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数/来源/资源校验失败"
+          },
+          "403": {
+            "description": "权限不足"
+          },
+          "404": {
+            "description": "资源不可访问"
+          },
+          "409": {
+            "description": "回收站、generation或幂等冲突"
+          },
+          "412": {
+            "description": "人工修订乐观锁冲突"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Chunk"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/captures/{id}/complete": {
+      "post": {
+        "operationId": "completeCapture",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事务已提交或鉴权读取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureSnapshot"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数/来源/资源校验失败"
+          },
+          "403": {
+            "description": "权限不足"
+          },
+          "404": {
+            "description": "资源不可访问"
+          },
+          "409": {
+            "description": "回收站、generation或幂等冲突"
+          },
+          "412": {
+            "description": "人工修订乐观锁冲突"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Complete"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/items/{id}/images/chunks": {
+      "post": {
+        "operationId": "uploadManualImage",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事务已提交或鉴权读取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChunkAck"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数/来源/资源校验失败"
+          },
+          "403": {
+            "description": "权限不足"
+          },
+          "404": {
+            "description": "资源不可访问"
+          },
+          "409": {
+            "description": "回收站、generation或幂等冲突"
+          },
+          "412": {
+            "description": "人工修订乐观锁冲突"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManualChunk"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/assets/{id}": {
+      "get": {
+        "operationId": "downloadAsset",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事务已提交或鉴权读取成功",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数/来源/资源校验失败"
+          },
+          "403": {
+            "description": "权限不足"
+          },
+          "404": {
+            "description": "资源不可访问"
+          },
+          "409": {
+            "description": "回收站、generation或幂等冲突"
+          },
+          "412": {
+            "description": "人工修订乐观锁冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/exports": {
+      "post": {
+        "operationId": "createExport",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事务已提交或鉴权读取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportCreated"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数/来源/资源校验失败"
+          },
+          "403": {
+            "description": "权限不足"
+          },
+          "404": {
+            "description": "资源不可访问"
+          },
+          "409": {
+            "description": "回收站、generation或幂等冲突"
+          },
+          "412": {
+            "description": "人工修订乐观锁冲突"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Export"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/exports/{id}/download": {
+      "get": {
+        "operationId": "downloadExport",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事务已提交或鉴权读取成功",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数/来源/资源校验失败"
+          },
+          "403": {
+            "description": "权限不足"
+          },
+          "404": {
+            "description": "资源不可访问"
+          },
+          "409": {
+            "description": "回收站、generation或幂等冲突"
+          },
+          "412": {
+            "description": "人工修订乐观锁冲突"
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/assets/{id}/thumbnail": {
+      "get": {
+        "operationId": "downloadAssetThumbnail",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "已保存PNG缩略图（同原图鉴权）",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不可访问"
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/items/{id}/snapshots": {
+      "get": {
+        "operationId": "listSnapshotVersions",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "有界历史版本读取",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SnapshotPage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不属于该Workspace或该商品"
+          }
+        }
+      }
+    },
+    "/api/v1/aden/collection/workspaces/{workspaceId}/items/{id}/snapshots/{snapshotId}": {
+      "get": {
+        "operationId": "getSnapshotVersion",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "snapshotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "有界历史版本读取",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureSnapshot"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不属于该Workspace或该商品"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "Capture": {
+        "type": "object",
+        "properties": {
+          "captureId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source": {
+            "const": "JD"
+          },
+          "fields": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "sku": {
+                "type": "string",
+                "pattern": "^[0-9]{1,32}$"
+              },
+              "price": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "priceText": {
+                "type": "string"
+              },
+              "sourceUrl": {
+                "type": "string"
+              },
+              "specification": {},
+              "shop": {
+                "type": "string"
+              },
+              "parameters": {}
+            },
+            "required": [
+              "title",
+              "sku",
+              "sourceUrl"
+            ]
+          },
+          "blocks": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "imageId": {
+                  "type": "string"
+                }
+              },
+              "required": []
+            }
+          },
+          "images": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "object",
+              "properties": {
+                "imageId": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "group": {
+                  "type": "string"
+                },
+                "order": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "imageId"
+              ]
+            }
+          },
+          "documentId": {
+            "type": "string"
+          },
+          "parserVersion": {
+            "type": "string"
+          },
+          "completeness": {}
+        },
+        "required": [
+          "captureId",
+          "fields"
+        ]
+      },
+      "ManualItem": {
+        "type": "object",
+        "properties": {
+          "idempotencyKey": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "price": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sourceUrl": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "idempotencyKey",
+          "title"
+        ]
+      },
+      "Curation": {
+        "type": "object",
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "snapshotId": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "overrides": {
+            "type": "object"
+          },
+          "removedImageIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mainImageId": {
+            "type": "string"
+          },
+          "imageOrder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "revision"
+        ]
+      },
+      "ItemIds": {
+        "type": "object",
+        "properties": {
+          "itemIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "itemIds"
+        ]
+      },
+      "Chunk": {
+        "type": "object",
+        "properties": {
+          "generation": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "totalSize": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10485760
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "mimeType": {
+            "type": "string",
+            "enum": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ]
+          },
+          "dataBase64": {
+            "type": "string",
+            "maxLength": 180000
+          }
+        },
+        "required": [
+          "generation",
+          "offset",
+          "totalSize",
+          "sha256",
+          "mimeType",
+          "dataBase64"
+        ]
+      },
+      "ManualChunk": {
+        "type": "object",
+        "properties": {
+          "generation": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "totalSize": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10485760
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "mimeType": {
+            "type": "string",
+            "enum": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ]
+          },
+          "dataBase64": {
+            "type": "string",
+            "maxLength": 180000
+          },
+          "imageId": {
+            "type": "string"
+          },
+          "snapshotId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "generation",
+          "offset",
+          "totalSize",
+          "sha256",
+          "mimeType",
+          "dataBase64",
+          "imageId",
+          "snapshotId"
+        ]
+      },
+      "Complete": {
+        "type": "object",
+        "properties": {
+          "generation": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "failures": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "imageId": {
+                  "type": "string"
+                },
+                "error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "imageId",
+                "error"
+              ]
+            }
+          }
+        },
+        "required": [
+          "generation"
+        ]
+      },
+      "Export": {
+        "type": "object",
+        "properties": {
+          "itemIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "string"
+            }
+          },
+          "format": {
+            "enum": [
+              "XLSX",
+              "ZIP"
+            ]
+          },
+          "snapshotIds": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "itemIds",
+          "format"
+        ]
+      },
+      "Image": {
+        "type": "object",
+        "properties": {
+          "imageId": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "source": {
+            "enum": [
+              "JD",
+              "MANUAL"
+            ]
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "SAVED",
+              "FAILED"
+            ]
+          },
+          "assetId": {
+            "type": "string"
+          },
+          "thumbnailAssetId": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "error": {
+            "type": "string"
+          },
+          "sourceDenied": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "imageId",
+          "status"
+        ]
+      },
+      "CaptureSnapshot": {
+        "type": "object",
+        "properties": {
+          "captureId": {
+            "type": "string"
+          },
+          "snapshotId": {
+            "type": "string"
+          },
+          "itemId": {
+            "type": "string"
+          },
+          "coreTaskId": {
+            "type": "string"
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "source": {
+            "enum": [
+              "JD",
+              "MANUAL"
+            ]
+          },
+          "status": {
+            "enum": [
+              "SAVING",
+              "SAVED",
+              "PARTIAL"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "assetManifestVersion": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "fields": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "sku": {
+                "type": "string",
+                "pattern": "^[0-9]{1,32}$"
+              },
+              "price": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "priceText": {
+                "type": "string"
+              },
+              "sourceUrl": {
+                "type": "string"
+              },
+              "specification": {},
+              "shop": {
+                "type": "string"
+              },
+              "parameters": {}
+            },
+            "required": [
+              "title",
+              "sku",
+              "sourceUrl"
+            ]
+          },
+          "blocks": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "imageId": {
+                  "type": "string"
+                }
+              },
+              "required": []
+            }
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Image"
+            }
+          },
+          "sourceFixture": {
+            "type": "boolean"
+          },
+          "documentId": {
+            "type": "string"
+          },
+          "parserVersion": {
+            "type": "string"
+          },
+          "completeness": {}
+        },
+        "required": [
+          "captureId",
+          "snapshotId",
+          "itemId",
+          "coreTaskId",
+          "generation",
+          "status",
+          "fields",
+          "images"
+        ]
+      },
+      "ItemSummary": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "sku": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "snapshotId": {
+            "type": "string"
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "price": {},
+          "priceText": {},
+          "specification": {},
+          "thumbnailAssetId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "imageSaved": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "imageTotal": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "itemId",
+          "title",
+          "snapshotId",
+          "generation",
+          "version",
+          "deleted",
+          "status"
+        ]
+      },
+      "ItemDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ItemSummary"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "snapshots": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CaptureSnapshot"
+                }
+              },
+              "curation": {
+                "$ref": "#/components/schemas/Curation"
+              },
+              "currentSnapshot": {
+                "$ref": "#/components/schemas/CaptureSnapshot"
+              },
+              "snapshotCount": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "snapshots",
+              "curation",
+              "currentSnapshot",
+              "snapshotCount"
+            ]
+          }
+        ]
+      },
+      "ItemPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemSummary"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "pageSize": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ]
+      },
+      "ChunkAck": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "complete": {
+            "type": "boolean"
+          },
+          "assetId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "offset",
+          "complete"
+        ]
+      },
+      "BatchResults": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "itemId": {
+                  "type": "string"
+                },
+                "success": {
+                  "type": "boolean"
+                },
+                "error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "itemId",
+                "success"
+              ]
+            }
+          }
+        },
+        "required": [
+          "results"
+        ]
+      },
+      "Lookup": {
+        "type": "object",
+        "properties": {
+          "exists": {
+            "type": "boolean"
+          },
+          "itemId": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "exists"
+        ]
+      },
+      "ExportCreated": {
+        "type": "object",
+        "properties": {
+          "exportId": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "exportId",
+          "fileName",
+          "mimeType",
+          "size"
+        ]
+      },
+      "SnapshotSummary": {
+        "type": "object",
+        "properties": {
+          "snapshotId": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "assetManifestVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "snapshotId",
+          "source",
+          "status",
+          "createdAt"
+        ]
+      },
+      "SnapshotPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SnapshotSummary"
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "pageSize": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ]
+      }
+    }
+  }
+}

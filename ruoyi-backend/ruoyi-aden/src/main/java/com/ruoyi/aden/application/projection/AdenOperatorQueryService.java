@@ -213,7 +213,7 @@ public class AdenOperatorQueryService {
                               AdenOperatorProjectionRepository.TaskView row) {
         AdenTaskState state = AdenTaskState.valueOf(row.state());
         List<OperatorTaskCommand> allowed = new ArrayList<>();
-        boolean canWrite = membership.role() != AdenWorkspaceRole.VIEWER;
+        boolean canWrite = membership.role() != AdenWorkspaceRole.VIEWER && "SYNTHETIC_CORE".equals(row.taskType());
         if (canWrite && principal.hasPermission("aden:task:command")
                 && AdenTaskTransitions.allows(state, AdenTaskActor.OPERATOR,
                 AdenTaskCommand.SUBMIT_FOR_VALIDATION)) {

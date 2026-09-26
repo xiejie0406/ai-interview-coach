@@ -29,7 +29,7 @@ import java.util.Optional;
 /** PostgreSQL stream head、append-only event、cursor 校验与有界 replay 的唯一 JDBC owner。 */
 @InterviewEnabled
 @Repository
-@Transactional(readOnly = true)
+@Transactional(transactionManager = "interviewTransactionManager", readOnly = true)
 public class JdbcDurableStreamRepository implements DurableStreamPort {
 
     private static final int MAX_REPLAY_LIMIT = 500;
@@ -50,7 +50,7 @@ public class JdbcDurableStreamRepository implements DurableStreamPort {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public DurableStreamEvent append(AppendCommand command) {
         MapSqlParameterSource parameters = parameters(command);
         jdbc.update("""
@@ -203,7 +203,7 @@ public class JdbcDurableStreamRepository implements DurableStreamPort {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional(transactionManager = "interviewTransactionManager", propagation = Propagation.MANDATORY)
     public int purgeExpiredPrefixes(Instant observedAt, int limit) {
         java.util.Objects.requireNonNull(observedAt, "observedAt");
         if (limit <= 0 || limit > MAX_PURGE_LIMIT) {
